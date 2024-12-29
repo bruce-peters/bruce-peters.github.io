@@ -5,7 +5,7 @@ import { skills } from "../../constants";
 
 const About = () => {
   return (
-    <div className="flex flex-col w-3/4 mx-auto">
+    <div className="flex flex-col" id="about">
       {/* Lets just get into the details */}
       <SectionTitle title="About" />
       <div className="relative flex flex-row gap-4">

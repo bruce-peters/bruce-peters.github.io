@@ -59,7 +59,10 @@ const Home = () => {
           </p>
         </Reveal>
       </div>
-      <img
+      <motion.img
+        initial={{ x: "300px" }}
+        animate={{ x: 0 }}
+        transition={{ duration: 1, ease: "easeInOut" }}
         src={bgVector}
         alt="Vector"
         className="absolute left-2/3 bottom-0 w-1/3 h-full"

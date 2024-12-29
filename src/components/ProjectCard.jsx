@@ -9,20 +9,16 @@ const ProjectCard = ({ projectData }) => {
 
   return (
     <Tilt
-      options={{ max: 25 }}
-      className="bg-primary text-white w-fit p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+      options={{ max: 10 }}
+      className="bg-slate-700 bg-opacity-50 text-white w-fit p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
     >
+      <div className="flex flex-row justify-end align-top w-full"></div>
       <div className="flex flex-col items-center">
-        {/* Add an image or icon */}
-        <img
-          src={projectImage}
-          alt={projectData.name}
-          className="size-20 mb-4"
-        />
         <h1 className="text-xl font-bold mb-2">{projectData.name}</h1>
         <p className="text-center text-md">{projectData.description}</p>
       </div>
     </Tilt>
+    // <div className="h-20 bg-slate-600"></div>
   );
 };
 

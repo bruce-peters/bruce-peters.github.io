@@ -16,7 +16,7 @@ const Reveal = ({ children, width = "w-fit" }) => {
   }, [isInView]);
 
   return (
-    <div ref={ref} className={"relative " + width + " overflow-hidden"}>
+    <div ref={ref} className={"relative " + width + " overflow-hidden h-fit"}>
       <motion.div
         variants={{
           hidden: {
@@ -31,6 +31,7 @@ const Reveal = ({ children, width = "w-fit" }) => {
         initial="hidden"
         animate={mainControls}
         transition={{ duration: 0.5, delay: 0.25 }}
+        className="h-fit"
       >
         {children}
       </motion.div>

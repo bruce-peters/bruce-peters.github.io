@@ -3,7 +3,7 @@ import SectionTitle from "../SectionTitle";
 
 const Contact = () => {
   return (
-    <div className="w-3/4 mx-auto">
+    <div id="contact" className="">
       <SectionTitle title="Contact" />
     </div>
   );

@@ -1,6 +1,7 @@
 import React from "react";
 import { sections } from "../constants";
 import { Link } from "react-router";
+import { motion } from "framer-motion";
 
 const Navigation = () => {
   return (
@@ -13,13 +14,24 @@ const Navigation = () => {
         {sections.map(
           (page, index) =>
             page.path !== "/" && (
-              <a
+              <motion.a
+                initial={{
+                  opacity: 0,
+                  y: -20,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                transition={{
+                  delay: index * 0.1,
+                }}
                 href={page.path}
                 key={index}
                 className="text-xl text-primary my-auto"
               >
                 ./{page.name}
-              </a>
+              </motion.a>
             )
         )}
       </div>
