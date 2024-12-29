@@ -3,18 +3,21 @@ import Reveal from "../framer-effects/Reveal";
 import ExternalLink from "./ExternalLink";
 
 const FeaturedProjectCard = ({ projectData, reverse = false }) => {
-  const testImg =
+  const placeholderImage =
     "https://blog.lipsumhub.com/wp-content/uploads/2024/09/what-does-lorem-ipsum-dolor-sit-amet-mean-and-why-is-it-used-as-text-in-web-development-lipsumhub.jpg";
   return (
-    <div className="relative h-80">
+    <div className="relative min-h-20 flex-row">
       <div
         className={
-          "absolute h-full w-3/4 rounded-lg overflow-hidden " +
-          (reverse ? "right-0" : "left-0")
+          "relative h-full w-3/4 rounded-lg " +
+          (reverse ? "justify-self-end" : "justify-self-start")
         }
       >
-        <img src={testImg} className="h-full w-full object-cover"></img>
-        <div className="absolute top-0 left-0 w-full h-full bg-blue-950 opacity-70 hover:opacity-0 transition-all duration-500"></div>
+        <img
+          src={projectData.image ?? placeholderImage}
+          className="inset-0 object-cover"
+        ></img>
+        <div className="absolute inset-0 bg-blue-950 opacity-70 hover:opacity-0 transition-all duration-500"></div>
       </div>
       {/* Other Stuff */}
       <div

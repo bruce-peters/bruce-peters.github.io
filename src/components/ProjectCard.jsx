@@ -4,11 +4,6 @@ import Reveal from "../framer-effects/Reveal";
 import ExternalLink from "./ExternalLink";
 
 const ProjectCard = ({ projectData }) => {
-  // Use a placeholder image if projectImage is not provided
-  const projectImage =
-    projectData.projectImage ||
-    `https://picsum.photos/200?random=${projectData.id}`;
-
   return (
     <div
       onClick={() => {

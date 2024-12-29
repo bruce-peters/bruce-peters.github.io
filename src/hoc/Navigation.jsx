@@ -6,7 +6,10 @@ import { Link } from "react-scroll";
 const Navigation = () => {
   return (
     <div className="sticky top-0 z-40 flex flex-row h-16 w-full justify-between align-middle backdrop-blur-md pr-20">
-      <a href="/" className="text-3xl justify-self-start my-auto px-10">
+      <a
+        href="/portfolio"
+        className="text-3xl justify-self-start my-auto px-10"
+      >
         <span className="text-primary">BP</span>
         <span className="text-secondary">Dev</span>
       </a>

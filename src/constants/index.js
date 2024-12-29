@@ -1,3 +1,9 @@
+import {
+  notesReviewAppScreenshot,
+  wordleCloneScreenshot,
+  chatAppScreenshot,
+} from "../assets";
+
 const sections = [
   { name: "Home", id: "home", path: "/" },
   { name: "About", id: "about", path: "/#about" },
@@ -14,6 +20,7 @@ const projects = [
     url: "https://bobcat999.github.io/notes-review-app/",
     id: "notes-review-app",
     tools: ["React", "Tailwind CSS", "Firebase", "Gemini"],
+    image: notesReviewAppScreenshot,
     featured: true,
   },
   {
@@ -34,6 +41,7 @@ const projects = [
     url: "https://wordle-app-i.web.app/",
     id: "wordle-clone",
     tools: ["React", "Firebase"],
+    image: wordleCloneScreenshot,
     featured: true,
   },
   {
@@ -44,6 +52,7 @@ const projects = [
     url: "https://chat-react-app-feb57.web.app/",
     id: "chat-app",
     tools: ["React", "Firebase"],
+    image: chatAppScreenshot,
     featured: true,
   },
   {
