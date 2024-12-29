@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { bgVector } from "../../assets";
+import { heroVector } from "../../assets";
 import { motion } from "framer-motion";
 import Reveal from "../../framer-effects/Reveal";
 import { Link } from "react-scroll";
@@ -64,9 +64,9 @@ const Home = () => {
         initial={{ x: "300px" }}
         animate={{ x: 0 }}
         transition={{ duration: 1, ease: "easeInOut" }}
-        src={bgVector}
+        src={heroVector}
         alt="Vector"
-        className="absolute left-2/3 bottom-0 w-1/3 h-full"
+        className="absolute left-2/3 bottom-0 h-full"
       />
       <motion.div
         className="absolute size-[30vw] rounded-full opacity-30 blur-[10rem] bottom-1/3 right-0 bg-white"
