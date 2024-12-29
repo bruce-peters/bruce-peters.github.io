@@ -76,7 +76,7 @@ const projects = [
     name: "Non-euclidean Escape",
     description:
       "This is a non-euclidean escape game that I built using Unity. This game took me around a year to develop but I wasn't able to finish it due to a corruption of the files (it kindof fits with the theme ig). It features a non-euclidean world with portals making the levels very confusing where the player must escape. It was inspired by games like Portal and Antichamber. The game is still playable and has a descent amount of polish. All of the content is done except for the very final level.",
-    url: "https://bobcat9.itch.io/noneuclidianescapedebug",
+    url: "https://bobcat9.itch.io/non-euclidean-escape",
     tools: ["Unity", "C#", "Blender"],
     id: "non-euclidean-escape",
   },
