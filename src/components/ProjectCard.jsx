@@ -14,22 +14,31 @@ const ProjectCard = ({ projectData }) => {
       onClick={() => {
         window.open(projectData.url ?? projectData.github ?? "");
       }}
+      className="h-full w-full"
     >
       <Tilt
         options={{ max: 10 }}
-        className="bg-slate-700 bg-opacity-50 text-white w-fit p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col gap-2 group"
+        className="bg-slate-700 bg-opacity-50 text-white w-fit p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col gap-2 group h-full"
       >
         <div className="flex flex-row justify-end align-top w-full">
           <div className="flex flex-row gap-4 mt-4">
             {projectData.github && (
               <Reveal>
-                <ExternalLink link={projectData.github} type={"github"} />
+                <ExternalLink
+                  link={projectData.github}
+                  type={"github"}
+                  clickable={false}
+                />
               </Reveal>
             )}
 
             {projectData.url && (
               <Reveal>
-                <ExternalLink link={projectData.url} type={"external"} />
+                <ExternalLink
+                  link={projectData.url}
+                  type={"external"}
+                  clickable={false}
+                />
               </Reveal>
             )}
           </div>
@@ -41,7 +50,7 @@ const ProjectCard = ({ projectData }) => {
             </h1>
           </Reveal>
           <Reveal>
-            <p className="text-sm text-light">{projectData.description}</p>
+            <p className="text-xs text-light">{projectData.description}</p>
           </Reveal>
         </div>
         {/* Tools */}

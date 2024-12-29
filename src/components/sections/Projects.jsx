@@ -3,6 +3,7 @@ import { projects } from "../../constants";
 import ProjectCard from "../ProjectCard";
 import SectionTitle from "../SectionTitle";
 import FeaturedProjectCard from "../FeaturedProjectCard";
+import Reveal from "../../framer-effects/Reveal";
 
 const Projects = () => {
   return (
@@ -27,9 +28,11 @@ const Projects = () => {
           ))}
       </div>
       {/* Other Projects */}
-      <div className="text-3xl font-bold text-primary mt-9">
-        Other Noteworthy Projects
-      </div>
+      <Reveal>
+        <div className="text-3xl font-bold text-primary mt-9">
+          Other Noteworthy Projects
+        </div>
+      </Reveal>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
         {projects
           .filter((project) => project.featured !== true)

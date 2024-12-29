@@ -7,13 +7,15 @@ const FeaturedProjectCard = ({ projectData, reverse = false }) => {
     "https://blog.lipsumhub.com/wp-content/uploads/2024/09/what-does-lorem-ipsum-dolor-sit-amet-mean-and-why-is-it-used-as-text-in-web-development-lipsumhub.jpg";
   return (
     <div className="relative h-80">
-      <img
-        src={testImg}
+      <div
         className={
-          "absolute h-full filter brightness-50 " +
+          "absolute h-full w-3/4 rounded-lg overflow-hidden " +
           (reverse ? "right-0" : "left-0")
         }
-      ></img>
+      >
+        <img src={testImg} className="h-full w-full object-cover"></img>
+        <div className="absolute top-0 left-0 w-full h-full bg-blue-950 opacity-70 hover:opacity-0 transition-all duration-500"></div>
+      </div>
       {/* Other Stuff */}
       <div
         className={
