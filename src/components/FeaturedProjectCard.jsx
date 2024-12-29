@@ -15,7 +15,8 @@ const FeaturedProjectCard = ({ projectData, reverse = false }) => {
       >
         <img
           src={projectData.image ?? placeholderImage}
-          className="inset-0 object-cover"
+          className="inset-0 object-cover w-full h-full rounded-lg"
+          loading="lazy"
         ></img>
         <div className="absolute inset-0 bg-blue-950 opacity-70 hover:opacity-0 transition-all duration-500"></div>
       </div>
