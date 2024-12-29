@@ -1,11 +1,11 @@
 import React from "react";
 import { sections } from "../constants";
-import { Link } from "react-router";
 import { motion } from "framer-motion";
+import { Link } from "react-scroll";
 
 const Navigation = () => {
   return (
-    <div className="sticky top-0 z-20 flex flex-row h-16 w-full justify-between align-middle backdrop-blur-md">
+    <div className="sticky top-0 z-40 flex flex-row h-16 w-full justify-between align-middle backdrop-blur-md pr-20">
       <a href="/" className="text-3xl justify-self-start my-auto px-10">
         <span className="text-primary">BP</span>
         <span className="text-secondary">Dev</span>
@@ -14,7 +14,7 @@ const Navigation = () => {
         {sections.map(
           (page, index) =>
             page.path !== "/" && (
-              <motion.a
+              <motion.div
                 initial={{
                   opacity: 0,
                   y: -20,
@@ -26,12 +26,13 @@ const Navigation = () => {
                 transition={{
                   delay: index * 0.1,
                 }}
-                href={page.path}
                 key={index}
                 className="text-xl text-primary my-auto"
               >
-                ./{page.name}
-              </motion.a>
+                <Link to={page.id} smooth={true} duration={800} offset={-50}>
+                  ./{page.name}
+                </Link>
+              </motion.div>
             )
         )}
       </div>

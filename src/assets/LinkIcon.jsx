@@ -12,7 +12,7 @@ const LinkIcon = ({ fillColor = "none", strokeColor = "white" }) => {
       strokeLinecap="round"
       strokeLinejoin="round"
       className={
-        "feather feather-github size-8 stroke-" +
+        "feather feather-github size-6 stroke-" +
         strokeColor +
         " hover:stroke-secondary transition-all duration-200"
       }

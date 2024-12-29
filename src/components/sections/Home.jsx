@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { bgVector } from "../../assets";
 import { motion } from "framer-motion";
 import Reveal from "../../framer-effects/Reveal";
+import { Link } from "react-scroll";
 
 const Home = () => {
   const [text, setText] = useState("");
@@ -72,6 +73,21 @@ const Home = () => {
         animate={{ y: [100, -100, 100] }}
         transition={{ duration: 8, repeat: Infinity }}
       ></motion.div>
+      <Link to="about" smooth={true} duration={800} offset={-50}>
+        <div className="w-[35px] h-[64px] rounded-3xl border-4 border-light flex justify-center items-start p-2 absolute bottom-[80px] left-1/2 opacity-50">
+          <motion.div
+            animate={{
+              y: [0, 24, 0],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              repeatType: "loop",
+            }}
+            className="w-3 h-3 rounded-full bg-light mb-1"
+          />
+        </div>
+      </Link>
     </div>
   );
 };
