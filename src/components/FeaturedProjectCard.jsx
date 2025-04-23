@@ -13,12 +13,24 @@ const FeaturedProjectCard = ({ projectData, reverse = false }) => {
           (reverse ? "justify-self-end" : "justify-self-start")
         }
       >
-        <img
-          src={projectData.image ?? placeholderImage}
-          className="inset-0 object-cover w-full h-full rounded-lg"
-          loading="lazy"
-        ></img>
-        <div className="absolute inset-0 bg-blue-950 opacity-70 hover:opacity-0 transition-all duration-500"></div>
+        {projectData.image ? (
+          <>
+            <img
+              src={projectData.image}
+              className="inset-0 object-cover w-full h-full rounded-lg"
+              loading="lazy"
+            ></img>
+            <div className="absolute inset-0 bg-blue-950 opacity-70 hover:opacity-0 transition-all duration-500"></div>
+          </>
+        ) : (
+          <>
+            <img
+              src={placeholderImage}
+              className="inset-0 object-cover w-full h-full rounded-lg opacity-0"
+              loading="lazy"
+            ></img>
+          </>
+        )}
       </div>
       {/* Other Stuff */}
       <div

@@ -1,7 +1,9 @@
 import {
-  notesReviewAppScreenshot,
-  wordleCloneScreenshot,
   chatAppScreenshot,
+  notesReviewAppScreenshot,
+  portfolioAppScreenshot,
+  scoutingAppScreenshot,
+  wordleCloneScreenshot,
 } from "../assets";
 
 const sections = [
@@ -12,6 +14,37 @@ const sections = [
 ];
 
 const projects = [
+  {
+    name: "C̬̥͙̩͔̱͚̠̓̊̓̿͆͂͗͗L̷̡̨̟͓̬̟͍̯̱͎̎̀Ą̸̫́̈́S̵̡̙͉̻̈́̄S̴̮̭̯̲̥̮̺̦̉ͅI̶̗̭͉̮͗̊̐̂̀͋̕͝͝F̶̡̝̭̹̮̞̔̊̓͗͆̍̂͝ͅÎ̸̛̦̻͙̙̪̦͍͋͜Ę̴̨̡̘͚̳͓̌̈́͐͂̕͜D̸̛̘̓͂̊̉̋̀̕͝",
+    description:
+      "This is the current project I'm working on but you cannot know any details about it until I release it to the public!!",
+    github: "https://guthib.com",
+    id: "current-project",
+    tools: ["React", "AWS", "Torch", "Python", "Tailwind CSS", "MORE"],
+    featured: true,
+  },
+  {
+    name: "Iron Panthers Scouting app",
+    description:
+      "This is an app that I made for my robotics team to help us scout other teams at competitions. It allows users to enter data about the teams and then view the data in a table.",
+    github: "https://github.com/Iron-Panthers/2025-scout.git",
+    image: scoutingAppScreenshot,
+    url: "scout.ironpanthers.com",
+    id: "scouting-app",
+    tools: ["React", "Tailwind CSS", "Vite"],
+    featured: true,
+  },
+  {
+    name: "This website",
+    description:
+      "This portfolio website required a lot of graphics design tools as well as front end development frameworks",
+    github: "https://github.com/Bobcat999/portfolio.git",
+    url: "https://bobcat999.github.io/portfolio",
+    id: "portfolio-website",
+    image: portfolioAppScreenshot,
+    tools: ["React", "Tailwind CSS", "Vite", "Figma"],
+    featured: true,
+  },
   {
     name: "Notes Review App",
     description:
@@ -42,7 +75,6 @@ const projects = [
     id: "wordle-clone",
     tools: ["React", "Firebase"],
     image: wordleCloneScreenshot,
-    featured: true,
   },
   {
     name: "Chat App",
@@ -53,7 +85,6 @@ const projects = [
     id: "chat-app",
     tools: ["React", "Firebase"],
     image: chatAppScreenshot,
-    featured: true,
   },
   {
     name: "Scuffed Platformer",
@@ -121,4 +152,4 @@ const skills = [
   "Visual Studio Code",
 ];
 
-export { sections, projects, skills };
+export { projects, sections, skills };
