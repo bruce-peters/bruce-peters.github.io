@@ -29,7 +29,7 @@ const projects = [
       "This is an app that I made for my robotics team to help us scout other teams at competitions. It allows users to enter data about the teams and then view the data in a table.",
     github: "https://github.com/Iron-Panthers/2025-scout.git",
     image: scoutingAppScreenshot,
-    url: "scout.ironpanthers.com",
+    url: "https://scout.ironpanthers.com",
     id: "scouting-app",
     tools: ["React", "Tailwind CSS", "Vite"],
     featured: true,
