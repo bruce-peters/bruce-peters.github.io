@@ -4,6 +4,7 @@ import {
   portfolioAppScreenshot,
   scoutingAppScreenshot,
   wordleCloneScreenshot,
+  wordWizAIScreenshot,
 } from "../assets";
 
 const sections = [
@@ -20,17 +21,8 @@ const projects = [
       "This is an AI EdTech Startup that I am working on. It allows kids to learn how to read faster and easier with ai and phonics. Using both advanced audio transcription techniques, and large language models it provides quality feedback and new tailored reading content for early readers, allowing them to quickly improve.",
     github: "https://github.com/bruce-peters/word-wiz-ai",
     id: "word-wiz-ai",
-    tools: [
-      "React",
-      "AWS",
-      "Torch",
-      "Python",
-      "Tailwind CSS",
-      "LLMs",
-      "TTS Engines",
-      "Figma",
-      "FastAPI",
-    ],
+    tools: ["React", "AWS", "Torch", "Python", "Tailwind CSS"],
+    image: wordWizAIScreenshot,
     featured: true,
   },
   {
@@ -49,7 +41,7 @@ const projects = [
     description:
       "This portfolio website required a lot of graphics design tools as well as front end development frameworks",
     github: "https://github.com/bruce-peters/portfolio.git",
-    url: "https://bruce-peters.github.io/portfolio",
+    url: "https://bruce-peters.github.io",
     id: "portfolio-website",
     image: portfolioAppScreenshot,
     tools: ["React", "Tailwind CSS", "Vite", "Figma"],

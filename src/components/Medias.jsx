@@ -58,7 +58,7 @@ const ItchIcon = () => {
 const mediaInfo = [
   {
     name: "Github",
-    link: "https://github.com/Bobcat999",
+    link: "https://github.com/bruce-peters",
     icon: <GithubIcon />,
   },
   {
