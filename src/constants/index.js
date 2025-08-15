@@ -15,12 +15,22 @@ const sections = [
 
 const projects = [
   {
-    name: "C̬̥͙̩͔̱͚̠̓̊̓̿͆͂͗͗L̷̡̨̟͓̬̟͍̯̱͎̎̀Ą̸̫́̈́S̵̡̙͉̻̈́̄S̴̮̭̯̲̥̮̺̦̉ͅI̶̗̭͉̮͗̊̐̂̀͋̕͝͝F̶̡̝̭̹̮̞̔̊̓͗͆̍̂͝ͅÎ̸̛̦̻͙̙̪̦͍͋͜Ę̴̨̡̘͚̳͓̌̈́͐͂̕͜D̸̛̘̓͂̊̉̋̀̕͝",
+    name: "Word Wiz AI",
     description:
-      "This is the current project I'm working on but you cannot know any details about it until I release it to the public!!",
-    github: "https://guthib.com",
-    id: "current-project",
-    tools: ["React", "AWS", "Torch", "Python", "Tailwind CSS", "MORE"],
+      "This is an AI EdTech Startup that I am working on. It allows kids to learn how to read faster and easier with ai and phonics. Using both advanced audio transcription techniques, and large language models it provides quality feedback and new tailored reading content for early readers, allowing them to quickly improve.",
+    github: "https://github.com/bruce-peters/word-wiz-ai",
+    id: "word-wiz-ai",
+    tools: [
+      "React",
+      "AWS",
+      "Torch",
+      "Python",
+      "Tailwind CSS",
+      "LLMs",
+      "TTS Engines",
+      "Figma",
+      "FastAPI",
+    ],
     featured: true,
   },
   {
@@ -38,8 +48,8 @@ const projects = [
     name: "This website",
     description:
       "This portfolio website required a lot of graphics design tools as well as front end development frameworks",
-    github: "https://github.com/Bobcat999/portfolio.git",
-    url: "https://bobcat999.github.io/portfolio",
+    github: "https://github.com/bruce-peters/portfolio.git",
+    url: "https://bruce-peters.github.io/portfolio",
     id: "portfolio-website",
     image: portfolioAppScreenshot,
     tools: ["React", "Tailwind CSS", "Vite", "Figma"],
@@ -49,8 +59,8 @@ const projects = [
     name: "Notes Review App",
     description:
       "This is a notes review application that I built using React, Tailwind CSS, Gemini, and Firebase. It allows users to upload their notes, get them summarized into bite sized facts and then enter a typing console to repeatedly type out and memorize them.",
-    github: "https://github.com/Bobcat999/notes-review-app",
-    url: "https://bobcat999.github.io/notes-review-app/",
+    github: "https://github.com/bruce-peters/notes-review-app",
+    url: "https://bruce-peters.github.io/notes-review-app/",
     id: "notes-review-app",
     tools: ["React", "Tailwind CSS", "Firebase", "Gemini"],
     image: notesReviewAppScreenshot,
@@ -60,7 +70,7 @@ const projects = [
     name: "Facial Emotion Detection",
     description:
       "This is a facial emotion detection project that I built using Python, OpenCV, TensorFlow, and Kaggle. It detects emotions in real-time.",
-    github: "https://github.com/Bobcat999/facial-emotion-detection",
+    github: "https://github.com/bruce-peters/facial-emotion-detection",
     url: "https://facial-emotion-app.web.app/",
     id: "facial-emotion-detection",
     tools: ["Python", "OpenCV", "Tensorflow", "Kaggle"],
@@ -70,7 +80,7 @@ const projects = [
     name: "Wordle Clone",
     description:
       "This is a clone of the popular game Wordle. I built this project using React to practice my skills.",
-    github: "https://github.com/Bobcat999/wordle-app",
+    github: "https://github.com/bruce-peters/wordle-app",
     url: "https://wordle-app-i.web.app/",
     id: "wordle-clone",
     tools: ["React", "Firebase"],
@@ -80,7 +90,7 @@ const projects = [
     name: "Chat App",
     description:
       "This is a chat application that I built using React and Firebase. It was one of the first things I made using react. The design isn't very good but it functions well. It allows users to send messages in real-time in private chat rooms.",
-    github: "https://github.com/Bobcat999/chat-react-app",
+    github: "https://github.com/bruce-peters/chat-react-app",
     url: "https://chat-react-app-feb57.web.app/",
     id: "chat-app",
     tools: ["React", "Firebase"],
@@ -98,7 +108,7 @@ const projects = [
     name: "Survival Game",
     description:
       "This is a survival game that I built using Unity. It's a simple survival game where the player must survive in a forest by collecting resources. It features a day-night cycle, crafting, and a procedurally generated world.",
-    github: "https://github.com/Bobcat999/SurvivalGame",
+    github: "https://github.com/bruce-peters/SurvivalGame",
     url: "https://bobcat9.itch.io/survival-2d",
     tools: ["Unity", "C#"],
     id: "survival-game",
