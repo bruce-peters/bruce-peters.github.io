@@ -7,8 +7,8 @@ const Navigation = () => {
   return (
     <div className="sticky top-0 z-40 flex flex-row h-16 w-full justify-between align-middle backdrop-blur-md pr-20">
       <a href="/" className="text-3xl justify-self-start my-auto px-10">
-        <span className="text-primary">BP</span>
-        <span className="text-secondary">Dev</span>
+        <span className="text-primary">Bruce</span>
+        <span className="text-secondary">Peters</span>
       </a>
       <div className="flex flex-row space-x-20">
         {sections.map(
@@ -29,11 +29,17 @@ const Navigation = () => {
                 key={index}
                 className="text-xl text-primary my-auto"
               >
-                <Link to={page.id} smooth={true} duration={800} offset={-50}>
+                <Link
+                  to={page.id}
+                  smooth={true}
+                  duration={800}
+                  offset={-50}
+                  className="cursor-pointer hover:text-secondary hover:font-bold transition-colors duration-300"
+                >
                   ./{page.name}
                 </Link>
               </motion.div>
-            )
+            ),
         )}
       </div>
     </div>

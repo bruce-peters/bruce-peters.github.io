@@ -19,7 +19,8 @@ const projects = [
     name: "Word Wiz AI",
     description:
       "This is an AI EdTech Startup that I am working on. It allows kids to learn how to read faster and easier with ai and phonics. Using both advanced audio transcription techniques, and large language models it provides quality feedback and new tailored reading content for early readers, allowing them to quickly improve.",
-    github: "https://github.com/bruce-peters/word-wiz-ai",
+    github: "https://github.com/wordwizai/word-wiz-ai",
+    url: "https://wordwizai.com",
     id: "word-wiz-ai",
     tools: ["React", "AWS", "Torch", "Python", "Tailwind CSS"],
     image: wordWizAIScreenshot,
@@ -66,7 +67,6 @@ const projects = [
     url: "https://facial-emotion-app.web.app/",
     id: "facial-emotion-detection",
     tools: ["Python", "OpenCV", "Tensorflow", "Kaggle"],
-    featured: true,
   },
   {
     name: "Wordle Clone",

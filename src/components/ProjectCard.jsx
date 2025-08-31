@@ -50,7 +50,7 @@ const ProjectCard = ({ projectData }) => {
         </div>
         {/* Tools */}
         <Reveal>
-          <div className="flex flex-row gap-4">
+          <div className="flex flex-row gap-4 flex-wrap">
             {projectData.tools?.map((tool, index) => (
               <div
                 key={index}
