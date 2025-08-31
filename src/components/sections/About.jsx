@@ -14,10 +14,13 @@ const About = () => {
             I'm a high school student with a passion for coding and learning new
             things. I'm currently learning web development and I'm also
             interested in machine learning and artificial intelligence. I'm also
-            part of a robotics team and I'm learning about robotics and
-            electronics. In the robotics club, I teach the new freshmen how to
-            program in java and how to use certain libraries to program our
-            robot.
+            part of a robotics team and where we just won the{" "}
+            <strong className="text-secondary">FRC WORLD CHAMPIONSHIPS</strong>.
+            In my robotics team, I program our robot and am currently working on
+            a system that allows us to completely simulate our robot on a
+            computer. This will effectively 5x our development speed by
+            decreasing the amount of times each person has to interact with our
+            physical robot.
           </p>
         </Reveal>
         {/* Tools */}

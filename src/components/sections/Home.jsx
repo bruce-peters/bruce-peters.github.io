@@ -6,8 +6,7 @@ import { Link } from "react-scroll";
 
 const Home = () => {
   const [text, setText] = useState("");
-  const fullText =
-    "student - web dev - robotics enthusiast - game dev - teacher";
+  const fullText = "student - web dev - robotics enthusiast - ai dev - leader";
   const typingSpeed = 100; // milliseconds
   const pauseDuration = 500; // milliseconds
   const onEndPause = 3000; // milliseconds
@@ -56,7 +55,14 @@ const Home = () => {
         <Reveal>
           <p className="text-xl">
             {text}
-            <span className="animate-pulse">|</span>
+            <motion.span
+              initial={{ opacity: 1 }}
+              animate={{ opacity: [1, 1, 0, 0, 1] }}
+              transition={{ duration: 0.75, repeat: Infinity }}
+              className="relative"
+            >
+              <span className="absolute left-0">|</span>
+            </motion.span>
           </p>
         </Reveal>
       </div>
