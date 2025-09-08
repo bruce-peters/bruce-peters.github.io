@@ -62,7 +62,7 @@ const FeaturedProjectCard = ({ projectData, reverse = false }) => {
         </Reveal>
         {/* Tools */}
         <Reveal>
-          <div className="flex flex-row gap-4">
+          <div className="flex flex-row gap-4 flex-wrap max-w-[500px] justify-end">
             {projectData.tools?.map((tool, index) => (
               <div
                 key={index}
