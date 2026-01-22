@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { heroVector } from "../../assets";
 import { motion } from "framer-motion";
 import Reveal from "../../framer-effects/Reveal";
 import { Link } from "react-scroll";
+import ThreeHero from "../ThreeHero";
 
 const Home = () => {
   const [text, setText] = useState("");
@@ -66,19 +66,7 @@ const Home = () => {
           </p>
         </Reveal>
       </div>
-      <motion.img
-        initial={{ x: "300px" }}
-        animate={{ x: 0 }}
-        transition={{ duration: 1, ease: "easeInOut" }}
-        src={heroVector}
-        alt="Vector"
-        className="absolute left-2/3 bottom-0 h-full"
-      />
-      <motion.div
-        className="absolute size-[30vw] rounded-full opacity-30 blur-[10rem] bottom-1/3 right-0 bg-white"
-        animate={{ y: [100, -100, 100] }}
-        transition={{ duration: 8, repeat: Infinity }}
-      ></motion.div>
+      <ThreeHero />
       <Link to="about" smooth={true} duration={800} offset={-50}>
         <div className="w-[35px] h-[64px] rounded-3xl border-4 border-light flex justify-center items-start p-2 absolute bottom-[80px] left-1/2 opacity-50">
           <motion.div
