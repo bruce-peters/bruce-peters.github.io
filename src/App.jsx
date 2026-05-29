@@ -11,6 +11,8 @@ import Instructions from './components/Instructions.jsx'
 import LoadingScreen from './components/LoadingScreen.jsx'
 import TuneMode from './components/TuneMode.jsx'
 
+const isLocalhost = window.location.hostname === 'localhost'
+
 export default function App() {
   const [activeProject, setActiveProject] = useState(PROJECTS[0])
   const [activeIndex, setActiveIndex] = useState(0)
@@ -51,8 +53,9 @@ export default function App() {
     })
   }, [])
 
-  // Tune mode toggle (Shift+T)
+  // Tune mode toggle (Shift+T) — localhost only
   useEffect(() => {
+    if (!isLocalhost) return
     const onKey = (e) => {
       if (e.key === 'T' && e.shiftKey) {
         setTuneMode(prev => {
@@ -128,7 +131,7 @@ export default function App() {
       <Counter project={activeProject} />
       <DotRail activeIndex={activeIndex} goToIndex={goToIndex} />
       <ProjectCard project={activeProject} onExternalLink={openExternalLink} />
-      <TuneMode
+      {isLocalhost && <TuneMode
         tuneMode={tuneMode}
         editorState={editorState}
         onEnter={enterTune}
@@ -138,7 +141,7 @@ export default function App() {
         activeProject={activeProject}
         selectedId={selectedId}
         onSelectId={setSelectedId}
-      />
+      />}
       <LoadingScreen loaded={loaded} />
     </div>
   )
