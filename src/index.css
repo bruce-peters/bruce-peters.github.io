@@ -1,3 +1,39 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: #000000;
+  color: #f3efe7;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.dragging {
+  cursor: grabbing !important;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+#scene-container {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  cursor: grab;
+}
+
+#scene-container.dragging {
+  cursor: grabbing;
+}

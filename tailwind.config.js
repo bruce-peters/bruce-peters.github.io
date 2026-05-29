@@ -1,19 +1,33 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  darkMode: 'class',
+  content: [
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
+  ],
   theme: {
     extend: {
       colors: {
-        dark: "#1d2735",
-        light: "#d5f4f5",
-        white: "#ffffff",
-        primary: "#6895be",
-        secondary: "#e84f28", // Replace with your secondary color
+        bg:     '#000000',
+        fg:     '#f3efe7',
+        dim:    '#7a766e',
+        accent: '#e7c265',
+        line:   '#1a1a1a',
       },
       fontFamily: {
-        mono: ["IBM Plex Mono", "Roboto Mono", "monospace"],
+        mono:  ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+        serif: ['"Instrument Serif"', 'Georgia', 'serif'],
+      },
+      animation: {
+        pulse2: 'pulse2 2s infinite',
+      },
+      keyframes: {
+        pulse2: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.4' },
+        },
       },
     },
   },
   plugins: [],
-};
+}
