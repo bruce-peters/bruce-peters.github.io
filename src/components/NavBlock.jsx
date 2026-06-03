@@ -1,7 +1,7 @@
 export default function NavBlock({ onExternalLink }) {
   return (
-    <nav className="fixed top-7 right-8 z-10">
-      <ul className="flex gap-[22px] list-none p-0 m-0 text-[11px] uppercase tracking-[0.18em]">
+    <nav className="fixed top-7 right-8 z-20">
+      <ul className="flex gap-[22px] list-none p-0 m-0 font-mono text-[11px] uppercase tracking-[0.18em]">
         {[
           { label: 'GitHub', href: 'https://github.com/bruce-peters' },
           { label: 'Word Wiz', href: 'https://wordwizai.com' },

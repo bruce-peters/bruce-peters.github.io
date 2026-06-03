@@ -3,11 +3,8 @@ import { PROJECTS } from './data/projects.js'
 import { initScene } from './scene/scene.js'
 import IdentityBlock from './components/IdentityBlock.jsx'
 import NavBlock from './components/NavBlock.jsx'
-import Hero from './components/Hero.jsx'
 import DotRail from './components/DotRail.jsx'
-import ProjectCard from './components/ProjectCard.jsx'
-import Counter from './components/Counter.jsx'
-import Instructions from './components/Instructions.jsx'
+import ProjectSection from './components/ProjectSection.jsx'
 import LoadingScreen from './components/LoadingScreen.jsx'
 import TuneMode from './components/TuneMode.jsx'
 
@@ -24,12 +21,14 @@ export default function App() {
   const [exiting, setExiting] = useState(false)
   const containerRef = useRef(null)
   const sceneRef = useRef(null)
+  const sectionRefs = useRef([])
 
   const handleProjectChange = useCallback((project, index) => {
     setActiveProject(project)
     setActiveIndex(index)
   }, [])
 
+  // Init the 3D background scene
   useEffect(() => {
     if (!containerRef.current) return
     try {
@@ -41,8 +40,49 @@ export default function App() {
     }
   }, [handleProjectChange])
 
+  // Drive the background camera from the document scroll position.
+  // nodeFloat ∈ [0, N-1] is interpolated from where the viewport center sits
+  // between adjacent section centers, so the camera eases between projects.
+  useEffect(() => {
+    let raf = null
+    const compute = () => {
+      raf = null
+      const secs = sectionRefs.current.filter(Boolean)
+      if (secs.length === 0) return
+      const vpCenter = window.scrollY + window.innerHeight / 2
+      const centers = secs.map(el => {
+        const r = el.getBoundingClientRect()
+        return r.top + window.scrollY + r.height / 2
+      })
+
+      let node
+      if (vpCenter <= centers[0]) node = 0
+      else if (vpCenter >= centers[centers.length - 1]) node = centers.length - 1
+      else {
+        node = centers.length - 1
+        for (let i = 0; i < centers.length - 1; i++) {
+          if (vpCenter >= centers[i] && vpCenter <= centers[i + 1]) {
+            node = i + (vpCenter - centers[i]) / (centers[i + 1] - centers[i])
+            break
+          }
+        }
+      }
+      sceneRef.current?.setScroll(node)
+    }
+    const onScroll = () => { if (raf == null) raf = requestAnimationFrame(compute) }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    compute()
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [])
+
+  // Dot-rail / nav → scroll the matching section into view
   const goToIndex = useCallback((i) => {
-    sceneRef.current?.goToIndex(i)
+    sectionRefs.current[i]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, [])
 
   const openExternalLink = useCallback((href) => {
@@ -96,25 +136,21 @@ export default function App() {
   }
 
   return (
-    <div className="relative w-full h-full">
-      <div ref={containerRef} id="scene-container" className="fixed inset-0 z-0" />
+    <div className="relative w-full">
+      {/* Fixed 3D background */}
+      <div ref={containerRef} id="scene-container" />
 
+      {/* Readability scrim — keeps cards legible over a busy scene */}
       <div
-        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[5]"
-        style={{ opacity: 0.06 }}
-      >
-        <div className="relative w-0 h-0">
-          <div className="absolute bg-fg" style={{ width: '1px', height: '240px', top: '-120px', left: '0' }} />
-          <div className="absolute bg-fg" style={{ width: '240px', height: '1px', top: '0', left: '-120px' }} />
-        </div>
-      </div>
+        className="fixed inset-0 z-[1] pointer-events-none"
+        style={{ background: 'radial-gradient(120% 80% at 50% 50%, transparent 40%, rgba(16,16,18,0.55) 100%)' }}
+      />
 
-      <div
-        id="auto-playback-hud"
-        className="hidden fixed bottom-7 right-7 z-20 px-3 py-1.5 text-[10px] tracking-[0.16em] uppercase border border-dim/40 text-dim bg-black/40 backdrop-blur-sm pointer-events-none"
-      >
-        AUTO REPLAY
-      </div>
+      {/* Fixed chrome */}
+      <IdentityBlock />
+      <NavBlock onExternalLink={openExternalLink} />
+      <DotRail activeIndex={activeIndex} goToIndex={goToIndex} />
+
       {/* White flash overlay for external link transitions */}
       <div
         className="fixed inset-0 z-[100] bg-white pointer-events-none"
@@ -124,13 +160,20 @@ export default function App() {
         }}
       />
 
-      <IdentityBlock />
-      <NavBlock onExternalLink={openExternalLink} />
-      <Hero isOverview={!!activeProject?.isOverview} />
-      <Instructions />
-      <Counter project={activeProject} />
-      <DotRail activeIndex={activeIndex} goToIndex={goToIndex} />
-      <ProjectCard project={activeProject} onExternalLink={openExternalLink} />
+      {/* Scrolling content — one section per project node */}
+      <main className="relative z-10">
+        {PROJECTS.map((p, i) => (
+          <ProjectSection
+            key={p.id}
+            ref={el => { sectionRefs.current[i] = el }}
+            project={p}
+            side={i % 2 === 0 ? 'left' : 'right'}
+            onExternalLink={openExternalLink}
+            goToIndex={goToIndex}
+          />
+        ))}
+      </main>
+
       {isLocalhost && <TuneMode
         tuneMode={tuneMode}
         editorState={editorState}

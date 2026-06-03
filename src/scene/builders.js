@@ -79,14 +79,14 @@ export function buildReader(pos) {
         [["The","green"],["cat","green"],["sat","green"]],
         [["on","green"],["a","green"],["mat","lime"]],
       ],
-      feedback: { label: "/æ/ · mat", bg: "#c8f06b", fg: "#1a1a1a" },
+      feedback: { label: "/æ/ · mat", bg: "#c7ee5e", fg: "#1d1d21" },
     },
     {
       rows: [
         [["She","green"],["can","green"],["run","coral"]],
         [["and","green"],["play","green"],["tag","green"]],
       ],
-      feedback: { label: "/r/ · run", bg: "#e89478", fg: "#1a1a1a" },
+      feedback: { label: "/r/ · run", bg: "#ec9576", fg: "#1d1d21" },
     },
     {
       rows: [
@@ -265,10 +265,17 @@ export function buildReader(pos) {
 }
 
 export function buildProjectCard(p, opts = {}) {
+  const slim = opts.slim ?? true;
+
+  // In slim mode the card is just the project's screenshot. A project with no
+  // image would render as an empty frame — skip it; the scene's other visuals
+  // (robot, fields, Word Wiz demo, screenshot panes) carry that node instead.
+  if (slim && !p.image) return null;
+
   const g = new THREE.Group();
   g.position.set(...(opts.pos ?? p.pos));
 
-  const t = projectCardTexture(p);
+  const t = projectCardTexture(p, slim);
   const card = makeFloatingCard(t, 2.6);
   card.userData.basePos = new THREE.Vector3(0, 0, 0);
   card.userData.phase = Math.random() * Math.PI * 2;
@@ -360,8 +367,10 @@ export function buildProjectCard(p, opts = {}) {
   return g;
 }
 
-// Archive gate — a minimal floor disc + lighting at the archive corridor entrance.
-// Individual archive work cards are built in scene.js via buildProjectCard().
+// Archive corridor — a floor-disc gate plus a git commit graph (one node per
+// archive work) running down −Z. The actual project content is the DOM cards
+// rendered over the scene; the graph is the on-theme backdrop, and the node for
+// the project the camera is parked on lights up (see update(t, activeId)).
 export function buildArchive() {
   const ARCHIVE = PROJECTS.find((p) => p.id === "archive");
   const g = new THREE.Group();
@@ -396,18 +405,18 @@ export function buildArchive() {
   const cctx = centerCanvas.getContext("2d");
   cctx.fillStyle = "rgba(0,0,0,0)";
   cctx.fillRect(0, 0, 512, 512);
-  cctx.strokeStyle = "#e7c265";
+  cctx.strokeStyle = "#57d36a";
   cctx.lineWidth = 2;
   cctx.beginPath();
   cctx.arc(256, 256, 240, 0, Math.PI * 2);
   cctx.stroke();
-  cctx.fillStyle = "#e7c265";
-  cctx.font = `400 220px 'Instrument Serif', serif`;
+  cctx.fillStyle = "#57d36a";
+  cctx.font = `700 220px 'Bricolage Grotesque', sans-serif`;
   cctx.textAlign = "center";
   cctx.textBaseline = "middle";
   cctx.fillText("05", 256, 268);
-  cctx.font = `500 36px 'IBM Plex Mono', monospace`;
-  cctx.fillStyle = "#7a766e";
+  cctx.font = `500 36px 'JetBrains Mono', monospace`;
+  cctx.fillStyle = "#9a958b";
   cctx.fillText("A R C H I V E", 256, 410);
   const centerTex = new THREE.CanvasTexture(centerCanvas);
   centerTex.colorSpace = THREE.SRGBColorSpace;
@@ -419,56 +428,134 @@ export function buildArchive() {
   centerDisc.position.y = 0.02;
   g.add(centerDisc);
 
-  // Red carpet running down the centre of the archive corridor
-  const carpetCanvas = document.createElement("canvas");
-  carpetCanvas.width = 128;
-  carpetCanvas.height = 512;
-  const carp = carpetCanvas.getContext("2d");
-  // Deep-red base
-  carp.fillStyle = "#8b0000";
-  carp.fillRect(0, 0, 128, 512);
-  // Subtle pile texture — thin horizontal grain lines
-  for (let y = 0; y < 512; y += 4) {
-    carp.fillStyle = `rgba(0,0,0,${0.08 + 0.06 * (y % 8 === 0 ? 1 : 0)})`;
-    carp.fillRect(0, y, 128, 2);
-  }
-  // Gold border stripes along long edges
-  carp.fillStyle = "#b8962e";
-  carp.fillRect(0, 0, 8, 512);
-  carp.fillRect(120, 0, 8, 512);
-  // Faint inner border lines
-  carp.fillStyle = "rgba(231,194,101,0.35)";
-  carp.fillRect(10, 0, 2, 512);
-  carp.fillRect(116, 0, 2, 512);
-  const carpetTex = new THREE.CanvasTexture(carpetCanvas);
-  carpetTex.colorSpace = THREE.SRGBColorSpace;
-  carpetTex.wrapS = THREE.ClampToEdgeWrapping;
-  carpetTex.wrapT = THREE.RepeatWrapping;
-  carpetTex.repeat.set(1, 10);
-  // Corridor spans local z = 0 → -120; carpet length = 122, centred at z = -61
-  const carpetLength = 122;
-  const carpetMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.0, carpetLength),
-    new THREE.MeshStandardMaterial({
-      map: carpetTex,
-      roughness: 0.92,
-      metalness: 0.0,
-    })
-  );
-  carpetMesh.rotation.x = -Math.PI / 2;
-  carpetMesh.position.set(0, 0.006, -carpetLength / 2 + 1);
-  carpetMesh.receiveShadow = true;
-  g.add(carpetMesh);
+  // ── Git commit graph running down the corridor ──────────────────────────
+  // Each archive work is a commit node; consecutive commits are joined by an
+  // edge, and a lane change (trunk ↔ branch) renders as a branch/merge. Node
+  // positions come from projects.js (world space) and are converted to local.
+  const ACCENT = 0x57d36a;
+  const works = PROJECTS.filter((p) => p.isArchive);
 
-  // Soft overhead glow
-  const archLight = new THREE.PointLight(0xffd394, 0.9, 16, 1.5);
-  archLight.position.set(0, 5, 0);
-  g.add(archLight);
+  // deterministic 7-char "sha" from a string (FNV-1a)
+  const shaOf = (s) => {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 0x01000193);
+    }
+    return (h >>> 0).toString(16).padStart(8, "0").slice(0, 7);
+  };
+
+  // thin emissive tube between two local-space points
+  const edgeBetween = (a, b) => {
+    const dir = new THREE.Vector3().subVectors(b, a);
+    const len = dir.length();
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0x0a1a0f,
+      emissive: ACCENT,
+      emissiveIntensity: 0.4,
+      roughness: 0.5,
+      metalness: 0.0,
+    });
+    const mesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.035, 0.035, len, 8),
+      mat
+    );
+    mesh.position.copy(a).add(b).multiplyScalar(0.5);
+    mesh.quaternion.setFromUnitVectors(
+      new THREE.Vector3(0, 1, 0),
+      dir.normalize()
+    );
+    return { mesh, mat };
+  };
+
+  // small "sha · year" label plane facing the camera (+Z)
+  const labelFor = (sha, year) => {
+    const c = document.createElement("canvas");
+    c.width = 256;
+    c.height = 64;
+    const x = c.getContext("2d");
+    x.font = "500 26px 'JetBrains Mono', monospace";
+    x.textBaseline = "middle";
+    x.fillStyle = "#57d36a";
+    x.fillText(sha, 8, 34);
+    const shaW = x.measureText(sha).width;
+    x.fillStyle = "#7c776d";
+    x.fillText(`  ·  ${year}`, 8 + shaW, 34);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const mesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.0, 0.5),
+      new THREE.MeshBasicMaterial({
+        map: tex,
+        transparent: true,
+        opacity: 0.35,
+        depthWrite: false,
+      })
+    );
+    return mesh;
+  };
+
+  const localOf = (p) =>
+    new THREE.Vector3(
+      p.pos[0] - ARCHIVE.pos[0],
+      p.pos[1] - ARCHIVE.pos[1],
+      p.pos[2] - ARCHIVE.pos[2]
+    );
+
+  const nodeMeshes = [];
+  const edges = [];
+
+  // edges first so nodes render on top
+  for (let i = 1; i < works.length; i++) {
+    const e = edgeBetween(localOf(works[i - 1]), localOf(works[i]));
+    e.a = i - 1;
+    e.b = i;
+    g.add(e.mesh);
+    edges.push(e);
+  }
+
+  works.forEach((p, i) => {
+    const pos = localOf(p);
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0x0c1f12,
+      emissive: ACCENT,
+      emissiveIntensity: 0.55,
+      roughness: 0.35,
+      metalness: 0.2,
+    });
+    const node = new THREE.Mesh(new THREE.SphereGeometry(0.17, 20, 20), mat);
+    node.position.copy(pos);
+    g.add(node);
+
+    const label = labelFor(shaOf(p.title), p.year);
+    // offset the label toward the branch side so it never sits under a node
+    label.position.set(pos.x + (p.archiveLane === 1 ? 1.5 : -1.5), pos.y + 0.05, pos.z);
+    g.add(label);
+
+    nodeMeshes.push({ id: p.id, mesh: node, mat, label });
+  });
 
   g.userData = {
     project: ARCHIVE,
-    update: (t) => {
-      ring.material.color.setHSL(0.12, 0.0, 0.18 + 0.04 * Math.sin(t * 0.2));
+    // activeId is the id of the project the camera is currently parked on.
+    update: (t, activeId) => {
+      ring.material.color.setHSL(0.34, 0.4, 0.18 + 0.04 * Math.sin(t * 0.2));
+      nodeMeshes.forEach((n, idx) => {
+        const active = n.id === activeId;
+        const tgtEmis = active ? 2.6 : 0.5 + 0.12 * Math.sin(t * 1.4 + idx);
+        n.mat.emissiveIntensity += (tgtEmis - n.mat.emissiveIntensity) * 0.12;
+        const tgtScale = active ? 1.8 : 1.0;
+        const s = n.mesh.scale.x + (tgtScale - n.mesh.scale.x) * 0.12;
+        n.mesh.scale.setScalar(s);
+        const tgtOp = active ? 1.0 : 0.32;
+        n.label.material.opacity += (tgtOp - n.label.material.opacity) * 0.12;
+      });
+      edges.forEach((e) => {
+        const lit =
+          nodeMeshes[e.a].id === activeId || nodeMeshes[e.b].id === activeId;
+        const tgt = lit ? 1.5 : 0.35;
+        e.mat.emissiveIntensity += (tgt - e.mat.emissiveIntensity) * 0.12;
+      });
     },
   };
   return g;
@@ -552,116 +639,170 @@ function _rr(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-function aboutCardTexture() {
-  const cw = 1280,
-    ch = 820;
+function _aboutTex(canvas) {
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.anisotropy = 8;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+// A small "build.log" terminal — window chrome + traffic-light dots + a few
+// machine-voice lines. Carries proof in the scene without repeating the card.
+function aboutTerminalTexture() {
+  const cw = 880,
+    ch = 460;
   const canvas = document.createElement("canvas");
   canvas.width = cw;
   canvas.height = ch;
   const ctx = canvas.getContext("2d");
 
-  // Background gradient
-  const bg = ctx.createLinearGradient(0, 0, 0, ch);
-  bg.addColorStop(0, "#141414");
-  bg.addColorStop(1, "#0a0a0a");
-  ctx.fillStyle = bg;
-  _rr(ctx, 8, 8, cw - 16, ch - 16, 36);
+  // Window body
+  ctx.fillStyle = "#0c0c0e";
+  _rr(ctx, 6, 6, cw - 12, ch - 12, 26);
   ctx.fill();
-  ctx.strokeStyle = "#222";
+  ctx.strokeStyle = "#26262b";
   ctx.lineWidth = 2;
-  _rr(ctx, 8, 8, cw - 16, ch - 16, 36);
+  _rr(ctx, 6, 6, cw - 12, ch - 12, 26);
   ctx.stroke();
 
-  // Badge
-  ctx.fillStyle = "#1a1a1a";
-  _rr(ctx, 48, 48, 128, 44, 22);
+  // Title bar
+  ctx.fillStyle = "#1d1d21";
+  _rr(ctx, 6, 6, cw - 12, 78, 26);
   ctx.fill();
-  ctx.fillStyle = "#7a766e";
-  ctx.font = `500 20px 'IBM Plex Mono', monospace`;
+  ctx.fillStyle = "#1d1d21";
+  ctx.fillRect(6, 50, cw - 12, 34); // square off the bottom of the bar
+  const dots = ["#e63b6d", "#c7ee5e", "#57d36a"];
+  dots.forEach((col, i) => {
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    ctx.arc(48 + i * 34, 45, 10, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.fillStyle = "#9a958b";
+  ctx.font = `500 26px 'JetBrains Mono', monospace`;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-  ctx.fillText("about", 78, 70);
+  ctx.fillText("build.log", 176, 46);
 
-  // Byline
-  ctx.fillStyle = "#7a766e";
-  ctx.font = `500 20px 'IBM Plex Mono', monospace`;
-  ctx.fillText("BRUCE PETERS  ·  CLASS OF 2027", 48, 132);
+  // Lines
+  const lines = [
+    ["✓", "2025 worlds champions", "#57d36a", "#cbc6bc"],
+    ["✓", "2024 word wiz · 4k readers", "#57d36a", "#cbc6bc"],
+    ["//", "next: sim pipeline", "#6f6b62", "#6f6b62"],
+  ];
+  ctx.font = `500 30px 'JetBrains Mono', monospace`;
+  let y = 150;
+  for (const [mark, text, markCol, textCol] of lines) {
+    ctx.fillStyle = markCol;
+    ctx.fillText(mark, 48, y);
+    const mw = ctx.measureText(mark + "  ").width;
+    ctx.fillStyle = textCol;
+    ctx.fillText(text, 48 + mw, y);
+    y += 56;
+  }
 
-  // Title
-  ctx.fillStyle = "#f3efe7";
-  ctx.font = `400 108px 'Instrument Serif', serif`;
-  ctx.textBaseline = "top";
-  ctx.fillText("About.", 48, 158);
+  return { tex: _aboutTex(canvas), aspect: cw / ch };
+}
 
-  // Gold accent
-  ctx.fillStyle = "#e7c265";
-  ctx.fillRect(48, 288, 80, 4);
+// A compact project card — accent top bar, title, one-line sub, and a tag.
+// Smaller and lighter than the full scene `projectCardTexture`; it reads as a
+// flagship/supporting work in the About cluster.
+function aboutMiniCardTexture(title, sub, accent) {
+  const cw = 760,
+    ch = 480;
+  const canvas = document.createElement("canvas");
+  canvas.width = cw;
+  canvas.height = ch;
+  const ctx = canvas.getContext("2d");
 
-  // Bio
-  const bio =
-    "High school junior from Hillsborough, CA. Started with Unity games at 12, reached FRC World Championships at 17. Now building AI products and winning hackathons between seasons.";
-  ctx.fillStyle = "#cbc7bf";
-  ctx.font = `400 25px 'IBM Plex Mono', monospace`;
+  ctx.fillStyle = "#161619";
+  _rr(ctx, 8, 8, cw - 16, ch - 16, 30);
+  ctx.fill();
+  ctx.strokeStyle = "#26262b";
+  ctx.lineWidth = 2;
+  _rr(ctx, 8, 8, cw - 16, ch - 16, 30);
+  ctx.stroke();
+
+  // Accent top bar
+  ctx.fillStyle = accent;
+  _rr(ctx, 44, 40, 70, 7, 3.5);
+  ctx.fill();
+
+  // Title (word-wrapped)
+  ctx.fillStyle = "#f4f0e8";
+  ctx.font = `700 64px 'Bricolage Grotesque', sans-serif`;
+  ctx.textAlign = "left";
   ctx.textBaseline = "top";
   let line = "";
-  let y = 312;
-  for (const w of bio.split(" ")) {
+  let y = 92;
+  const maxW = cw - 88;
+  for (const w of title.split(" ")) {
     const test = line + w + " ";
-    if (ctx.measureText(test).width > cw - 96 && line) {
-      ctx.fillText(line.trim(), 48, y);
+    if (ctx.measureText(test).width > maxW && line) {
+      ctx.fillText(line.trim(), 44, y);
       line = w + " ";
-      y += 36;
+      y += 70;
     } else line = test;
   }
-  ctx.fillText(line.trim(), 48, y);
+  ctx.fillText(line.trim(), 44, y);
+  y += 84;
 
-  // Tools label
-  ctx.fillStyle = "#7a766e";
-  ctx.font = `500 18px 'IBM Plex Mono', monospace`;
-  ctx.fillText("TOOLS", 48, ch - 208);
-
-  // Tool chips
-  const tools = [
-    "Java",
-    "Python",
-    "JS / TS",
-    "React",
-    "FastAPI",
-    "PyTorch",
-    "WPILib",
-    "OpenCV",
-    "AWS",
-    "Firebase",
-    "MySQL",
-    "Three.js",
-  ];
-  let tx = 48;
-  let ty = ch - 178;
-  ctx.font = `500 17px 'IBM Plex Mono', monospace`;
-  for (const tool of tools) {
-    const tw = ctx.measureText(tool).width + 26;
-    if (tx + tw > cw - 48) {
-      tx = 48;
-      ty += 42;
-    }
-    ctx.strokeStyle = "#2a2a2a";
-    ctx.lineWidth = 1;
-    _rr(ctx, tx, ty, tw, 32, 16);
-    ctx.stroke();
-    ctx.fillStyle = "#7a766e";
-    ctx.textBaseline = "middle";
-    ctx.fillText(tool, tx + 13, ty + 16);
-    tx += tw + 10;
+  // Sub line(s)
+  ctx.fillStyle = "#cbc6bc";
+  ctx.font = `400 27px 'JetBrains Mono', monospace`;
+  let sline = "";
+  for (const w of sub.split(" ")) {
+    const test = sline + w + " ";
+    if (ctx.measureText(test).width > maxW && sline) {
+      ctx.fillText(sline.trim(), 44, y);
+      sline = w + " ";
+      y += 38;
+    } else sline = test;
   }
+  ctx.fillText(sline.trim(), 44, y);
 
-  // Accent bar
-  ctx.fillStyle = "#e7c265";
-  ctx.fillRect(48, ch - 32, 60, 4);
+  // Accent dot bottom-left
+  ctx.fillStyle = accent;
+  ctx.beginPath();
+  ctx.arc(58, ch - 56, 9, 0, Math.PI * 2);
+  ctx.fill();
 
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.anisotropy = 8;
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return { tex, aspect: cw / ch };
+  return { tex: _aboutTex(canvas), aspect: cw / ch };
+}
+
+// A faint "// label" atmosphere sticker — bordered pill, accent dot, mono text.
+function aboutStickerTexture(text, accent) {
+  const label = "// " + text;
+  const m = document.createElement("canvas").getContext("2d");
+  m.font = `500 44px 'JetBrains Mono', monospace`;
+  const tw = m.measureText(label).width;
+  const cw = Math.ceil(tw + 150),
+    ch = 110;
+  const canvas = document.createElement("canvas");
+  canvas.width = cw;
+  canvas.height = ch;
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = "rgba(22,22,25,0.85)";
+  _rr(ctx, 4, 4, cw - 8, ch - 8, 50);
+  ctx.fill();
+  ctx.strokeStyle = "#26262b";
+  ctx.lineWidth = 2;
+  _rr(ctx, 4, 4, cw - 8, ch - 8, 50);
+  ctx.stroke();
+
+  ctx.fillStyle = accent;
+  ctx.beginPath();
+  ctx.arc(46, ch / 2, 10, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#9a958b";
+  ctx.font = `500 44px 'JetBrains Mono', monospace`;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillText(label, 78, ch / 2 + 2);
+
+  return { tex: _aboutTex(canvas), aspect: cw / ch };
 }
 
 export function buildAbout() {
@@ -669,44 +810,13 @@ export function buildAbout() {
   const g = new THREE.Group();
   g.position.set(...ABOUT.pos);
 
-  // Main bio panel — rotated 0.42 rad to face camera at [-12, 3, 17]
-  const t = aboutCardTexture();
-  const card = makeFloatingCard(t, 3.5);
-  card.rotation.y = 0.42;
-  card.position.set(0, 0.6, 0);
-  card.userData.basePos = card.position.clone();
-  card.userData.phase = 0;
-  g.add(card);
+  // The DOM About card owns the prose. The 3D layer carries *identity + work*,
+  // not a repeated tech list: a /bp/ anchor, a build.log terminal, two project
+  // cards, a few scattered phoneme fragments, and faint atmosphere stickers —
+  // depth-staggered around the node (biased to the open side) so the cluster
+  // reads as depth rather than a flat wall.
 
-  // Shadow behind panel
-  const shadow = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.5 * t.aspect + 0.3, 3.8),
-    new THREE.MeshBasicMaterial({
-      color: 0x000000,
-      transparent: true,
-      opacity: 0.5,
-      depthWrite: false,
-    })
-  );
-  shadow.position.set(0.1, 0.5, -0.15);
-  shadow.rotation.y = 0.42;
-  g.add(shadow);
-
-  // Floating tool pills — laid out in a halo in the card's right/up plane and
-  // pushed slightly forward (toward camera) so none hide behind the panel.
-  // Each pill shares the card's Y rotation so its face points at the camera.
-  const pills = [
-    ["Java", "green"],
-    ["Python", "lime"],
-    ["TypeScript", "green"],
-    ["React", "coral"],
-    ["PyTorch", "pink"],
-    ["WPILib", "green"],
-    ["OpenCV", "lime"],
-    ["AWS", "coral"],
-    ["Firebase", "green"],
-    ["Three.js", "white"],
-  ];
+  // Deterministic RNG so the layout is stable between reloads.
   const _rng = (() => {
     let s = 42;
     return () => {
@@ -714,33 +824,101 @@ export function buildAbout() {
       return (s - 1) / 2147483646;
     };
   })();
+
+  // Card-plane basis: panels face the camera by sharing this Y rotation. dx runs
+  // along the card's right axis, fwdOffset along its forward (toward-camera) axis.
   const cardRotY = 0.42;
   const fwd = new THREE.Vector3(Math.sin(cardRotY), 0, Math.cos(cardRotY));
   const rgt = new THREE.Vector3(Math.cos(cardRotY), 0, -Math.sin(cardRotY));
-  pills.forEach(([word, variant], i) => {
-    const pt = wordPillTexture(word, variant);
-    const pill = makeFloatingCard(pt, 0.55, { opacity: 0.85 });
-    const angle = (i / pills.length) * Math.PI * 2 + 0.4 + (_rng() - 0.5) * 0.7;
-    const rx = 3.6 + _rng() * 1.8;
-    const ry = 2.1 + _rng() * 1.4;
-    const fwdOffset = 0.3 + _rng() * 1.8;
-    const dx = Math.cos(angle) * rx;
-    const dy = Math.sin(angle) * ry + (_rng() - 0.5) * 0.6;
-    pill.position.set(
+
+  // place(mesh, dx, dy, fwdOffset, jitter) — position in the card plane + register bob.
+  const place = (mesh, dx, dy, fwdOffset, jitter = 0.2) => {
+    mesh.position.set(
       rgt.x * dx + fwd.x * fwdOffset,
-      dy + 0.6,
+      dy,
       rgt.z * dx + fwd.z * fwdOffset
     );
-    pill.rotation.y = cardRotY + (_rng() - 0.5) * 0.25;
-    pill.userData.basePos = pill.position.clone();
-    pill.userData.phase = _rng() * Math.PI * 2;
-    pill.userData.speed = 0.25 + _rng() * 0.4;
-    g.add(pill);
+    mesh.rotation.y = cardRotY + (_rng() - 0.5) * jitter;
+    mesh.userData.basePos = mesh.position.clone();
+    mesh.userData.phase = _rng() * Math.PI * 2;
+    mesh.userData.speed = 0.22 + _rng() * 0.32;
+    g.add(mesh);
+    return mesh;
+  };
+
+  // ── /bp/ anchor — green, with a soft glow plane behind it. Brand rule: the
+  //    logo is always green, regardless of the DOM accent. Forward in Z.
+  const bp = makeFloatingCard(wordPillTexture("/bp/", "green"), 0.72, {
+    opacity: 0.95,
+  });
+  place(bp, -0.2, 1.7, 1.0, 0.1);
+
+  const glowPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.2, 1.6),
+    new THREE.MeshBasicMaterial({
+      color: 0x57d36a,
+      transparent: true,
+      opacity: 0.16,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    })
+  );
+  glowPlane.position.set(
+    rgt.x * -0.2 + fwd.x * 0.85,
+    1.7,
+    rgt.z * -0.2 + fwd.z * 0.85
+  );
+  glowPlane.rotation.y = cardRotY;
+  g.add(glowPlane); // static (no basePos) — sits behind the anchor
+
+  // ── build.log terminal — proof, machine-voice. Mid plane, to the open side.
+  place(aboutTerminal(), -2.9, -0.3, -0.4, 0.12);
+
+  // ── Project cards — flagship forward, supporting pushed back in Z.
+  const wordWiz = makeFloatingCard(
+    aboutMiniCardTexture(
+      "Word Wiz AI",
+      "reading tutor · hears the sounds kids miss",
+      "#57d36a"
+    ),
+    1.9,
+    { opacity: 0.97 }
+  );
+  place(wordWiz, 2.9, 1.0, -0.3, 0.1);
+
+  const robotSim = makeFloatingCard(
+    aboutMiniCardTexture(
+      "Robot Sim",
+      "wpilib physics · 3× team throughput",
+      "#e63b6d"
+    ),
+    1.55,
+    { opacity: 0.92 }
+  );
+  place(robotSim, 3.7, -1.6, -2.4, 0.14);
+
+  // ── Phoneme fragments — identity DNA, small and scattered, half pushed back.
+  const phonemes = [
+    ["b", "green", -3.7, 2.4, -1.8],
+    ["r", "coral", 1.1, 2.9, -2.6],
+    ["oo", "lime", -1.6, -1.9, -1.6],
+    ["s", "pink", 4.6, 1.0, -3.0],
+  ];
+  phonemes.forEach(([w, v, dx, dy, fz]) => {
+    place(makeFloatingCard(wordPillTexture(w, v), 0.42, { opacity: 0.9 }), dx, dy, fz, 0.3);
   });
 
-  const glow = new THREE.PointLight(0xfff0e0, 0.5, 14, 2);
-  glow.position.set(0, 4, 2);
-  g.add(glow);
+  // ── Atmosphere stickers — faint, far back. Tools live in the DOM, not here;
+  //    these are texture, not a list.
+  const stickers = [
+    ["three.js", "#9b8cff", -2.4, 2.7, -2.8],
+    ["Java", "#c7ee5e", 0.4, -2.4, -2.2],
+    ["WPILib", "#57d36a", 2.2, 2.3, -2.9],
+  ];
+  stickers.forEach(([t, col, dx, dy, fz]) => {
+    const s = makeFloatingCard(aboutStickerTexture(t, col), 0.46, { opacity: 0.55 });
+    place(s, dx, dy, fz, 0.25);
+  });
 
   g.userData = {
     project: ABOUT,
@@ -756,6 +934,11 @@ export function buildAbout() {
     },
   };
   return g;
+}
+
+// small wrapper so the terminal reads cleanly in buildAbout's layout block
+function aboutTerminal() {
+  return makeFloatingCard(aboutTerminalTexture(), 1.5, { opacity: 0.95 });
 }
 
 // ---------------------------------------------------------------------------

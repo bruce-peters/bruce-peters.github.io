@@ -9,31 +9,38 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
   width: 100%;
-  background: #000000;
-  color: #f3efe7;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  overflow: hidden;
+  background: #101012;
+  color: #f4f0e8;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
 }
 
-body.dragging {
-  cursor: grabbing !important;
-}
+/* selection uses the brand green */
+::selection { background: #57d36a; color: #0c0c0e; }
 
 #root {
-  height: 100%;
   width: 100%;
 }
 
+/* the 3D scene is a fixed background — it never intercepts page scroll/clicks */
 #scene-container {
   position: fixed;
   inset: 0;
   z-index: 0;
-  cursor: grab;
+  pointer-events: none;
 }
 
-#scene-container.dragging {
+/* tune mode (localhost): the canvas must own all pointer input (orbit + gizmos),
+   so raise it above the scrolling content (z-10/20/30). The tune panels live at
+   z-40 and stay clickable above it. */
+#scene-container.tune-active {
+  pointer-events: auto;
+  z-index: 35;
+  cursor: grab;
+}
+#scene-container.tune-active.dragging {
   cursor: grabbing;
 }

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bruce Peters — /bp/</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;0,800;1,500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../tokens.css" />
+<style>
+  body { min-height: 100vh; overflow-x: hidden; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(20px,5vw,56px); }
+
+  /* nav */
+  .nav { position: sticky; top: 0; z-index: 40; backdrop-filter: blur(12px); background: color-mix(in srgb, var(--ink-850) 80%, transparent); border-bottom: var(--bd); }
+  .nav .row { display: flex; align-items: center; gap: var(--s-4); height: 64px; }
+  .nav .spacer { flex: 1; }
+  .nav .links { display: flex; gap: var(--s-5); }
+  .nav .links a { font-family: var(--font-mono); font-size: 12px; color: var(--dim-1); text-decoration: none; transition: color .15s; }
+  .nav .links a:hover { color: var(--green); }
+  @media (max-width:720px){ .nav .links { display:none; } }
+
+  /* hero */
+  .hero { position: relative; padding: clamp(48px,9vh,110px) 0 var(--s-9); overflow: hidden; }
+  .field {
+    position: absolute; inset: 0; pointer-events: none; opacity: .55;
+    background-image: linear-gradient(var(--ink-700) 1px, transparent 1px), linear-gradient(90deg, var(--ink-700) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 75% 30%, #000, transparent 72%);
+            mask-image: radial-gradient(ellipse 70% 70% at 75% 30%, #000, transparent 72%);
+  }
+  .hero-layout { position: relative; display: grid; grid-template-columns: 1.05fr 0.95fr; gap: var(--s-7); align-items: center; }
+  @media (max-width: 880px){ .hero-layout { grid-template-columns: 1fr; gap: var(--s-7); } }
+
+  .status { display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:12px; color:var(--dim-1); border:1px solid var(--ink-600); border-radius:var(--r-pill); padding:5px 13px 6px; margin-bottom: var(--s-5); }
+  .status .live { width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 0 0 var(--green-glow); animation: pulse 2.4s infinite; }
+  @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(87,211,106,.5)} 70%{box-shadow:0 0 0 9px rgba(87,211,106,0)} 100%{box-shadow:0 0 0 0 rgba(87,211,106,0)} }
+
+  h1.big { font-size: clamp(44px, 6.4vw, 88px); font-weight: 700; line-height: 0.98; letter-spacing: -0.03em; margin: 0 0 var(--s-5); }
+  h1.big .pill-in { display:inline-flex; vertical-align: baseline; }
+  .lede { font-size: clamp(16px,1.7vw,19px); color: var(--dim-1); line-height: 1.55; max-width: 46ch; margin: 0 0 var(--s-6); }
+  .cta-row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  .btn { font-family:var(--font-mono); font-weight:700; font-size:13px; border-radius:var(--r-pill); padding:12px 24px; border:0; cursor:pointer; display:inline-flex; align-items:center; gap:8px; text-decoration:none; transition: transform .15s var(--ease), box-shadow .24s var(--ease), border-color .15s, color .15s; }
+  .btn-primary { background:var(--green); color:var(--green-ink); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow-green); }
+  .btn-ghost { background:transparent; color:var(--cream); border:1px solid var(--ink-600); }
+  .btn-ghost:hover { border-color:var(--green); color:var(--green); }
+
+  .tech-row { display:flex; gap:8px; flex-wrap:wrap; margin-top: var(--s-6); }
+  .tech-chip { font-family:var(--font-mono); font-size:12px; padding:5px 12px 6px; border-radius:var(--r-pill); border:1px solid var(--ink-600); color:var(--cream-dim); display:inline-flex; align-items:center; gap:6px; }
+  .tech-chip .d { width:7px; height:7px; border-radius:50%; }
+
+  /* terminal panel (right) */
+  .term { background:var(--ink-900); border:var(--bd); border-radius:var(--r-card); overflow:hidden; font-family:var(--font-mono); box-shadow: var(--shadow-pop); }
+  .term-bar { display:flex; align-items:center; gap:8px; padding:11px 14px; border-bottom:var(--bd); background:var(--ink-800); }
+  .term-bar .dot { width:11px; height:11px; border-radius:50%; }
+  .term-bar .ttl { margin-left:6px; font-size:11px; color:var(--dim-1); }
+  .term-body { padding: var(--s-5); font-size:13.5px; line-height:1.95; min-height: 280px; white-space: pre-wrap; }
+  .term-body .l { white-space: pre-wrap; }
+  .term-body .gp { color:var(--green); }
+  .term-body .dim { color:var(--dim-2); }
+  .term-body .mg { color:var(--magenta); }
+  .term-body .cr { color:var(--cream); }
+  .term-body .li { color:var(--lime); }
+  .caret { display:inline-block; width:8px; height:16px; background:var(--green); transform:translateY(2px); animation: bp-blink 1.05s steps(1) infinite; }
+  @keyframes bp-blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+  /* works strip */
+  .works { padding: var(--s-8) 0 var(--s-9); border-top: var(--bd); }
+  .works .lab { font-family:var(--font-mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim-2); margin-bottom: var(--s-5); }
+  .works .lab b { color: var(--green); font-weight:500; }
+  .work-grid { display:grid; grid-template-columns: repeat(3,1fr); gap: var(--s-5); }
+  @media (max-width:820px){ .work-grid { grid-template-columns:1fr; } }
+  .work { border:var(--bd); border-radius:var(--r-card); overflow:hidden; background:var(--ink-800); transition: transform .24s var(--ease), border-color .24s; }
+  .work:hover { transform: translateY(-3px); border-color: var(--ink-500); }
+  .work .bar { height:7px; }
+  .work .in { padding: var(--s-5); }
+  .work .k { font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; }
+  .work h3 { margin:10px 0 6px; font-size:21px; font-weight:700; letter-spacing:-.01em; }
+  .work p { margin:0 0 var(--s-4); color:var(--dim-1); font-size:14px; line-height:1.5; }
+  .work .meta { font-family:var(--font-mono); font-size:11px; color:var(--dim-2); display:flex; justify-content:space-between; }
+
+  @media (prefers-reduced-motion: reduce){ .caret,.status .live { animation:none; } }
+</style>
+</head>
+<body>
+
+  <div class="nav">
+    <div class="wrap row">
+      <span class="bp-pill" style="font-size:18px; padding:.4em .55em .48em;"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span>
+      <span class="spacer"></span>
+      <div class="links">
+        <a href="#work">work</a>
+        <a href="#about">about</a>
+        <a href="../Bruce Peters — Design System.html">system ↗</a>
+        <a href="#contact" style="color:var(--green);">contact</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="field"></div>
+    <div class="wrap hero-layout">
+      <div>
+        <span class="status"><span class="live"></span> currently · ai-assisted sim pipeline</span>
+        <h1 class="big">i build things<br/>that outlast me.</h1>
+        <p class="lede">Bruce Peters — programmer, founder, and the guy who'll join every room he doesn't belong in yet. Robotics, reading apps, whatever needs to exist. then I ship it.</p>
+        <div class="cta-row">
+          <a href="#work" class="btn btn-primary">see the work →</a>
+          <a href="#contact" class="btn btn-ghost">get in touch</a>
+        </div>
+        <div class="tech-row">
+          <span class="tech-chip"><span class="d" style="background:var(--green)"></span>Java</span>
+          <span class="tech-chip"><span class="d" style="background:var(--lime)"></span>WPILib</span>
+          <span class="tech-chip"><span class="d" style="background:var(--coral)"></span>React / TS</span>
+          <span class="tech-chip"><span class="d" style="background:var(--magenta)"></span>FastAPI</span>
+          <span class="tech-chip"><span class="d" style="background:var(--violet)"></span>OpenCV</span>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-bar">
+          <span class="dot" style="background:var(--magenta)"></span>
+          <span class="dot" style="background:var(--lime)"></span>
+          <span class="dot" style="background:var(--green)"></span>
+          <span class="ttl">~/bruce — whoami</span>
+        </div>
+        <div class="term-body" id="typed"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="works" id="work">
+    <div class="wrap">
+      <div class="lab">// <b>selected works</b> — built, shipped, still running</div>
+      <div class="work-grid">
+        <div class="work">
+          <div class="bar" style="background:var(--green)"></div>
+          <div class="in">
+            <span class="k" style="color:var(--green)">// flagship · solo</span>
+            <h3>Word Wiz AI</h3>
+            <p>A reading tutor that hears the exact sounds kids miss — phoneme-level feedback for ages 5–8.</p>
+            <div class="meta"><span>5 ML models · ~2s</span><span style="color:var(--magenta)">4K READERS</span></div>
+          </div>
+        </div>
+        <div class="work">
+          <div class="bar" style="background:var(--magenta)"></div>
+          <div class="in">
+            <span class="k" style="color:var(--magenta)">// robotics · iron panthers</span>
+            <h3>Robot Sim Platform</h3>
+            <p>A software twin of the robot. 3× the programming team's speed — and it'll outlast me on the team.</p>
+            <div class="meta"><span>Java · WPILib</span><span style="color:var(--green)">WORLDS '25 🏆</span></div>
+          </div>
+        </div>
+        <div class="work">
+          <div class="bar" style="background:var(--coral)"></div>
+          <div class="in">
+            <span class="k" style="color:var(--coral)">// full-stack</span>
+            <h3>Scouting App</h3>
+            <p>Real-time match data for the whole team. Rebuilt from scratch — the app that taught me the web.</p>
+            <div class="meta"><span>React · Firebase</span><span style="color:var(--dim-1)">TEAM-WIDE</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // typing effect for the terminal whoami
+    const lines = [
+      ['dim', '$ '], ['cr', 'whoami\n'],
+      ['gp', '> '], ['cr', 'bruce peters — builder\n\n'],
+      ['dim', '  role     '], ['cr', 'programmer · founder · treasurer\n'],
+      ['dim', '  building '], ['li', 'word wiz ai'], ['cr', ', '], ['li', 'robot sim'], ['cr', '\n'],
+      ['dim', '  shipped  '], ['gp', '✓ worlds champs'], ['cr', '  '], ['mg', '✓ 2nd @ CAC'], ['cr', '\n'],
+      ['dim', '  motto    '], ['cr', 'it\'s just what I do\n\n'],
+      ['gp', '> '], ['cr', 'next: '], ['li', 'ai-assisted sim pipeline'], ['cr', ' ']
+    ];
+    const host = document.getElementById('typed');
+    let li = 0, ci = 0, html = '';
+    function tick(){
+      if (li >= lines.length){ host.innerHTML = html + '<span class="caret"></span>'; return; }
+      const [cls, txt] = lines[li];
+      if (ci === 0) html += '<span class="'+cls+'">';
+      if (ci < txt.length){ host.innerHTML = html + txt.slice(0, ci+1) + '</span><span class="caret"></span>'; ci++; setTimeout(tick, txt[ci-1]==='\n'?60: 16 + Math.random()*22); }
+      else { html += txt + '</span>'; li++; ci = 0; setTimeout(tick, 90); }
+    }
+    tick();
+  </script>
+</body>
+</html>

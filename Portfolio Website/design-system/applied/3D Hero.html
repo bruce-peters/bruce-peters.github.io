@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bruce Peters — /bp/ · 3D hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;0,800;1,500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../tokens.css" />
+<style>
+  html, body { height: 100%; }
+  body { overflow: hidden; background: var(--ink-900); }
+
+  /* the 3D layer */
+  #scene { position: fixed; inset: 0; z-index: 0; display: block; }
+  /* vignette + top/bottom fades to seat the canvas into the page */
+  .veil {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(12,12,14,0.95) 0%, rgba(12,12,14,0.78) 30%, rgba(12,12,14,0.32) 50%, transparent 66%),
+      radial-gradient(120% 90% at 74% 44%, transparent 48%, rgba(12,12,14,0.5) 100%),
+      linear-gradient(180deg, rgba(12,12,14,0.85) 0%, transparent 22%, transparent 70%, rgba(12,12,14,0.92) 100%);
+  }
+
+  /* DOM overlay — crisp UI rides above the canvas */
+  .overlay { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
+  .overlay .pe { pointer-events: auto; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(20px,5vw,56px); }
+
+  /* nav */
+  .nav { position: absolute; top: 0; left: 0; right: 0; }
+  .nav .row { display: flex; align-items: center; gap: var(--s-4); height: 64px; }
+  .nav .spacer { flex: 1; }
+  .nav .links { display: flex; gap: var(--s-5); }
+  .nav .links a { font-family: var(--font-mono); font-size: 12px; color: var(--dim-1); text-decoration: none; transition: color .15s; }
+  .nav .links a:hover { color: var(--green); }
+  @media (max-width: 720px){ .nav .links { display: none; } }
+
+  /* hero copy block (left) */
+  .stage { position: absolute; inset: 0; display: flex; align-items: center; }
+  .copy { max-width: 640px; }
+  .status { display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:12px; color:var(--dim-1);
+    border:1px solid var(--ink-600); background: color-mix(in srgb, var(--ink-850) 70%, transparent); backdrop-filter: blur(6px);
+    border-radius:var(--r-pill); padding:5px 13px 6px; margin-bottom: var(--s-5); }
+  .status .live { width:7px; height:7px; border-radius:50%; background:var(--green); animation: pulse 2.4s infinite; }
+  @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(87,211,106,.5)} 70%{box-shadow:0 0 0 9px rgba(87,211,106,0)} 100%{box-shadow:0 0 0 0 rgba(87,211,106,0)} }
+
+  h1.big { font-size: clamp(40px, 5vw, 62px); font-weight: 700; line-height: 1.04; letter-spacing: -0.03em; margin: 0 0 28px;
+    text-shadow: 0 2px 30px rgba(12,12,14,0.85); }
+  .lede { font-size: clamp(16px,1.7vw,19px); color: var(--cream); opacity: 0.82; line-height: 1.55; max-width: 38ch; margin: 0 0 var(--s-6);
+    text-shadow: 0 1px 16px rgba(12,12,14,0.95); }
+  .cta-row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  .btn { font-family:var(--font-mono); font-weight:700; font-size:13px; border-radius:var(--r-pill); padding:12px 24px; border:0; cursor:pointer;
+    display:inline-flex; align-items:center; gap:8px; text-decoration:none; transition: transform .15s var(--ease), box-shadow .24s var(--ease), border-color .15s, color .15s; }
+  .btn-primary { background:var(--green); color:var(--green-ink); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow-green); }
+  .btn-ghost { background: color-mix(in srgb, var(--ink-850) 55%, transparent); color:var(--cream); border:1px solid var(--ink-600); backdrop-filter: blur(6px); }
+  .btn-ghost:hover { border-color:var(--green); color:var(--green); }
+
+  /* hint + handoff badge */
+  .scrollhint { position:absolute; bottom: 22px; left: 50%; transform: translateX(-50%); font-family:var(--font-mono); font-size:11px; color:var(--dim-2); letter-spacing:.1em; }
+  .handoff { position:absolute; bottom: 18px; right: clamp(20px,5vw,56px); font-family:var(--font-mono); font-size:11px; color:var(--dim-2); }
+  .handoff a { color: var(--green); text-decoration: none; }
+
+  /* loading state */
+  #loading { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; background: var(--ink-900); transition: opacity .5s ease; }
+  #loading.hide { opacity: 0; pointer-events: none; }
+  .loadpill { font-family: var(--font-mono); font-weight: 800; font-size: 26px; color: var(--green-ink); background: var(--green); border-radius: var(--r-pill); padding: .4em .6em .48em; animation: bob 1.4s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-7px) } }
+
+  @media (prefers-reduced-motion: reduce){ .status .live, .loadpill { animation: none; } }
+</style>
+</head>
+<body>
+
+  <div id="loading"><span class="loadpill"><span style="opacity:.5;font-weight:500">/</span>bp<span style="opacity:.5;font-weight:500">/</span></span></div>
+
+  <canvas id="scene"></canvas>
+  <div class="veil"></div>
+
+  <div class="overlay">
+    <!-- nav -->
+    <div class="nav">
+      <div class="wrap row">
+        <span class="bp-pill pe" style="font-size:18px; padding:.4em .55em .48em;"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span>
+        <span class="spacer"></span>
+        <div class="links pe">
+          <a href="Hero.html">work</a>
+          <a href="../Bruce Peters — Design System.html">system ↗</a>
+          <a href="#" style="color:var(--green);">contact</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- hero copy -->
+    <div class="stage">
+      <div class="wrap">
+        <div class="copy">
+          <span class="status pe"><span class="live"></span> currently · ai-assisted sim pipeline</span>
+          <h1 class="big">i build things<br/>that outlast me.</h1>
+          <p class="lede">Programmer, founder, and the guy who'll join every room he doesn't belong in yet. I build the thing that needs to exist — then I ship it.</p>
+          <div class="cta-row pe">
+            <a href="Hero.html" class="btn btn-primary">see the work →</a>
+            <a href="#" class="btn btn-ghost">get in touch</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <span class="scrollhint">drag / move to explore the scene</span>
+    <span class="handoff">reference build · scene → <a href="scene.js">scene.js</a></span>
+  </div>
+
+  <!-- Three.js (pinned) -->
+  <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+  <script src="scene.js"></script>
+  <script>
+    const canvas = document.getElementById('scene');
+    function hideLoader(){ document.getElementById('loading').classList.add('hide'); }
+    function boot(){
+      try { window.BP_BOOT(canvas, hideLoader); }
+      catch(e){ console.error(e); hideLoader(); }
+      // failsafe in case onReady never fires
+      setTimeout(hideLoader, 2500);
+    }
+    if (window.THREE) boot();
+    else addEventListener('load', boot);
+  </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
-import { PROJECTS, ARCHIVE_PROJECTS, SCENE_ELEMENTS } from '../data/projects.js'
+import { PROJECTS, SCENE_ELEMENTS } from '../data/projects.js'
 import { makeStars, buildReader, buildProjectCard, buildArchive, buildAbout, loadFieldModel, loadField2025Model, buildScreenshotPanes } from './builders.js'
 import { loadAutoPlayback } from './autoPlayback.js'
 import { loadAutoPlayback2025 } from './autoPlayback2025.js'
@@ -26,7 +26,7 @@ export function initScene(container, onProjectChange, onLoad) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   renderer.setSize(window.innerWidth, window.innerHeight)
-  renderer.setClearColor(0x000000, 1)
+  renderer.setClearColor(0x101012, 1)
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.PCFShadowMap
   renderer.toneMapping = THREE.ACESFilmicToneMapping
@@ -41,8 +41,8 @@ export function initScene(container, onProjectChange, onLoad) {
 
   // Scene
   const scene = new THREE.Scene()
-  scene.background = new THREE.Color(0x000000)
-  scene.fog = new THREE.Fog(0x000000, 50, 120)
+  scene.background = new THREE.Color(0x101012)
+  scene.fog = new THREE.Fog(0x101012, 50, 120)
   scene.environment = envTexture
   scene.environmentIntensity = 0.2
 
@@ -63,6 +63,7 @@ export function initScene(container, onProjectChange, onLoad) {
   controls.rotateSpeed = 0.5
   controls.enableZoom = false
   controls.enablePan = false
+  controls.enableRotate = false   // background is scroll-driven; re-enabled only in tune mode
   controls.minDistance = 6
   controls.maxDistance = 50
   controls.maxPolarAngle = Math.PI * 0.9
@@ -70,28 +71,9 @@ export function initScene(container, onProjectChange, onLoad) {
   const _overviewLookAt = _overview.lookAt ?? _overview.pos
   controls.target.set(_overviewLookAt[0], _overviewLookAt[1], _overviewLookAt[2])
 
-  // Lights — dim ambient so shadows read clearly; colored alliance zone point lights
-  scene.add(new THREE.AmbientLight(0xffffff, 0.01))
-
-  // Key overhead — kept dim so shadows are visible on the field surface
-  const key = new THREE.DirectionalLight(0xfff4d6, 0.12)
-  key.position.set(0, 25, 0); key.castShadow = true
-  key.shadow.mapSize.set(4096, 4096)
-  key.shadow.camera.left = -14; key.shadow.camera.right = 14
-  key.shadow.camera.top = 7; key.shadow.camera.bottom = -7
-  key.shadow.camera.near = 0.5; key.shadow.camera.far = 30
-  key.shadow.bias = -0.001
-  scene.add(key)
-
-  // Red alliance — left end of field (world -X)
-  const redLight = new THREE.PointLight(0xff2200, 18, 14, 2)
-  redLight.position.set(-7.5, 3, 0)
-  scene.add(redLight)
-
-  // Blue alliance — right end of field (world +X)
-  const blueLight = new THREE.PointLight(0x0066ff, 18, 14, 2)
-  blueLight.position.set(7.5, 3, 0)
-  scene.add(blueLight)
+  // Lights — design-system palette: warm cream ambient only, kept deliberately
+  // dim so the field reads dark and moody, lit by the environment map.
+  scene.add(new THREE.AmbientLight(0xf4f0e8, 0.02))
 
   // Stars
   scene.add(makeStars())
@@ -110,13 +92,6 @@ export function initScene(container, onProjectChange, onLoad) {
   const field2025Group = loadField2025Model(scene, _field2025El?.pos)
   elementGroups.set('field2025', field2025Group)
 
-  // Lights for the 2025 field area
-  const red2024 = new THREE.PointLight(0xff2200, 18, 14, 2)
-  red2024.position.set(-7.5, 3, -20)
-  scene.add(red2024)
-  const blue2024 = new THREE.PointLight(0x0066ff, 18, 14, 2)
-  blue2024.position.set(7.5, 3, -20)
-  scene.add(blue2024)
 
   // Project groups
   const allUpdaters = []
@@ -153,68 +128,58 @@ export function initScene(container, onProjectChange, onLoad) {
   const scoutingP  = PROJECTS.find(p => p.id === 'scouting')
   const readerP    = PROJECTS.find(p => p.id === 'reader')
 
-  // FRC card — right side of arena, face pointing left toward arena (-X)
-  const frcCard = buildProjectCard(roboticsP, { rotY: roboticsP.cardRotY ?? -Math.PI / 2 })
-  scene.add(frcCard); allUpdaters.push(frcCard.userData.update)
-  cardGroups.set(roboticsP.id, frcCard)
-
-  // 2025 robot card — same layout as main robotics card, positioned next to the 2025 field
-  const robot2025Card = buildProjectCard(robot2025P, { rotY: robot2025P.cardRotY ?? -Math.PI / 2 })
-  scene.add(robot2025Card); allUpdaters.push(robot2025Card.userData.update)
-  cardGroups.set(robot2025P.id, robot2025Card)
-
-  // Sim card — left side of arena, face pointing right toward arena (+X)
-  const simCard = buildProjectCard(simP, { rotY: simP.cardRotY ?? Math.PI / 2 })
-  scene.add(simCard); allUpdaters.push(simCard.userData.update)
-  cardGroups.set(simP.id, simCard)
-
-  // Scouting card
-  const scoutCard = buildProjectCard(scoutingP, { rotY: scoutingP.cardRotY ?? 0 })
-  scene.add(scoutCard); allUpdaters.push(scoutCard.userData.update)
-  cardGroups.set(scoutingP.id, scoutCard)
-
-  // Reader (Word Wiz AI) card — pos and rotY come from projects.js data
-  const readerCard = buildProjectCard(readerP, { rotY: readerP.cardRotY ?? 0 })
-  scene.add(readerCard); allUpdaters.push(readerCard.userData.update)
-  cardGroups.set(readerP.id, readerCard)
-
-  // Archive gate — atmospheric floor disc at corridor entrance
-  const archive = buildArchive()
-  scene.add(archive); allUpdaters.push(archive.userData.update)
-  extraGroups.set('archive', archive)
-
-  // Individual archive work cards — spaced along the negative-Z corridor
-  ARCHIVE_PROJECTS.forEach((p) => {
-    const g = buildProjectCard(p, { rotY: p.archiveRotY })
+  // Helper: add a slim project card if one was built (skipped when imageless)
+  function addCard(p, opts) {
+    const g = buildProjectCard(p, opts)
+    if (!g) return
     scene.add(g); allUpdaters.push(g.userData.update)
     cardGroups.set(p.id, g)
-  })
+  }
+
+  // FRC card — right side of arena, face pointing left toward arena (-X)
+  addCard(roboticsP, { rotY: roboticsP.cardRotY ?? -Math.PI / 2 })
+
+  // 2025 robot card — same layout as main robotics card, positioned next to the 2025 field
+  addCard(robot2025P, { rotY: robot2025P.cardRotY ?? -Math.PI / 2 })
+
+  // Sim card — left side of arena, face pointing right toward arena (+X)
+  addCard(simP, { rotY: simP.cardRotY ?? Math.PI / 2 })
+
+  // Scouting card
+  addCard(scoutingP, { rotY: scoutingP.cardRotY ?? 0 })
+
+  // Reader (Word Wiz AI) card — pos and rotY come from projects.js data
+  addCard(readerP, { rotY: readerP.cardRotY ?? 0 })
+
+  // Archive corridor — floor-disc gate + git commit graph. Each archive work is
+  // a commit node; the node for the project the camera is parked on lights up,
+  // so we feed the graph the active project id every frame.
+  const archive = buildArchive()
+  scene.add(archive)
+  allUpdaters.push((t) => archive.userData.update(t, PROJECTS[activeIndex]?.id))
+  extraGroups.set('archive', archive)
 
   // Screenshot panes (load async — silently skip missing files)
   paneController = buildScreenshotPanes(scene, allUpdaters)
 
-  // ── Physics-based continuous scroll ────────────────────────────────────────
-  // scroll    : float position in [0, N-1] — directly drives the camera
-  // scrollVel : velocity in nodes/sec — added to by inputs, killed by friction
-  // snapTarget: integer set by keyboard nav; null = snap to Math.round(scroll)
-  // activeIndex: the "current" node for UI (= Math.round(scroll), updated each frame)
+  // ── Scroll-driven camera ───────────────────────────────────────────────────
+  // scroll      : float position in [0, N-1] — drives the camera (eased toward target)
+  // scrollTarget: where the document scroll wants the camera to be (set via setScroll)
+  // activeIndex : the "current" node for UI (= Math.round(scroll), updated each frame)
   //
-  // Design: wheel events directly push velocity — no discrete jumps, no timers.
-  // When velocity drops below SNAP_THRESHOLD the camera spring-locks to the
-  // nearest node (or snapTarget) so it always rests cleanly at a waypoint.
+  // Design (new layout): the page is a normal scrolling document. React maps the
+  // viewport position to a node-float and calls setScroll(); here we just ease
+  // `scroll` toward that target so the background camera glides between projects.
   // ─────────────────────────────────────────────────────────────────────────
-  let scroll     = 0.0
-  let scrollVel  = 0.0
-  let snapTarget = null   // integer or null
-  let activeIndex = 0
-  let debugMode  = false  // true while manual camera control is active
+  let scroll       = 0.0
+  let scrollTarget = 0.0
+  let activeIndex  = 0
+  let debugMode    = false  // true while manual camera control is active (tune/exit)
 
-  const N               = PROJECTS.length
-  const SENSITIVITY     = 0.025  // deltaY (px) → velocity
-  const MAX_VEL         = 1.5    // nodes / sec cap
-  const FRICTION        = 3.5    // exp decay — slower than before so small inputs linger
-  const SNAP_THRESHOLD  = 0.06   // vel below which snap spring activates (was 0.5 — too high, killed small inputs immediately)
-  const SNAP_SPEED      = 1.0    // spring speed toward nearest node
+  const N        = PROJECTS.length
+  const SCROLL_LERP = 5.0     // exp ease toward scrollTarget (higher = snappier)
+  const PARALLAX = 0.3        // world-unit camera offset from mouse position
+  let   mouseX = 0, mouseY = 0   // normalized [-1, 1]
 
   // Pre-compute camera positions and look-at targets for every node, then
   // build open CatmullRom splines so the camera glides smoothly between all
@@ -229,71 +194,36 @@ export function initScene(container, onProjectChange, onLoad) {
   const camCurve  = new THREE.CatmullRomCurve3(nodeCamPos, false, 'catmullrom', 0.5)
   const lookCurve = new THREE.CatmullRomCurve3(nodeLookAt, false, 'catmullrom', 0.5)
 
-  // goToIndex — instant jump (dot-rail, Home/End).
-  // Keyboard arrows instead push velocity directly so the camera scrolls
-  // through space rather than teleporting.
+  // setScroll — React drives this from the document scroll position.
+  // nodeFloat ∈ [0, N-1]; the camera eases toward it in tick().
+  function setScroll(nodeFloat) {
+    if (tuneActive) return
+    debugMode = false
+    scrollTarget = Math.max(0, Math.min(N - 1, nodeFloat))
+  }
+
+  // goToIndex — kept for API compatibility; snaps the target (used by exit/legacy).
   function goToIndex(i, opts = {}) {
     const next = Math.max(0, Math.min(N - 1, i))
-    scroll     = next
-    scrollVel  = 0
-    snapTarget = null
+    scroll = next
+    scrollTarget = next
     if (next !== activeIndex || opts.force) {
       activeIndex = next
       onProjectChange(PROJECTS[next], next)
     }
   }
 
-  // Wheel — add to velocity; physics handles the rest.
-  // Normalize deltaMode so line-mode devices behave like pixel-mode.
-  function onWheel(e) {
-    if (tuneActive) return  // OrbitControls handles zoom in tune mode
-    e.preventDefault()
-    debugMode = false
-    const normalisers = [1, 40, 800]
-    const delta = e.deltaY * normalisers[e.deltaMode ?? 0]
-    scrollVel = Math.max(-MAX_VEL, Math.min(MAX_VEL, scrollVel + delta * SENSITIVITY))
-    snapTarget = null  // user is manually scrolling — release keyboard snap target
+  // Subtle mouse parallax — gives the fixed background life without hijacking scroll.
+  function onPointerMove(e) {
+    mouseX = (e.clientX / window.innerWidth) * 2 - 1
+    mouseY = (e.clientY / window.innerHeight) * 2 - 1
   }
-  window.addEventListener('wheel', onWheel, { passive: false })
+  window.addEventListener('pointermove', onPointerMove, { passive: true })
 
-  // Keyboard — arrows push velocity (continuous feel); Home/End jump instantly.
-  function onKeyDown(e) {
-    if (tuneActive) return  // suppress node navigation in tune mode
-    if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(e.key)) {
-      e.preventDefault()
-      debugMode  = false
-      snapTarget = Math.min(N - 1, Math.round(scroll) + 1)
-      scrollVel  = 0
-    } else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) {
-      e.preventDefault()
-      debugMode  = false
-      snapTarget = Math.max(0, Math.round(scroll) - 1)
-      scrollVel  = 0
-    } else if (e.key === 'Home') { debugMode = false; goToIndex(0) }
-    else if (e.key === 'End')   { debugMode = false; goToIndex(N - 1) }
-  }
-  document.addEventListener('keydown', onKeyDown)
-
-  // Touch — convert swipe distance to an initial velocity.
-  let touchStartY = null
-  function onTouchStart(e) { if (e.touches.length === 1) touchStartY = e.touches[0].clientY }
-  function onTouchEnd(e) {
-    if (touchStartY == null) return
-    const dy = (e.changedTouches[0]?.clientY ?? touchStartY) - touchStartY
-    if (Math.abs(dy) > 30) {
-      debugMode  = false
-      scrollVel  = Math.max(-MAX_VEL, Math.min(MAX_VEL, -dy * 0.03))
-      snapTarget = null
-    }
-    touchStartY = null
-  }
-  window.addEventListener('touchstart', onTouchStart, { passive: true })
-  window.addEventListener('touchend', onTouchEnd)
-
-  // Drag cursor
-  renderer.domElement.addEventListener('pointerdown', () => document.body.classList.add('dragging'))
-  renderer.domElement.addEventListener('pointerup', () => document.body.classList.remove('dragging'))
-  renderer.domElement.addEventListener('pointerleave', () => document.body.classList.remove('dragging'))
+  // Drag cursor (only meaningful in tune mode, where the canvas grabs pointer events)
+  renderer.domElement.addEventListener('pointerdown', () => tuneActive && container.classList.add('dragging'))
+  renderer.domElement.addEventListener('pointerup', () => container.classList.remove('dragging'))
+  renderer.domElement.addEventListener('pointerleave', () => container.classList.remove('dragging'))
 
   // Resize
   function onResize() {
@@ -315,44 +245,36 @@ export function initScene(container, onProjectChange, onLoad) {
     const dt = Math.min(timer.getDelta(), 0.1)
     allUpdaters.forEach(fn => fn && fn(t))
 
-    // ── 1. Integrate velocity ───────────────────────────────────────────────
-    scroll    += scrollVel * dt
-    scrollVel *= Math.exp(-FRICTION * dt)   // frame-rate-independent friction
+    // ── 1. Ease `scroll` toward the document-driven target ─────────────────
+    const prevScroll = scroll
+    scroll += (scrollTarget - scroll) * (1 - Math.exp(-SCROLL_LERP * dt))
+    if (Math.abs(scrollTarget - scroll) < 0.0005) scroll = scrollTarget
 
-    // Hard clamp + kill velocity at the ends
-    if (scroll <= 0)     { scroll = 0;     scrollVel = Math.max(0, scrollVel) }
-    if (scroll >= N - 1) { scroll = N - 1; scrollVel = Math.min(0, scrollVel) }
-
-    // ── 2. Snap spring ─────────────────────────────────────────────────────
-    // When nearly stopped, spring toward the nearest node (or keyboard target).
-    if (Math.abs(scrollVel) < SNAP_THRESHOLD) {
-      scrollVel = 0
-      const target = snapTarget !== null ? snapTarget : Math.round(scroll)
-      scroll += (target - scroll) * (1 - Math.exp(-SNAP_SPEED * dt))
-      if (snapTarget !== null && Math.abs(scroll - snapTarget) < 0.002) snapTarget = null
-    }
-
-    // ── 3. Update UI whenever the nearest node changes ─────────────────────
+    // ── 2. Update UI whenever the nearest node changes ─────────────────────
     const nearestNode = Math.round(scroll)
     if (nearestNode !== activeIndex) {
       activeIndex = nearestNode
       onProjectChange(PROJECTS[activeIndex], activeIndex)
     }
 
-    // ── 4. Camera — pure function of scroll via open CatmullRom spline ─────
-    // debugMode suspends this block so DebugPanel can hold manual positions.
+    // ── 3. Camera — pure function of scroll via open CatmullRom spline ─────
+    // debugMode suspends this block so tune/exit can hold manual positions.
     if (!debugMode) {
-      // Eased spline parameter: smootherstep the fractional part of scroll so
-      // the camera lingers near each waypoint and rushes through the midpoint.
+      // Eased spline parameter: ease the fractional part of scroll so the
+      // camera lingers near each waypoint and glides through the midpoint.
       const i0       = Math.min(Math.floor(scroll), N - 2)
       const frac     = Math.max(0, Math.min(1, scroll - i0))
       const pathT    = (i0 + nodeEase(frac)) / (N - 1)
       camera.position.copy(camCurve.getPoint(pathT))
       controls.target.copy(lookCurve.getPoint(pathT))
 
-      // Subtle FOV breathing: widens during fast movement, contracts at rest
-      const speed = Math.abs(scrollVel)
-      camera.fov = THREE.MathUtils.lerp(camera.fov, 45 + Math.min(speed, MAX_VEL) * 0.8, 0.08)
+      // Subtle mouse parallax around the spline point
+      camera.position.x += mouseX * PARALLAX
+      camera.position.y += -mouseY * PARALLAX
+
+      // Gentle FOV breathing: widens while the camera is moving, settles at rest
+      const speed = Math.abs(scroll - prevScroll) / Math.max(dt, 0.001)
+      camera.fov = THREE.MathUtils.lerp(camera.fov, 45 + Math.min(speed, 1.5) * 0.8, 0.08)
       camera.updateProjectionMatrix()
     }
 
@@ -371,17 +293,20 @@ export function initScene(container, onProjectChange, onLoad) {
   document.fonts.ready.then(start)
   setTimeout(start, 1800)
 
-  // Expose goToIndex + tune mode API to React
+  // Expose scroll control + tune mode API to React
   return {
     goToIndex,
+    setScroll,
 
     // ── Tune mode ───────────────────────────────────────────────────────────
     enterTuneMode(onStateChange, onSelect) {
       tuneActive = true
       debugMode  = true
-      scrollVel  = 0
+      document.body.style.overflow = 'hidden'   // lock page scroll so wheel zooms the scene
+      container.classList.add('tune-active')     // re-enable pointer events on the canvas
       controls.enableZoom     = true
       controls.enablePan      = true
+      controls.enableRotate   = true
       controls.maxDistance    = 500
       controls.minPolarAngle  = 0
       controls.maxPolarAngle  = Math.PI
@@ -401,10 +326,11 @@ export function initScene(container, onProjectChange, onLoad) {
       tuneGizmoManager = null
       tuneActive  = false
       debugMode   = false
-      scrollVel   = 0
-      snapTarget  = null
+      document.body.style.overflow = ''           // restore page scroll
+      container.classList.remove('tune-active', 'dragging')
       controls.enableZoom     = false
       controls.enablePan      = false
+      controls.enableRotate   = false
       controls.maxDistance    = 50
       controls.minPolarAngle  = Math.PI * 0.1
       controls.maxPolarAngle  = Math.PI * 0.9
@@ -430,7 +356,6 @@ export function initScene(container, onProjectChange, onLoad) {
     // ── Exit animation — zoom toward lookAt, then call onComplete ───────────
     startExitAnimation(onComplete) {
       if (debugMode && tuneActive) return  // don't run during tune mode
-      scrollVel = 0
       debugMode = true
       controls.enabled = false
 
@@ -467,10 +392,9 @@ export function initScene(container, onProjectChange, onLoad) {
       }
     },
     setCameraState(pos, target) {
-      scroll     = activeIndex
-      scrollVel  = 0
-      snapTarget = null
-      debugMode  = true
+      scroll       = activeIndex
+      scrollTarget = activeIndex
+      debugMode    = true
       camera.position.set(pos[0], pos[1], pos[2])
       controls.target.set(target[0], target[1], target[2])
       controls.update()
@@ -494,11 +418,9 @@ export function initScene(container, onProjectChange, onLoad) {
     destroy() {
       tuneGizmoManager?.dispose()
       cancelAnimationFrame(animId)
-      window.removeEventListener('wheel', onWheel)
-      document.removeEventListener('keydown', onKeyDown)
-      window.removeEventListener('touchstart', onTouchStart)
-      window.removeEventListener('touchend', onTouchEnd)
+      window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('resize', onResize)
+      document.body.style.overflow = ''
       renderer.dispose()
       container.removeChild(renderer.domElement)
     },

@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>/bp/ — Bruce Peters Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;0,800;1,500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+<style>
+  /* ---------- page chrome ---------- */
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--ink-850) 86%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-bottom: var(--bd);
+  }
+  .topbar .row { display: flex; align-items: center; gap: var(--s-4); height: 64px; }
+  .topbar .spacer { flex: 1; }
+  .topbar nav { display: flex; gap: var(--s-5); }
+  .topbar nav a {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em;
+    color: var(--dim-1); text-decoration: none; transition: color var(--dur-fast) var(--ease);
+  }
+  .topbar nav a:hover { color: var(--green); }
+  @media (max-width: 760px){ .topbar nav { display: none; } }
+
+  /* hero */
+  .hero { padding: clamp(60px,12vh,140px) 0 var(--s-9); border-bottom: var(--bd); position: relative; overflow: hidden; }
+  .hero-grid {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.5;
+    background-image:
+      linear-gradient(var(--ink-700) 1px, transparent 1px),
+      linear-gradient(90deg, var(--ink-700) 1px, transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 30% 0%, #000 0%, transparent 75%);
+            mask-image: radial-gradient(ellipse 80% 60% at 30% 0%, #000 0%, transparent 75%);
+  }
+  .hero-inner { position: relative; }
+  .hero h1 {
+    font-size: var(--t-mega); line-height: var(--lh-tight); letter-spacing: var(--tracking-tight);
+    font-weight: 700; margin: var(--s-5) 0 var(--s-4); max-width: 14ch;
+  }
+  .hero p.lede {
+    font-size: clamp(17px, 2vw, 21px); color: var(--dim-1); max-width: 52ch; margin: 0 0 var(--s-6);
+    line-height: 1.5;
+  }
+  .hero .meta { display: flex; gap: var(--s-5); flex-wrap: wrap; font-family: var(--font-mono); font-size: 12px; color: var(--dim-2); }
+  .hero .meta b { color: var(--cream); font-weight: 500; }
+
+  /* section scaffolding */
+  section.block { padding: var(--s-9) 0; border-bottom: var(--bd); }
+  .sec-head { display: flex; align-items: baseline; gap: var(--s-4); margin-bottom: var(--s-7); flex-wrap: wrap; }
+  .sec-num { font-family: var(--font-mono); font-size: 12px; color: var(--green); letter-spacing: 0.1em; }
+  .sec-head h2 { font-size: var(--t-h2); font-weight: 700; letter-spacing: var(--tracking-tight); margin: 0; line-height: 1.05; }
+  .sec-head p { color: var(--dim-1); margin: 0; font-size: var(--t-sm); max-width: 46ch; }
+  .sec-head .spacer { flex: 1; }
+
+  .grid { display: grid; gap: var(--s-5); }
+  .cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .cols-4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 900px){ .cols-3, .cols-4 { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 600px){ .cols-2, .cols-3, .cols-4 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--ink-800); border: var(--bd); border-radius: var(--r-card);
+    padding: var(--s-5); box-shadow: var(--shadow-card);
+  }
+  .card .bp-label { display: block; margin-bottom: var(--s-3); }
+
+  /* ---------- LOGO SECTION ---------- */
+  .logo-stage {
+    background:
+      radial-gradient(ellipse 60% 80% at 50% 40%, rgba(87,211,106,0.06), transparent 70%),
+      var(--ink-900);
+    border: var(--bd); border-radius: var(--r-card);
+    min-height: 360px; display: grid; place-items: center; position: relative; overflow: hidden;
+  }
+  .logo-stage .bp-pill { font-size: 86px; padding: 0.4em 0.58em 0.48em; box-shadow: var(--glow-green); }
+  .logo-tick { position: absolute; font-family: var(--font-mono); font-size: 10px; color: var(--dim-2); letter-spacing: 0.1em; }
+
+  .lockups { display: flex; flex-direction: column; gap: var(--s-5); }
+  .lockup-row { display: flex; align-items: center; gap: var(--s-5); flex-wrap: wrap; padding: var(--s-4) 0; border-bottom: var(--bd-faint); }
+  .lockup-row:last-child { border-bottom: 0; }
+  .lockup-row .tag { font-family: var(--font-mono); font-size: 11px; color: var(--dim-2); width: 120px; flex-shrink: 0; }
+
+  .wordmark { display: inline-flex; flex-direction: column; line-height: 1; }
+  .wordmark .nm { font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: -0.02em; }
+  .wordmark .sub { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; color: var(--dim-2); text-transform: uppercase; margin-top: 5px; }
+
+  /* clearspace diagram */
+  .clearspace { position: relative; display: inline-flex; padding: 36px; }
+  .clearspace::before {
+    content: ''; position: absolute; inset: 0; border: 1px dashed var(--ink-500); border-radius: var(--r-sm);
+  }
+
+  /* misuse */
+  .dont { border-color: color-mix(in srgb, var(--magenta) 30%, var(--ink-600)); }
+  .badge-do, .badge-dont { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 2px 8px; border-radius: var(--r-pill); display: inline-flex; align-items:center; gap:5px; }
+  .badge-do { color: var(--green); background: rgba(87,211,106,0.1); }
+  .badge-dont { color: var(--magenta); background: rgba(230,59,109,0.12); }
+
+  /* ---------- COLOR ---------- */
+  .swatch { border-radius: var(--r-card); overflow: hidden; border: var(--bd); }
+  .swatch .chip { height: 110px; display: flex; align-items: flex-end; padding: var(--s-3); }
+  .swatch .info { padding: var(--s-3) var(--s-4) var(--s-4); background: var(--ink-800); }
+  .swatch .info .nm { font-weight: 600; font-size: 14px; }
+  .swatch .info .hex { font-family: var(--font-mono); font-size: 11px; color: var(--dim-1); display: block; margin-top: 2px; }
+  .swatch .info .use { font-size: 11px; color: var(--dim-2); display:block; margin-top: 6px; line-height: 1.4; }
+  .chip-name { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; }
+
+  /* phoneme demo */
+  .phoneme-demo { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center; }
+  .ph {
+    font-family: var(--font-mono); font-weight: 700; font-size: 18px;
+    padding: 6px 14px 8px; border-radius: var(--r-pill); color: var(--green-ink);
+  }
+
+  /* ---------- TYPE ---------- */
+  .type-spec { border-bottom: var(--bd-faint); padding: var(--s-5) 0; display: grid; grid-template-columns: 120px 1fr; gap: var(--s-5); align-items: baseline; }
+  .type-spec:last-child { border-bottom: 0; }
+  .type-spec .label-col { font-family: var(--font-mono); font-size: 11px; color: var(--dim-2); line-height: 1.5; }
+  .type-spec .label-col b { display:block; color: var(--cream); font-weight: 500; }
+  .specimen { line-height: 1.05; }
+
+  /* ---------- COMPONENTS ---------- */
+  .btn {
+    font-family: var(--font-mono); font-weight: 700; font-size: 13px; letter-spacing: 0.02em;
+    border-radius: var(--r-pill); padding: 11px 22px; border: 0; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px; transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease), background var(--dur-fast);
+  }
+  .btn-primary { background: var(--green); color: var(--green-ink); }
+  .btn-primary:hover { box-shadow: var(--glow-green); transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--cream); border: 1px solid var(--ink-600); }
+  .btn-ghost:hover { border-color: var(--green); color: var(--green); }
+  .btn-mag { background: var(--magenta); color: #fff; }
+  .btn-mag:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(230,59,109,0.35); }
+
+  .chip-row { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+  .tech-chip {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 5px 12px 6px; border-radius: var(--r-pill); border: 1px solid var(--ink-600); color: var(--cream-dim);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .tech-chip .dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  /* terminal card */
+  .term {
+    background: var(--ink-900); border: var(--bd); border-radius: var(--r-card); overflow: hidden;
+    font-family: var(--font-mono); box-shadow: var(--shadow-card);
+  }
+  .term-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: var(--bd); background: var(--ink-800); }
+  .term-bar .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .term-bar .ttl { margin-left: 6px; font-size: 11px; color: var(--dim-1); letter-spacing: 0.04em; }
+  .term-body { padding: var(--s-4) var(--s-5); font-size: 13px; line-height: 1.9; }
+  .term-body .gp { color: var(--green); }
+  .term-body .dim { color: var(--dim-2); }
+  .term-body .cm { color: var(--dim-2); }
+  .term-body .mg { color: var(--magenta); }
+  .term-body .cr { color: var(--cream); }
+
+  /* stat readout */
+  .stat { border: var(--bd); border-radius: var(--r-card); padding: var(--s-5); background: var(--ink-800); }
+  .stat .v { font-family: var(--font-display); font-weight: 800; font-size: 42px; line-height: 1; letter-spacing: -0.02em; }
+  .stat .l { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim-2); margin-top: 10px; }
+
+  /* project card */
+  .proj { border: var(--bd); border-radius: var(--r-card); overflow: hidden; background: var(--ink-800); transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease); }
+  .proj:hover { border-color: var(--ink-500); transform: translateY(-2px); }
+  .proj .top { height: 8px; }
+  .proj .body { padding: var(--s-5); }
+  .proj h4 { margin: 0 0 6px; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+  .proj .desc { color: var(--dim-1); font-size: 14px; margin: 0 0 var(--s-4); line-height: 1.5; }
+
+  /* voice */
+  .voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-5); }
+  @media (max-width: 700px){ .voice-grid { grid-template-columns: 1fr; } }
+  .say, .dont-say { border-radius: var(--r-card); padding: var(--s-5); border: var(--bd); }
+  .say { background: rgba(87,211,106,0.05); border-color: color-mix(in srgb, var(--green) 26%, var(--ink-600)); }
+  .dont-say { background: rgba(230,59,109,0.04); border-color: color-mix(in srgb, var(--magenta) 22%, var(--ink-600)); }
+  .quote { font-family: var(--font-display); font-size: 19px; line-height: 1.4; margin: 0 0 var(--s-3); }
+  .quote.cross { color: var(--dim-1); text-decoration: line-through; text-decoration-color: var(--magenta); text-decoration-thickness: 1px; }
+  .voice-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .voice-list li { font-size: 14px; color: var(--dim-1); padding-left: 22px; position: relative; }
+  .voice-list li::before { content: '→'; position: absolute; left: 0; color: var(--green); }
+
+  /* footer */
+  footer { padding: var(--s-8) 0 var(--s-9); }
+  footer .row { display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap; }
+  footer .row .spacer { flex: 1; }
+  footer p { font-family: var(--font-mono); font-size: 12px; color: var(--dim-2); margin: 0; }
+
+  .pill-mini { font-size: 18px; padding: 0.4em 0.55em 0.48em; }
+
+  /* subtle one-time entrance, never hides content (PDF/print/no-JS safe) */
+  @media (prefers-reduced-motion: no-preference) {
+    .js .reveal { animation: rise var(--dur-slow) var(--ease) both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ================= TOP BAR ================= -->
+  <div class="topbar">
+    <div class="wrap row">
+      <span class="bp-pill pill-mini"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span>
+      <span class="spacer"></span>
+      <nav>
+        <a href="#logo">logo</a>
+        <a href="#color">color</a>
+        <a href="#type">type</a>
+        <a href="#components">components</a>
+        <a href="#voice">voice</a>
+        <a href="applied/Hero.html">↗ applied</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ================= HERO ================= -->
+  <header class="hero">
+    <div class="hero-grid"></div>
+    <div class="wrap hero-inner">
+      <span class="bp-label bp-comment">design system v1 · built to last</span>
+      <h1>The identity of a builder.</h1>
+      <p class="lede">A design system for Bruce Peters. The mark is his initials notated as a phoneme — <span class="bp-pill pill-mini"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span> — the same color-coded sound language he built into Word Wiz, set as a code token and dropped into a terminal world. Personal, engineered, and impossible to mistake for anyone else.</p>
+      <div class="meta">
+        <span><b>Type</b> Bricolage Grotesque + JetBrains Mono</span>
+        <span><b>Base</b> ink + cream</span>
+        <span><b>Accent</b> phoneme palette</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= 01 · LOGO ================= -->
+  <section class="block" id="logo">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-num">01</span>
+        <h2>The mark</h2>
+        <span class="spacer"></span>
+        <p>A phoneme is the smallest unit of sound. <b style="color:var(--cream)">/bp/</b> reads as "the bee-pee sound" — Bruce as the atomic unit.</p>
+      </div>
+
+      <div class="grid cols-2" style="align-items:stretch">
+        <div class="logo-stage">
+          <span class="logo-tick" style="top:14px; left:16px;">primary · phosphor green</span>
+          <span class="bp-pill"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span>
+          <span class="logo-tick" style="bottom:14px; right:16px;">JetBrains Mono · 800</span>
+        </div>
+
+        <div class="card" style="display:flex; flex-direction:column; gap: var(--s-3);">
+          <span class="bp-label">// anatomy</span>
+          <div style="display:flex; align-items:center; gap: 18px; padding: var(--s-4) 0;">
+            <span class="bp-pill" style="font-size:54px; padding:0.4em 0.58em 0.48em;"><span class="bp-slash" style="color:var(--magenta); opacity:1;">/</span>bp<span class="bp-slash" style="color:var(--magenta); opacity:1;">/</span></span>
+            <div style="font-family:var(--font-mono); font-size:12px; line-height:2; color:var(--dim-1);">
+              <div><span style="color:var(--magenta)">/&nbsp;/</span> &nbsp;phoneme delimiters</div>
+              <div><span style="color:var(--green)">bp</span> &nbsp;the initials, lowercase</div>
+              <div><span style="color:var(--dim-2)">◗</span> &nbsp;pill = Word Wiz sound feedback</div>
+            </div>
+          </div>
+          <p style="margin:0; color:var(--dim-1); font-size:13px; line-height:1.6;">Lowercase always. The slashes aren't decoration — they're real phonetic notation, the way you'd write a sound in a dictionary or a regex. That's the whole idea: the most personal thing he's built, turned into his signature.</p>
+        </div>
+      </div>
+
+      <!-- lockups + clearspace -->
+      <div class="grid cols-2" style="margin-top: var(--s-5);">
+        <div class="card">
+          <span class="bp-label">// lockups</span>
+          <div class="lockups">
+            <div class="lockup-row">
+              <span class="tag">primary</span>
+              <span class="bp-pill" style="font-size:30px; padding:0.4em 0.58em 0.48em;"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span>
+            </div>
+            <div class="lockup-row">
+              <span class="tag">mono / small</span>
+              <span class="bp-pill" style="font-size:18px; padding:0.4em 0.55em 0.48em;">bp</span>
+              <span style="font-family:var(--font-mono); font-size:11px; color:var(--dim-2);">no slashes under 16px</span>
+            </div>
+            <div class="lockup-row">
+              <span class="tag">horizontal</span>
+              <span class="bp-pill" style="font-size:22px; padding:0.4em 0.55em 0.48em;"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span>
+              <span class="wordmark"><span class="nm">Bruce Peters</span><span class="sub">builds · ships · repeats</span></span>
+            </div>
+            <div class="lockup-row">
+              <span class="tag">on color</span>
+              <span class="bp-pill" style="font-size:22px; padding:0.4em 0.55em 0.48em; background:var(--ink-900); color:var(--green);"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span>
+              <span class="bp-pill" style="font-size:22px; padding:0.4em 0.55em 0.48em; background:var(--magenta); color:#fff;"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span>
+              <span class="bp-pill" style="font-size:22px; padding:0.4em 0.55em 0.48em; background:transparent; color:var(--cream); box-shadow:inset 0 0 0 1.5px var(--ink-500);"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="bp-label">// clearspace &amp; min-size</span>
+          <div style="display:flex; gap: var(--s-6); align-items:center; flex-wrap:wrap; padding-top: var(--s-3);">
+            <div class="clearspace">
+              <span class="bp-pill" style="font-size:40px; padding:0.4em 0.58em 0.48em;"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:12px; color:var(--dim-1); line-height:1.9;">
+              <div><span style="color:var(--green)">clearspace</span> = cap-height of the<br/>&nbsp;&nbsp;"b" on all sides</div>
+              <div style="margin-top:12px;"><span style="color:var(--green)">min size</span> = 20px tall (digital)<br/>&nbsp;&nbsp;14px with "bp" only</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- do / dont -->
+      <div class="grid cols-4" style="margin-top: var(--s-5);">
+        <div class="card" style="text-align:center;">
+          <span class="badge-do">✓ do</span>
+          <div style="padding:22px 0;"><span class="bp-pill" style="font-size:26px; padding:0.4em 0.55em 0.48em;"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span></div>
+          <p style="margin:0; font-size:12px; color:var(--dim-2);">full color pill, lowercase</p>
+        </div>
+        <div class="card dont" style="text-align:center;">
+          <span class="badge-dont">✕ don't</span>
+          <div style="padding:22px 0;"><span class="bp-pill" style="font-size:26px; padding:0.4em 0.55em 0.48em; text-transform:uppercase;"><span class="bp-slash">/</span>BP<span class="bp-slash">/</span></span></div>
+          <p style="margin:0; font-size:12px; color:var(--dim-2);">never uppercase</p>
+        </div>
+        <div class="card dont" style="text-align:center;">
+          <span class="badge-dont">✕ don't</span>
+          <div style="padding:22px 0;"><span class="bp-pill" style="font-size:26px; padding:0.4em 0.55em 0.48em; background:linear-gradient(90deg,#57d36a,#e63b6d);"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span></div>
+          <p style="margin:0; font-size:12px; color:var(--dim-2);">no gradients</p>
+        </div>
+        <div class="card dont" style="text-align:center;">
+          <span class="badge-dont">✕ don't</span>
+          <div style="padding:22px 0;"><span class="bp-pill" style="font-size:26px; padding:0.18em 0.3em; border-radius:5px;"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span></div>
+          <p style="margin:0; font-size:12px; color:var(--dim-2);">keep it a pill, not a box</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 02 · COLOR ================= -->
+  <section class="block" id="color">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-num">02</span>
+        <h2>Color</h2>
+        <span class="spacer"></span>
+        <p>Dark base kept. The gold is gone — every accent is pulled from <b style="color:var(--cream)">Word Wiz's phoneme feedback</b>. Green leads because it's both a phoneme and terminal phosphor.</p>
+      </div>
+
+      <!-- accents -->
+      <span class="bp-label" style="display:block; margin-bottom: var(--s-4);">// phoneme accents</span>
+      <div class="grid cols-4">
+        <div class="swatch">
+          <div class="chip" style="background:var(--green);"><span class="chip-name" style="color:var(--green-ink);">PRIMARY</span></div>
+          <div class="info"><span class="nm">Phosphor Green</span><span class="hex">#57D36A</span><span class="use">The signal. Logo, primary action, success, the caret, links.</span></div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:var(--lime);"><span class="chip-name" style="color:var(--green-ink);">SUPPORT</span></div>
+          <div class="info"><span class="nm">Lime</span><span class="hex">#C7EE5E</span><span class="use">Second phoneme. Highlights, secondary tags, warm data.</span></div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:var(--coral);"><span class="chip-name" style="color:var(--green-ink);">SUPPORT</span></div>
+          <div class="info"><span class="nm">Coral</span><span class="hex">#EC9576</span><span class="use">Warm phoneme. A human, non-technical accent for storytelling.</span></div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:var(--magenta);"><span class="chip-name" style="color:#fff;">HOT</span></div>
+          <div class="info"><span class="nm">Magenta</span><span class="hex">#E63B6D</span><span class="use">The hot phoneme. Emphasis, alerts, "don't", rare highlight.</span></div>
+        </div>
+      </div>
+
+      <!-- ink + cream -->
+      <span class="bp-label" style="display:block; margin: var(--s-6) 0 var(--s-4);">// ink &amp; cream</span>
+      <div class="grid cols-4">
+        <div class="swatch">
+          <div class="chip" style="background:var(--ink-850);"><span class="chip-name" style="color:var(--dim-1);">BG</span></div>
+          <div class="info"><span class="nm">Ink 850</span><span class="hex">#101012</span><span class="use">Page background.</span></div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:var(--ink-700); border-bottom:1px solid var(--ink-600);"><span class="chip-name" style="color:var(--dim-1);">SURFACE</span></div>
+          <div class="info"><span class="nm">Ink 700</span><span class="hex">#1D1D21</span><span class="use">Cards, terminals, raised panels.</span></div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:var(--cream);"><span class="chip-name" style="color:var(--green-ink);">TEXT</span></div>
+          <div class="info"><span class="nm">Cream</span><span class="hex">#F4F0E8</span><span class="use">Primary text. Warm, never pure white.</span></div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:var(--dim-2);"><span class="chip-name" style="color:var(--ink-900);">MUTED</span></div>
+          <div class="info"><span class="nm">Dim</span><span class="hex">#6F6B62</span><span class="use">Metadata, mono labels, secondary copy.</span></div>
+        </div>
+      </div>
+
+      <!-- the phoneme proof -->
+      <div class="card" style="margin-top: var(--s-5);">
+        <span class="bp-label">// where it comes from — a word, broken into sounds</span>
+        <div class="phoneme-demo" style="margin-top: var(--s-3);">
+          <span class="ph" style="background:var(--green);">b</span>
+          <span class="ph" style="background:var(--lime);">r</span>
+          <span class="ph" style="background:var(--coral);">oo</span>
+          <span class="ph" style="background:var(--magenta); color:#fff;">s</span>
+          <span style="font-family:var(--font-mono); color:var(--dim-2); margin:0 10px;">→</span>
+          <span style="font-family:var(--font-display); font-weight:700; font-size:24px;">"Bruce", the Word Wiz way</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 03 · TYPE ================= -->
+  <section class="block" id="type">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-num">03</span>
+        <h2>Type</h2>
+        <span class="spacer"></span>
+        <p>Two families. <b style="color:var(--cream)">Bricolage Grotesque</b> for voice and scale; <b style="color:var(--cream)">JetBrains Mono</b> as the brand's native tongue — labels, code, metadata.</p>
+      </div>
+
+      <div class="grid cols-2" style="align-items:start;">
+        <div class="card">
+          <span class="bp-label">// display — Bricolage Grotesque</span>
+          <div class="type-spec" style="grid-template-columns:1fr;">
+            <div class="specimen">
+              <div style="font-weight:800; font-size:64px; letter-spacing:-0.03em; line-height:0.95;">Ship the<br/>thing.</div>
+            </div>
+          </div>
+          <div class="type-spec"><div class="label-col"><b>Mega</b>700 · -2%</div><div class="specimen" style="font-weight:700; font-size:34px; letter-spacing:-0.02em;">Built to last</div></div>
+          <div class="type-spec"><div class="label-col"><b>Heading</b>700</div><div class="specimen" style="font-weight:700; font-size:24px;">A builder's identity</div></div>
+          <div class="type-spec"><div class="label-col"><b>Body</b>400 · 1.6</div><div class="specimen" style="font-weight:400; font-size:15px; line-height:1.6; color:var(--dim-1);">Bricolage carries longer prose with just enough warmth — the optical-size axis keeps it from feeling mechanical at small sizes.</div></div>
+        </div>
+
+        <div class="card">
+          <span class="bp-label">// mono — JetBrains Mono</span>
+          <div class="type-spec" style="grid-template-columns:1fr;">
+            <div class="specimen" style="font-family:var(--font-mono);">
+              <div style="font-weight:800; font-size:46px; letter-spacing:-0.02em;">build &gt; ship</div>
+            </div>
+          </div>
+          <div class="type-spec"><div class="label-col"><b>Label</b>500 · caps · +18%</div><div class="specimen" style="font-family:var(--font-mono); font-weight:500; font-size:13px; letter-spacing:0.18em; text-transform:uppercase; color:var(--green);">SELECTED WORKS</div></div>
+          <div class="type-spec"><div class="label-col"><b>Comment</b>500 · the // marker</div><div class="specimen" style="font-family:var(--font-mono); font-size:14px;"><span style="color:var(--dim-2);">//</span> <span style="color:var(--green);">what i'm building</span></div></div>
+          <div class="type-spec"><div class="label-col"><b>Code / meta</b>400</div><div class="specimen" style="font-family:var(--font-mono); font-size:13px; color:var(--dim-1);">superstructure.java · 20ms loop · <span style="color:var(--magenta);">WORLDS '25</span></div></div>
+          <div class="type-spec"><div class="label-col"><b>Italic</b>500 · accents</div><div class="specimen" style="font-family:var(--font-mono); font-style:italic; font-size:14px; color:var(--dim-1);">// it's just what I do</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: var(--s-5);">
+        <span class="bp-label">// the rule</span>
+        <p style="margin: var(--s-2) 0 0; font-size:15px; color:var(--dim-1); line-height:1.6; max-width:70ch;">If a human would <b style="color:var(--cream)">say</b> it, set it in Bricolage. If a machine would <b style="color:var(--cream)">print</b> it — a label, a path, a stat, a timestamp, a tag — set it in mono. The tension between the two is the whole personality: warm voice, engineered chrome.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 04 · COMPONENTS ================= -->
+  <section class="block" id="components">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-num">04</span>
+        <h2>Components</h2>
+        <span class="spacer"></span>
+        <p>Everything is built from two primitives: the <b style="color:var(--cream)">pill</b> and the <b style="color:var(--cream)">terminal</b>. Pills for anything human and tappable; terminals for anything the machine reports.</p>
+      </div>
+
+      <div class="grid cols-2" style="align-items:start;">
+        <!-- buttons -->
+        <div class="card">
+          <span class="bp-label">// buttons</span>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top: var(--s-3);">
+            <button class="btn btn-primary">view work →</button>
+            <button class="btn btn-ghost">read more</button>
+            <button class="btn btn-mag">get in touch</button>
+          </div>
+          <p style="margin: var(--s-4) 0 0; font-size:12px; color:var(--dim-2);">Pills, always. Primary = green, lifts + glows on hover. Ghost for secondary. Magenta reserved for one hot action per view.</p>
+        </div>
+
+        <!-- tech chips -->
+        <div class="card">
+          <span class="bp-label">// tech chips — the kept code-comment stickers</span>
+          <div class="chip-row" style="margin-top: var(--s-3);">
+            <span class="tech-chip"><span class="dot" style="background:var(--green);"></span>Java</span>
+            <span class="tech-chip"><span class="dot" style="background:var(--lime);"></span>WPILib</span>
+            <span class="tech-chip"><span class="dot" style="background:var(--coral);"></span>React</span>
+            <span class="tech-chip"><span class="dot" style="background:var(--magenta);"></span>FastAPI</span>
+            <span class="tech-chip"><span class="dot" style="background:var(--violet);"></span>OpenCV</span>
+            <span class="tech-chip"><span class="dot" style="background:var(--green);"></span>AWS</span>
+          </div>
+          <p style="margin: var(--s-4) 0 0; font-size:12px; color:var(--dim-2);">The colored dot ties every tech back to a phoneme. Mono text, pill shape, hairline border.</p>
+        </div>
+
+        <!-- terminal -->
+        <div class="card">
+          <span class="bp-label">// terminal block — the build log</span>
+          <div class="term" style="margin-top: var(--s-3);">
+            <div class="term-bar">
+              <span class="dot" style="background:var(--magenta);"></span>
+              <span class="dot" style="background:var(--lime);"></span>
+              <span class="dot" style="background:var(--green);"></span>
+              <span class="ttl">~/bruce — build.log</span>
+            </div>
+            <div class="term-body">
+              <div><span class="gp">✓</span> <span class="dim">2025</span> <span class="cr">iron panthers</span> — worlds champions <span class="mg">REEFSCAPE</span></div>
+              <div><span class="gp">✓</span> <span class="dim">2024</span> <span class="cr">word wiz ai</span> — 4k readers <span class="mg">+ 2nd CAC</span></div>
+              <div><span class="cm">// next:</span> <span class="cr">ai-assisted sim pipeline</span> <span class="bp-caret" style="height:0.9em;"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- stats -->
+        <div class="card">
+          <span class="bp-label">// stat readout</span>
+          <div class="grid cols-3" style="gap:12px; margin-top: var(--s-3);">
+            <div class="stat"><div class="v" style="color:var(--green);">1st</div><div class="l">Worlds '25</div></div>
+            <div class="stat"><div class="v">4k+</div><div class="l">readers</div></div>
+            <div class="stat"><div class="v" style="color:var(--coral);">1000<span style="font-size:24px;">h</span></div><div class="l">in the lab</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- project cards -->
+      <span class="bp-label" style="display:block; margin: var(--s-6) 0 var(--s-4);">// project cards</span>
+      <div class="grid cols-3">
+        <div class="proj">
+          <div class="top" style="background:var(--green);"></div>
+          <div class="body">
+            <span class="bp-label" style="color:var(--green);">// flagship</span>
+            <h4 style="margin-top:8px;">Word Wiz AI</h4>
+            <p class="desc">A reading tutor that hears the sounds kids miss — phoneme-level feedback for early readers.</p>
+            <div class="chip-row"><span class="tech-chip" style="font-size:11px;">React</span><span class="tech-chip" style="font-size:11px;">FastAPI</span><span class="tech-chip" style="font-size:11px;">5 ML models</span></div>
+          </div>
+        </div>
+        <div class="proj">
+          <div class="top" style="background:var(--magenta);"></div>
+          <div class="body">
+            <span class="bp-label" style="color:var(--magenta);">// robotics</span>
+            <h4 style="margin-top:8px;">Robot Sim Platform</h4>
+            <p class="desc">A full software twin of the robot. 3× the programming team's speed — and it outlasts me.</p>
+            <div class="chip-row"><span class="tech-chip" style="font-size:11px;">Java</span><span class="tech-chip" style="font-size:11px;">WPILib</span><span class="tech-chip" style="font-size:11px;">physics</span></div>
+          </div>
+        </div>
+        <div class="proj">
+          <div class="top" style="background:var(--coral);"></div>
+          <div class="body">
+            <span class="bp-label" style="color:var(--coral);">// full-stack</span>
+            <h4 style="margin-top:8px;">Scouting App</h4>
+            <p class="desc">Real-time match data for the whole team. Rebuilt from scratch — the app that taught me the web.</p>
+            <div class="chip-row"><span class="tech-chip" style="font-size:11px;">React</span><span class="tech-chip" style="font-size:11px;">Firebase</span><span class="tech-chip" style="font-size:11px;">realtime</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 05 · VOICE ================= -->
+  <section class="block" id="voice">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-num">05</span>
+        <h2>Voice</h2>
+        <span class="spacer"></span>
+        <p>Plainspoken, present-tense, lowercase. A builder talking about what he's building — not a landing page selling a vision.</p>
+      </div>
+
+      <div class="voice-grid">
+        <div class="say">
+          <span class="badge-do" style="margin-bottom: var(--s-4);">✓ sounds like bruce</span>
+          <p class="quote">"i build things that outlast me."</p>
+          <p class="quote">"my code scored every point."</p>
+          <p class="quote">"a reading tutor that hears the sounds kids miss."</p>
+          <ul class="voice-list" style="margin-top: var(--s-4);">
+            <li>Lead with the verb. Build, ship, score, hear.</li>
+            <li>Concrete &gt; grand. Name the real thing.</li>
+            <li>Lowercase headers feel like a commit message.</li>
+          </ul>
+        </div>
+        <div class="dont-say">
+          <span class="badge-dont" style="margin-bottom: var(--s-4);">✕ too much</span>
+          <p class="quote cross">"Infrastructure for human potential."</p>
+          <p class="quote cross">"Leveraging cutting-edge AI to transform outcomes."</p>
+          <p class="quote cross">"A passionate, results-driven engineer."</p>
+          <ul class="voice-list" style="margin-top: var(--s-4);">
+            <li>No mission-statement abstraction.</li>
+            <li>No résumé adjectives — show the work instead.</li>
+            <li>No hype verbs: leverage, transform, revolutionize.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="wrap row">
+      <span class="bp-pill pill-mini"><span class="bp-slash">/</span>bp<span class="bp-slash">/</span></span>
+      <p>built to last · v1</p>
+      <span class="spacer"></span>
+      <p>see it live → <a href="applied/Hero.html" style="color:var(--green); text-decoration:none;">applied/Hero</a></p>
+    </div>
+  </footer>
+
+  <script>
+    document.documentElement.classList.add('js');
+    // entrance animation triggered as each section scrolls into view.
+    // content is visible by default — this only adds a one-time rise animation.
+    const io = new IntersectionObserver((es) => {
+      es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('reveal'); io.unobserve(e.target); } });
+    }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('section.block, .hero-inner').forEach(el => io.observe(el));
+    // smooth anchor scroll without scrollIntoView
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (ev) => {
+        const t = document.querySelector(a.getAttribute('href'));
+        if (t) { ev.preventDefault(); window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 72, behavior: 'smooth' }); }
+      });
+    });
+  </script>
+</body>
+</html>
