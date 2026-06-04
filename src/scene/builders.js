@@ -11,6 +11,26 @@ import {
   makeFloatingCard,
 } from "./textures.js";
 
+// Load an HTMLImageElement, optionally registering it with a THREE.LoadingManager
+// so the boot/loading screen can wait for it. Resolves the manager item on both
+// success and failure so a missing image never traps the loading screen.
+function loadImage(src, onload, manager) {
+  const img = new Image();
+  if (manager) manager.itemStart(src);
+  img.onload = () => {
+    onload(img);
+    if (manager) manager.itemEnd(src);
+  };
+  img.onerror = () => {
+    if (manager) {
+      manager.itemError(src);
+      manager.itemEnd(src);
+    }
+  };
+  img.src = src;
+  return img;
+}
+
 export function makeStars() {
   const geo = new THREE.BufferGeometry();
   const count = 1400;
@@ -264,7 +284,7 @@ export function buildReader(pos) {
   return g;
 }
 
-export function buildProjectCard(p, opts = {}) {
+export function buildProjectCard(p, opts = {}, manager) {
   const slim = opts.slim ?? true;
 
   // In slim mode the card is just the project's screenshot. A project with no
@@ -286,12 +306,10 @@ export function buildProjectCard(p, opts = {}) {
     if (p.image2) {
       let img1 = null, img2 = null;
       const tryUpdate = () => { if (img1 && img2) updateProjectCardWithImage(t, p, img1, img2); };
-      const i1 = new Image(); i1.onload = () => { img1 = i1; tryUpdate(); }; i1.src = p.image;
-      const i2 = new Image(); i2.onload = () => { img2 = i2; tryUpdate(); }; i2.src = p.image2;
+      loadImage(p.image,  (img) => { img1 = img; tryUpdate(); }, manager);
+      loadImage(p.image2, (img) => { img2 = img; tryUpdate(); }, manager);
     } else {
-      const img = new Image();
-      img.onload = () => updateProjectCardWithImage(t, p, img);
-      img.src = p.image;
+      loadImage(p.image, (img) => updateProjectCardWithImage(t, p, img), manager);
     }
   }
 
@@ -375,58 +393,6 @@ export function buildArchive() {
   const ARCHIVE = PROJECTS.find((p) => p.id === "archive");
   const g = new THREE.Group();
   g.position.set(...ARCHIVE.pos);
-
-  // Floor disc
-  const floorGeo = new THREE.CircleGeometry(5, 64);
-  const floorMat = new THREE.MeshStandardMaterial({
-    color: 0x060606,
-    roughness: 0.95,
-    metalness: 0.1,
-  });
-  const floor = new THREE.Mesh(floorGeo, floorMat);
-  floor.rotation.x = -Math.PI / 2;
-  floor.receiveShadow = true;
-  g.add(floor);
-
-  // Thin accent ring
-  const ringGeo = new THREE.RingGeometry(4.5, 4.55, 96);
-  const ringMat = new THREE.MeshBasicMaterial({
-    color: 0x2a2820,
-    side: THREE.DoubleSide,
-  });
-  const ring = new THREE.Mesh(ringGeo, ringMat);
-  ring.rotation.x = -Math.PI / 2;
-  ring.position.y = 0.01;
-  g.add(ring);
-
-  // Center "05 ARCHIVE" floor label
-  const centerCanvas = document.createElement("canvas");
-  centerCanvas.width = centerCanvas.height = 512;
-  const cctx = centerCanvas.getContext("2d");
-  cctx.fillStyle = "rgba(0,0,0,0)";
-  cctx.fillRect(0, 0, 512, 512);
-  cctx.strokeStyle = "#57d36a";
-  cctx.lineWidth = 2;
-  cctx.beginPath();
-  cctx.arc(256, 256, 240, 0, Math.PI * 2);
-  cctx.stroke();
-  cctx.fillStyle = "#57d36a";
-  cctx.font = `700 220px 'Bricolage Grotesque', sans-serif`;
-  cctx.textAlign = "center";
-  cctx.textBaseline = "middle";
-  cctx.fillText("05", 256, 268);
-  cctx.font = `500 36px 'JetBrains Mono', monospace`;
-  cctx.fillStyle = "#9a958b";
-  cctx.fillText("A R C H I V E", 256, 410);
-  const centerTex = new THREE.CanvasTexture(centerCanvas);
-  centerTex.colorSpace = THREE.SRGBColorSpace;
-  const centerDisc = new THREE.Mesh(
-    new THREE.PlaneGeometry(3, 3),
-    new THREE.MeshBasicMaterial({ map: centerTex, transparent: true })
-  );
-  centerDisc.rotation.x = -Math.PI / 2;
-  centerDisc.position.y = 0.02;
-  g.add(centerDisc);
 
   // ── Git commit graph running down the corridor ──────────────────────────
   // Each archive work is a commit node; consecutive commits are joined by an
@@ -539,7 +505,6 @@ export function buildArchive() {
     project: ARCHIVE,
     // activeId is the id of the project the camera is currently parked on.
     update: (t, activeId) => {
-      ring.material.color.setHSL(0.34, 0.4, 0.18 + 0.04 * Math.sin(t * 0.2));
       nodeMeshes.forEach((n, idx) => {
         const active = n.id === activeId;
         const tgtEmis = active ? 2.6 : 0.5 + 0.12 * Math.sin(t * 1.4 + idx);
@@ -639,11 +604,205 @@ function _rr(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
+// Rounded-rect path with square top corners and rounded bottom — for clipping a
+// photo into the bottom of a card so it follows the body's bottom radius.
+function _rrBottom(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + w, y);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.closePath();
+}
+
 function _aboutTex(canvas) {
   const tex = new THREE.CanvasTexture(canvas);
   tex.anisotropy = 8;
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
+}
+
+// Terminal-framed portrait — the same phosphor treatment as the DOM identity
+// band (grayscale + scanlines + green glow), rendered to a canvas so it floats
+// as the centerpiece of the About cluster. The image loads async; the frame
+// draws immediately and the texture refreshes once the photo arrives.
+function aboutPortraitTexture(src, manager) {
+  const cw = 560,
+    titleBar = 78;
+  const photoH = Math.round(cw * 1.25); // 4:5 portrait
+  const ch = titleBar + photoH;
+  const canvas = document.createElement("canvas");
+  canvas.width = cw;
+  canvas.height = ch;
+  const ctx = canvas.getContext("2d");
+
+  const draw = (img) => {
+    ctx.clearRect(0, 0, cw, ch);
+
+    // Card body
+    ctx.fillStyle = "#161619";
+    _rr(ctx, 4, 4, cw - 8, ch - 8, 26);
+    ctx.fill();
+
+    // Photo region — clipped to the body's bottom radius
+    const px = 8,
+      py = titleBar,
+      pw = cw - 16,
+      ph = photoH - 12;
+    ctx.save();
+    _rrBottom(ctx, px, py, pw, ph, 22);
+    ctx.clip();
+
+    // Render mode for the portrait. Flip to true for the green-ASCII printout;
+    // false shows the plain phosphor-graded photo (both kept for comparison).
+    const ASCII = false;
+
+    // Terminal backdrop behind the ASCII printout
+    ctx.fillStyle = "#0c0c0e";
+    ctx.fillRect(px, py, pw, ph);
+
+    if (img && !ASCII) {
+      // Plain photo — cropped to the top 70%, natural color (no phosphor grade).
+      const sw = img.width;
+      const sh = img.height * 0.7; // drop the bottom 30%
+      const dispR = pw / ph;
+      const sr = sw / sh;
+      let dw, dh;
+      if (sr > dispR) {
+        dh = ph;
+        dw = ph * sr;
+      } else {
+        dw = pw;
+        dh = pw / sr;
+      }
+      ctx.drawImage(
+        img,
+        0,
+        0,
+        sw,
+        sh,
+        px + (pw - dw) / 2,
+        py + (ph - dh) / 2,
+        dw,
+        dh
+      );
+    } else if (img) {
+      // Crop the bottom 30% of the source, then render the remaining top
+      // portion as green phosphor ASCII — a terminal printout of the face.
+      const cols = 110;
+      const cellW = pw / cols;
+      const cellH = cellW * 1.8; // mono line a touch taller than wide
+      const rows = Math.floor(ph / cellH);
+
+      const sw = img.width;
+      const sh = img.height * 0.7; // drop the bottom 30%
+
+      // cover-fit the cropped region into the photo box, then convert into the
+      // sample grid. Each cell renders at cellW×cellH (non-square), so the fit
+      // is computed in display units and divided by the cell size per axis —
+      // otherwise the anisotropic cell aspect warps the face vertically.
+      const sample = document.createElement("canvas");
+      sample.width = cols;
+      sample.height = rows;
+      const sctx = sample.getContext("2d");
+      const dispR = pw / ph;
+      const sr = sw / sh;
+      let dwD, dhD;
+      if (sr > dispR) {
+        dhD = ph;
+        dwD = ph * sr;
+      } else {
+        dwD = pw;
+        dhD = pw / sr;
+      }
+      sctx.drawImage(
+        img,
+        0,
+        0,
+        sw,
+        sh,
+        (pw - dwD) / 2 / cellW,
+        (ph - dhD) / 2 / cellH,
+        dwD / cellW,
+        dhD / cellH
+      );
+      const data = sctx.getImageData(0, 0, cols, rows).data;
+
+      // dark → light glyph ramp; brighter pixels print denser characters
+      const ramp = " .,:;irsXA253hMHGS#9B&@";
+      ctx.font = `${cellH}px 'JetBrains Mono', monospace`;
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const i = (r * cols + c) * 4;
+          const lum =
+            (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) / 255;
+          const gi = Math.min(ramp.length - 1, Math.floor(lum * ramp.length));
+          const glyph = ramp[gi];
+          if (glyph === " ") continue;
+          ctx.fillStyle = `rgba(87,211,106,${(0.3 + lum * 0.7).toFixed(3)})`;
+          ctx.fillText(glyph, px + c * cellW, py + r * cellH);
+        }
+      }
+    }
+
+    // Green phosphor glow rising from the bottom (ASCII mode only — keep the
+    // plain photo in natural color)
+    if (ASCII) {
+      const grad = ctx.createLinearGradient(0, py + ph, 0, py + ph * 0.4);
+      grad.addColorStop(0, "rgba(87,211,106,0.28)");
+      grad.addColorStop(1, "rgba(87,211,106,0)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(px, py, pw, ph);
+    }
+    ctx.restore();
+
+    // Title bar — chrome + traffic lights + path label
+    ctx.fillStyle = "#1d1d21";
+    _rr(ctx, 4, 4, cw - 8, titleBar, 26);
+    ctx.fill();
+    ctx.fillRect(4, titleBar - 26, cw - 8, 26); // square off the bar's bottom
+    ctx.strokeStyle = "#26262b";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(8, titleBar);
+    ctx.lineTo(cw - 8, titleBar);
+    ctx.stroke();
+
+    const dots = ["#e63b6d", "#c7ee5e", "#57d36a"];
+    dots.forEach((col, i) => {
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(40 + i * 30, 41, 9, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.fillStyle = "#6f6b62";
+    ctx.font = `500 24px 'JetBrains Mono', monospace`;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText("~/bruce/portrait.png", 150, 42);
+
+    // Outer border
+    ctx.strokeStyle = "#26262b";
+    ctx.lineWidth = 2;
+    _rr(ctx, 4, 4, cw - 8, ch - 8, 26);
+    ctx.stroke();
+  };
+
+  draw(null);
+  const tex = _aboutTex(canvas);
+
+  if (src) {
+    loadImage(src, (img) => {
+      draw(img);
+      tex.needsUpdate = true;
+    }, manager);
+  }
+
+  return { tex, aspect: cw / ch };
 }
 
 // A small "build.log" terminal — window chrome + traffic-light dots + a few
@@ -805,7 +964,7 @@ function aboutStickerTexture(text, accent) {
   return { tex: _aboutTex(canvas), aspect: cw / ch };
 }
 
-export function buildAbout() {
+export function buildAbout(manager) {
   const ABOUT = PROJECTS.find((p) => p.id === "about");
   const g = new THREE.Group();
   g.position.set(...ABOUT.pos);
@@ -851,7 +1010,7 @@ export function buildAbout() {
   const bp = makeFloatingCard(wordPillTexture("/bp/", "green"), 0.72, {
     opacity: 0.95,
   });
-  place(bp, -0.2, 1.7, 1.0, 0.1);
+  place(bp, 0.1, -0.2, 0.7, 0.1);
 
   const glowPlane = new THREE.Mesh(
     new THREE.PlaneGeometry(2.2, 1.6),
@@ -864,12 +1023,22 @@ export function buildAbout() {
     })
   );
   glowPlane.position.set(
-    rgt.x * -0.2 + fwd.x * 0.85,
-    1.7,
-    rgt.z * -0.2 + fwd.z * 0.85
+    rgt.x * 0.1 + fwd.x * 0.55,
+    -0.2,
+    rgt.z * 0.1 + fwd.z * 0.55
   );
   glowPlane.rotation.y = cardRotY;
   g.add(glowPlane); // static (no basePos) — sits behind the anchor
+
+  // ── Portrait — the human centerpiece. Terminal-framed + phosphor-graded to
+  //    match the DOM identity band. Sits in the middle of the cluster, brought
+  //    slightly forward so it reads as the focal point.
+  if (ABOUT.photo) {
+    const portrait = makeFloatingCard(aboutPortraitTexture(ABOUT.photo, manager), 2.4, {
+      opacity: 1,
+    });
+    place(portrait, -0.2, 1.7, 1.0, 0.06);
+  }
 
   // ── build.log terminal — proof, machine-voice. Mid plane, to the open side.
   place(aboutTerminal(), -2.9, -0.3, -0.4, 0.12);
@@ -950,14 +1119,14 @@ function aboutTerminal() {
 // config rotations (those are for AS's internal Z-up field coordinate system).
 // Raw bbox confirmed: X=22.56 (long), Z=9.14 (wide), Y=3.09 (structures) → flat.
 // ---------------------------------------------------------------------------
-export function loadFieldModel(scene, basePos = [0, 0, 0]) {
+export function loadFieldModel(scene, basePos = [0, 0, 0], manager) {
   // Wrap the field in a group whose position is the tunable offset. The model
   // is auto-centered relative to the group, so moving the group moves the field.
   const group = new THREE.Group();
   group.position.set(basePos[0], basePos[1], basePos[2]);
   scene.add(group);
 
-  const loader = new GLTFLoader();
+  const loader = new GLTFLoader(manager);
   loader.load(
     "/models/field.glb",
     (gltf) => {
@@ -1004,12 +1173,12 @@ export function loadFieldModel(scene, basePos = [0, 0, 0]) {
 // GLB is Z-up so we apply the config rotations: x:90° then z:180°.
 // Dimensions: 690.875" × 317" (17.55m × 8.05m).
 // ---------------------------------------------------------------------------
-export function loadField2025Model(scene, basePos = [0, 0, 0]) {
+export function loadField2025Model(scene, basePos = [0, 0, 0], manager) {
   const group = new THREE.Group();
   group.position.set(basePos[0], basePos[1], basePos[2]);
   scene.add(group);
 
-  const loader = new GLTFLoader();
+  const loader = new GLTFLoader(manager);
   loader.load(
     "/models/field2025.glb",
     (gltf) => {
@@ -1082,8 +1251,8 @@ export function loadRobotModel(scene) {
   );
 }
 
-export function buildScreenshotPanes(scene, allUpdaters) {
-  const loader = new THREE.TextureLoader();
+export function buildScreenshotPanes(scene, allUpdaters, manager) {
+  const loader = new THREE.TextureLoader(manager);
   const animatedPanes = [];
   // Each slot: { mesh, border } — filled once the texture loads
   const paneRefs = SCREENSHOT_PANES.map(() => ({ mesh: null, border: null }));

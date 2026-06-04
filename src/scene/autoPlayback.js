@@ -57,13 +57,13 @@ function parseCSV(text) {
 const ROBOT_YAW_OFFSET = Math.PI / 2
 const ROBOT_LATERAL_FLIP = 1 // set to -1 to mirror across field width
 
-export function loadAutoPlayback(scene, allUpdaters) {
+export function loadAutoPlayback(scene, allUpdaters, manager) {
   // Group that gets driven by the CSV. Robot model parents under it.
   const robotGroup = new THREE.Group()
   robotGroup.visible = false
   scene.add(robotGroup)
 
-  const loader = new GLTFLoader()
+  const loader = new GLTFLoader(manager)
   loader.load('/models/robot.glb', (gltf) => {
     const m = gltf.scene
     m.scale.setScalar(SCENE_PER_METER)

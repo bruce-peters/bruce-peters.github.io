@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { PROJECTS } from './data/projects.js'
-import { initScene } from './scene/scene.js'
 import IdentityBlock from './components/IdentityBlock.jsx'
 import NavBlock from './components/NavBlock.jsx'
 import DotRail from './components/DotRail.jsx'
@@ -28,16 +27,23 @@ export default function App() {
     setActiveIndex(index)
   }, [])
 
-  // Init the 3D background scene
+  // Init the 3D background scene. Three.js + the scene/builders live in a lazily
+  // imported chunk so the loading screen (tiny main bundle) paints instantly
+  // while the heavy 3D code downloads in the background.
   useEffect(() => {
     if (!containerRef.current) return
-    try {
-      const scene = initScene(containerRef.current, handleProjectChange, () => setLoaded(true))
-      sceneRef.current = scene
-      return () => scene.destroy()
-    } catch (e) {
-      setError(e.message + '\n' + e.stack)
-    }
+    let scene = null
+    let cancelled = false
+    import('./scene/scene.js').then(({ initScene }) => {
+      if (cancelled || !containerRef.current) return
+      try {
+        scene = initScene(containerRef.current, handleProjectChange, () => setLoaded(true))
+        sceneRef.current = scene
+      } catch (e) {
+        setError(e.message + '\n' + e.stack)
+      }
+    }).catch(e => setError(e.message + '\n' + e.stack))
+    return () => { cancelled = true; scene?.destroy() }
   }, [handleProjectChange])
 
   // Drive the background camera from the document scroll position.

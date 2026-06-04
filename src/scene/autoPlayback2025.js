@@ -51,12 +51,12 @@ function parseCSV(text) {
 const ROBOT_YAW_OFFSET   = -Math.PI / 2
 const ROBOT_LATERAL_FLIP = 1
 
-export function loadAutoPlayback2025(scene, allUpdaters) {
+export function loadAutoPlayback2025(scene, allUpdaters, manager) {
   const robotGroup = new THREE.Group()
   robotGroup.visible = false
   scene.add(robotGroup)
 
-  const loader = new GLTFLoader()
+  const loader = new GLTFLoader(manager)
 
   loader.load('/models/Robot_Reefer/model.glb', (gltf) => {
     const m = gltf.scene

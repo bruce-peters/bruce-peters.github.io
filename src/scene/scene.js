@@ -14,11 +14,11 @@ function smootherstep(t) {
   return t * t * t * (t * (t * 6 - 15) + 10)
 }
 
-// Blend of linear and smoothstep: minimum derivative 0.5 at t=0 and t=1
-// so the camera slows near waypoints but never fully stops mid-transit.
+// Use smootherstep so the camera fully dwells at each waypoint (zero velocity
+// and zero acceleration at t=0 and t=1) and rushes through the midpoint.
 function nodeEase(t) {
-  const s = t * t * (3 - 2 * t)   // smoothstep
-  return 0.5 * t + 0.5 * s
+  const s = t * t * (3 - 2 * t)
+  return 0.25 * t + 0.75 * s
 }
 
 export function initScene(container, onProjectChange, onLoad) {
@@ -38,6 +38,11 @@ export function initScene(container, onProjectChange, onLoad) {
   const pmrem = new THREE.PMREMGenerator(renderer)
   const envTexture = pmrem.fromScene(new RoomEnvironment()).texture
   pmrem.dispose()
+
+  // Shared asset-load tracker. Every GLB/texture/image loader below is given
+  // this manager so the React loading screen can wait for the real scene to
+  // finish loading before fading out (see start()/onLoad gating at the bottom).
+  const loadingManager = new THREE.LoadingManager()
 
   // Scene
   const scene = new THREE.Scene()
@@ -84,13 +89,15 @@ export function initScene(container, onProjectChange, onLoad) {
   const _field2025El = SCENE_ELEMENTS.find(e => e.id === 'field2025')
   const _readerDemoEl = SCENE_ELEMENTS.find(e => e.id === 'readerDemo')
 
-  // Real 2026 FRC field model (async, silently skips if missing)
-  const fieldGroup = loadFieldModel(scene, _fieldEl?.pos)
+  // Real 2026 FRC field model — gated by loadingManager (part of the first view)
+  const fieldGroup = loadFieldModel(scene, _fieldEl?.pos, loadingManager)
   elementGroups.set('field', fieldGroup)
 
-  // 2025 Reefscape field for the 2025 robot node
-  const field2025Group = loadField2025Model(scene, _field2025El?.pos)
-  elementGroups.set('field2025', field2025Group)
+  // The 2025 Reefscape field (14MB) + Robot_Reefer model (43MB) belong to a node
+  // deep in the scroll. They're the heaviest assets by far, so loading them
+  // up-front stalls the reveal. Instead they're streamed in the background AFTER
+  // the scene is shown (see loadDeferred() below) — NOT gated by loadingManager.
+  elementGroups.set('field2025', null)
 
 
   // Project groups
@@ -104,15 +111,15 @@ export function initScene(container, onProjectChange, onLoad) {
 
   // Auto-period playback: robot pose, intake/shooter markers, robot-held fuel,
   // and field fuel positions are driven from public/wpilog/<file>.auto.csv.
-  loadAutoPlayback(scene, allUpdaters)
-  loadAutoPlayback2025(scene, allUpdaters)
+  loadAutoPlayback(scene, allUpdaters, loadingManager)
+  // 2025 robot playback is deferred with the 2025 field — see loadDeferred().
 
   const reader = buildReader(_readerDemoEl?.pos)
   scene.add(reader); allUpdaters.push(reader.userData.update)
   elementGroups.set('readerDemo', reader)
 
   // About section — 3D floating panel off to the side
-  const about = buildAbout()
+  const about = buildAbout(loadingManager)
   scene.add(about); allUpdaters.push(about.userData.update)
 
   // Extra scene groups (not project cards) that tune mode can reposition
@@ -130,7 +137,7 @@ export function initScene(container, onProjectChange, onLoad) {
 
   // Helper: add a slim project card if one was built (skipped when imageless)
   function addCard(p, opts) {
-    const g = buildProjectCard(p, opts)
+    const g = buildProjectCard(p, opts, loadingManager)
     if (!g) return
     scene.add(g); allUpdaters.push(g.userData.update)
     cardGroups.set(p.id, g)
@@ -160,7 +167,7 @@ export function initScene(container, onProjectChange, onLoad) {
   extraGroups.set('archive', archive)
 
   // Screenshot panes (load async — silently skip missing files)
-  paneController = buildScreenshotPanes(scene, allUpdaters)
+  paneController = buildScreenshotPanes(scene, allUpdaters, loadingManager)
 
   // ── Scroll-driven camera ───────────────────────────────────────────────────
   // scroll      : float position in [0, N-1] — drives the camera (eased toward target)
@@ -282,16 +289,60 @@ export function initScene(container, onProjectChange, onLoad) {
     renderer.render(scene, camera)
   }
 
+  // start() spins up the render loop (so the real scene is drawing behind the
+  // loading screen). signalLoaded() tells React to fade the loading screen, and
+  // only fires once BOTH gates are met: fonts are ready AND every tracked asset
+  // (GLB models, screenshot/portrait textures, project images) has finished
+  // loading — so the first frame the user sees is the populated scene.
   function start() {
     if (started) return
     started = true
     onProjectChange(PROJECTS[0], 0)
     tick()
-    onLoad()
   }
 
-  document.fonts.ready.then(start)
-  setTimeout(start, 1800)
+  // Heavy 2025-season assets, streamed in the background once the critical scene
+  // is on screen. They're for a node deep in the scroll, so they pop in long
+  // before the user reaches it — without ever blocking the initial reveal.
+  let deferredStarted = false
+  function loadDeferred() {
+    if (deferredStarted) return
+    deferredStarted = true
+    const field2025Group = loadField2025Model(scene, _field2025El?.pos)
+    elementGroups.set('field2025', field2025Group)
+    loadAutoPlayback2025(scene, allUpdaters)
+  }
+
+  let signaled = false
+  function signalLoaded() {
+    if (signaled) return
+    signaled = true
+    onLoad()
+    // Critical scene is shown — now stream the heavy 2025 assets during idle time.
+    const schedule = window.requestIdleCallback || ((fn) => setTimeout(fn, 200))
+    schedule(loadDeferred)
+  }
+
+  let fontsReady = false
+  let assetsReady = false
+  const maybeReady = () => { if (fontsReady && assetsReady) signalLoaded() }
+
+  // LoadingManager.onLoad fires once the queue drains. All loaders register
+  // synchronously during init, so the queue can't drain early.
+  loadingManager.onLoad = () => { assetsReady = true; maybeReady() }
+  // Guard: if no asset ever registered (e.g. every loader is a no-op), don't
+  // wait on the manager — it would never fire onLoad.
+  if (loadingManager.itemsTotal === 0) assetsReady = true
+
+  document.fonts.ready.then(() => {
+    fontsReady = true
+    start()        // begin rendering the real scene behind the loading screen
+    maybeReady()
+  })
+
+  // Safety net: never trap the user behind the loading screen if fonts or an
+  // asset stall (slow network, a file that hangs without erroring).
+  setTimeout(() => { start(); signalLoaded() }, 12000)
 
   // Expose scroll control + tune mode API to React
   return {

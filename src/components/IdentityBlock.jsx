@@ -14,13 +14,6 @@ export default function IdentityBlock() {
         <span style={{ fontWeight: 500, opacity: 0.55 }}>/</span>bp
         <span style={{ fontWeight: 500, opacity: 0.55 }}>/</span>
       </span>
-      <p className="text-[11px] uppercase tracking-[0.18em] text-dim m-0 flex items-center gap-2 font-mono">
-        <span
-          className="inline-block w-1.5 h-1.5 rounded-full animate-pulse2"
-          style={{ background: '#57d36a', boxShadow: '0 0 8px #57d36a' }}
-        />
-        Builder · FRC Programmer · Founder
-      </p>
     </div>
   )
 }

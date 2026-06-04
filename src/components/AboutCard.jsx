@@ -45,54 +45,22 @@ export default function AboutCard({ project, side, onViewWork }) {
         </span>
       </div>
 
-      {/* Identity band — portrait (optional) + name / role / now */}
-      <div className="flex items-center gap-5 mb-5 max-[360px]:flex-col max-[360px]:items-start">
-        {project.photo && (
-          <div className="shrink-0 w-[118px] rounded-[14px] overflow-hidden border border-line bg-ink-800 shadow-2xl">
-            {/* terminal bar */}
-            <div className="flex items-center gap-1.5 px-2.5 py-2 bg-ink-700 border-b border-line">
-              <i className="w-[7px] h-[7px] rounded-full bg-magenta" />
-              <i className="w-[7px] h-[7px] rounded-full bg-lime" />
-              <i className="w-[7px] h-[7px] rounded-full bg-accent" />
-              <span className="ml-1.5 font-mono text-[9.5px] text-dim2 tracking-wide truncate">
-                ~/bruce/portrait.jpg
-              </span>
-            </div>
-            {/* photo + phosphor treatment */}
-            <div className="relative aspect-[4/5]">
-              <img
-                src={project.photo}
-                alt="Bruce Peters"
-                className="w-full h-full object-cover"
-                style={{ filter: 'grayscale(1) contrast(1.1) brightness(1.05)' }}
-              />
-              <span
-                className="absolute inset-0 pointer-events-none mix-blend-screen"
-                style={{
-                  background:
-                    'linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.22) 50%) 0 0 / 100% 3px,' +
-                    'linear-gradient(0deg, rgba(87,211,106,0.35), transparent 70%)',
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="min-w-0">
-          <p className="font-display font-extrabold text-[25px] leading-none tracking-[-0.02em] m-0 mb-2.5 text-fg">
-            {project.name}
-          </p>
-          <p className="font-mono text-[11px] text-dim leading-[1.5] m-0 mb-2 whitespace-pre-line">
-            {project.role}
-          </p>
-          <p className="font-mono text-[11px] text-dim2 flex items-center gap-2 m-0">
-            <span
-              className={`w-[7px] h-[7px] rounded-full bg-accent shrink-0 ${reduce ? '' : 'animate-pulse2'}`}
-              style={{ boxShadow: '0 0 8px #57d36a' }}
-            />
-            <b className="text-cream-dim font-medium">now —</b> {project.now}
-          </p>
-        </div>
+      {/* Identity band — name / role / now. The portrait lives in the 3D scene
+          (buildAbout's centerpiece), not here. */}
+      <div className="mb-5">
+        <p className="font-display font-extrabold text-[25px] leading-none tracking-[-0.02em] m-0 mb-2.5 text-fg">
+          {project.name}
+        </p>
+        <p className="font-mono text-[11px] text-dim leading-[1.5] m-0 mb-2 whitespace-pre-line">
+          {project.role}
+        </p>
+        <p className="font-mono text-[11px] text-dim2 flex items-center gap-2 m-0">
+          <span
+            className={`w-[7px] h-[7px] rounded-full bg-accent shrink-0 ${reduce ? '' : 'animate-pulse2'}`}
+            style={{ boxShadow: '0 0 8px #57d36a' }}
+          />
+          <b className="text-cream-dim font-medium">now —</b> {project.now}
+        </p>
       </div>
 
       {/* Headline — human voice; <em> renders accent green, upright */}

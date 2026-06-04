@@ -70,6 +70,8 @@ export const ARCHIVE_WORKS = [
     tag: "React · Supabase · GPT-4o · ESP32",
     year: "2025",
     href: "https://roots-app-rouge.vercel.app/",
+    repo: "https://github.com/bruce-peters/roots-app",
+    image: "/screenshots/roots.png",
   },
   {
     title: "Notes Review App",
@@ -77,6 +79,7 @@ export const ARCHIVE_WORKS = [
     tag: "React · Firebase · Gemini",
     year: "2024",
     href: "https://bruce-peters.github.io/notes-review-app/",
+    repo: "https://github.com/bruce-peters/notes-review-app",
   },
   {
     title: "Facial Emotion Detection",
@@ -91,6 +94,8 @@ export const ARCHIVE_WORKS = [
     tag: "1st · LG Hacks 2.0",
     year: "2024",
     href: null,
+    repo: "https://github.com/bruce-peters/krab_med_app",
+    image: "/screenshots/pill-pall.jpeg",
   },
   {
     title: "CanvAI",
@@ -98,6 +103,7 @@ export const ARCHIVE_WORKS = [
     tag: "2nd · UHS Hackathon",
     year: "2024",
     href: null,
+    repo: "https://github.com/bruce-peters/team-crab-uhs-hackathon",
   },
   {
     title: "Sci-Oly Bot",
@@ -105,6 +111,7 @@ export const ARCHIVE_WORKS = [
     tag: "3rd · Science Olympiad",
     year: "2024",
     href: null,
+    image: "/screenshots/scioly-robot.jpeg",
   },
   {
     title: "Wordle Clone",
@@ -112,6 +119,7 @@ export const ARCHIVE_WORKS = [
     tag: "React · Firebase",
     year: "2023",
     href: "https://wordle-app-i.web.app/",
+    image: "/screenshots/wordle.png",
   },
   {
     title: "Chat App",
@@ -119,6 +127,7 @@ export const ARCHIVE_WORKS = [
     tag: "React · Firebase",
     year: "2022",
     href: "https://chat-react-app-feb57.web.app/",
+    image: "/screenshots/chat-app.png",
   },
   {
     title: "Non-Euclidean Escape",
@@ -126,6 +135,7 @@ export const ARCHIVE_WORKS = [
     tag: "Unity · C# · Blender",
     year: "2021 — 2022",
     href: "https://bobcat9.itch.io/non-euclidean-escape",
+    image: "/screenshots/non-euclidean-escape.png",
   },
   {
     title: "Survival Game",
@@ -133,6 +143,8 @@ export const ARCHIVE_WORKS = [
     tag: "Unity · C#",
     year: "2022",
     href: "https://bobcat9.itch.io/survival-2d",
+    repo: "https://github.com/bruce-peters/SurvivalGame",
+    image: "/screenshots/survival-game.png",
   },
   {
     title: "Marshmallow Simulator",
@@ -140,6 +152,7 @@ export const ARCHIVE_WORKS = [
     tag: "Unity · multiplayer",
     year: "2022",
     href: "https://bobcat9.itch.io/marshmallow-simulator",
+    image: "/screenshots/marshmallow-simulator-lobby.png",
   },
   {
     title: "Scuffed Platformer",
@@ -147,6 +160,7 @@ export const ARCHIVE_WORKS = [
     tag: "Unity",
     year: "2021",
     href: "https://bobcat9.itch.io/scuffed-platformer",
+    image: "/screenshots/scuffed-platformer.png",
   },
   {
     title: "Quizlet Solver",
@@ -167,6 +181,8 @@ export const ARCHIVE_PROJECTS = ARCHIVE_WORKS.map((w, i) => ({
   stats: [],
   year: w.year,
   cta: w.href ? { label: "Open project", href: w.href } : null,
+  repo: w.repo || null,
+  image: w.image || null,
   pos: ARCHIVE_CARD_LAYOUT[i].pos,
   focusOffset: ARCHIVE_CARD_LAYOUT[i].focusOffset,
   archiveRotY: ARCHIVE_CARD_LAYOUT[i].rotY,
@@ -179,8 +195,8 @@ export const PROJECTS = [
     index: "00",
     label: "Overview",
     title: "Selected works",
-    desc: "Six years of building infrastructure that outlasts me — robots, reading software, scouting tools, school systems. Scroll to step through, drag to look around.",
-    tags: ["2020 — Present"],
+    desc: "Seven years of building infrastructure that outlasts me — robots, reading software, scouting tools, school systems. Scroll to step through, drag to look around.",
+    tags: ["2019 — Present"],
     stats: [],
     year: "",
     cta: null,
@@ -194,25 +210,17 @@ export const PROJECTS = [
     index: "—",
     label: "Builder · FRC Programmer · Founder",
     title: "",
-    isAbout: true,
-
-    // Identity band
     name: "Bruce Peters",
     role: "builder · frc programmer · founder\nhillsborough, ca",
-    now: "building a sim pipeline", // the "now —" line
-    // Drop a real portrait in src/assets/, import it, and set its URL here to
-    // enable the terminal-framed portrait. null renders the band photo-free.
-    photo: null,
-
-    // Headline — human voice (lowercase, present tense). <em> renders accent green.
+    now: "building a sim pipeline",
+    photo: "/screenshots/Headshot.jpg",
     headline: "i build things that <em>outlast me.</em>",
-
-    desc: "high-school junior from the bay area. i started in unity at 12, programmed my robotics team to an frc world championship at 17, and build ai products between seasons — like word wiz, a reading tutor that hears the exact sounds kids miss.",
+    desc: "high-school junior from the bay area. i started in scratch at 9, moved to unity at 12, programmed my robotics team to an frc world championship at 17, and build ai products between seasons — like word wiz, a reading tutor that hears the exact sounds kids miss.",
     tags: ["Java", "Python", "TypeScript", "React", "PyTorch", "WPILib"],
     stats: [
-      ["6+", "yrs building"],
+      ["7+", "yrs building"],
       ["1st", "worlds '25"],
-      ["4k+", "readers"],
+      ["6k+", "visitors"],
       ["'27", "graduating"],
     ],
     year: "",
@@ -220,6 +228,7 @@ export const PROJECTS = [
     pos: [-18.14, 0, 8.48],
     focusOffset: [4.82, 2.5, 7.72],
     lookAt: [-16, 0.6, 8],
+    isAbout: true,
   },
   {
     id: "robotics",
@@ -332,8 +341,8 @@ export const PROJECTS = [
     year: "",
     cta: null,
     pos: [0, 0, -30],
-    focusOffset: [0, 4, 11],
-    lookAt: [0, 0.5, -33],
+    focusOffset: [0, 4, -0.54],
+    lookAt: [0, 0.5, -40.38],
   },
   ...ARCHIVE_PROJECTS,
 ];
