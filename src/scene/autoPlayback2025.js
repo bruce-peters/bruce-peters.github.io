@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { createStateTower } from './stateTower.js'
+import { createTrajectoryPlayer } from './trajectory.js'
 
 // 2025 Reefscape field dimensions, in meters
 const FIELD_LENGTH_M = 17.548
@@ -112,6 +114,19 @@ export function loadAutoPlayback2025(scene, allUpdaters, manager) {
     pivotConfigGroup.add(m)
   })
 
+  // "The Robot's Mind": a tower of per-subsystem state pills above the robot.
+  const tower = createStateTower(robotGroup,
+    ['Elevator', 'Pivot', 'Rollers', 'Swerve'], { topY: 2.6 })
+
+  // PathPlanner trajectory — a green spline showing only the path segment active
+  // at the current playback time. Field-absolute, using the same x/y → scene
+  // mapping the robot uses so it overlays the driven path.
+  const trajectory = createTrajectoryPlayer(scene,
+    ([x, y]) => new THREE.Vector3(fieldX(x), 0.03, fieldZ(y) * ROBOT_LATERAL_FLIP))
+  fetch('/wpilog/akit_25_path.json').then(r => r.ok ? r.json() : null).then(segs => {
+    if (segs) trajectory.setSegments(segs)
+  }).catch(() => {})
+
   let data = null
   let totalSec = 0
   let startSec = null
@@ -140,6 +155,10 @@ export function loadAutoPlayback2025(scene, allUpdaters, manager) {
                    num('elevator_qw'), num('elevator_qx'), num('elevator_qy'), num('elevator_qz')],
         pivot:    [num('pivot_x'),    num('pivot_y'),    num('pivot_z'),
                    num('pivot_qw'),   num('pivot_qx'),   num('pivot_qy'),   num('pivot_qz')],
+        elev_state:    row[idx['elev_state']]    ?? '',
+        pivot_state:   row[idx['pivot_state']]   ?? '',
+        rollers_state: row[idx['rollers_state']] ?? '',
+        swerve_state:  row[idx['swerve_state']]  ?? '',
       })
     }
     data = out
@@ -183,6 +202,17 @@ export function loadAutoPlayback2025(scene, allUpdaters, manager) {
     if (startSec === null) startSec = elapsed
     const t = (elapsed - startSec) % totalSec
     const row = findRowAt(t)
+
+    // Show the PathPlanner segment active at this moment.
+    trajectory.update(t)
+
+    // Drive the subsystem state tower (texture work only when a state changes).
+    tower.update({
+      Elevator: row.elev_state,
+      Pivot:    row.pivot_state,
+      Rollers:  row.rollers_state,
+      Swerve:   row.swerve_state,
+    })
 
     const [rx, ry, rz, rqw, rqx, rqy, rqz] = row.robot
     if (Number.isFinite(rx)) {

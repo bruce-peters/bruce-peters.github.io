@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { PROJECTS } from '../data/projects.js'
+import { play } from '../lib/audio.js'
 
 const mainProjects = PROJECTS.filter(p => !p.isArchive)
 const archiveWorks = PROJECTS.filter(p => p.isArchive)
@@ -51,7 +52,7 @@ export default function DotRail({ activeIndex, goToIndex }) {
           <div
             key={p.id}
             ref={el => { dotRefs.current[i] = el }}
-            onClick={() => goToIndex(i)}
+            onClick={() => { play('tick'); goToIndex(i) }}
             className="flex items-center gap-3 cursor-pointer"
             style={{ color: isActive ? '#f4f0e8' : isHovered ? '#cbc6bc' : '#9a958b' }}
           >
@@ -91,7 +92,7 @@ export default function DotRail({ activeIndex, goToIndex }) {
             <div
               key={p.id}
               ref={el => { dotRefs.current[i] = el }}
-              onClick={() => goToIndex(i)}
+              onClick={() => { play('tick'); goToIndex(i) }}
               className="flex items-center gap-3 cursor-pointer"
             >
               {/* Label pops out to the left */}

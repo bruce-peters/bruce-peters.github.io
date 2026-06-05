@@ -26,6 +26,10 @@ from pathlib import Path
 
 POSE3D_BYTES = 56  # 7 doubles: x, y, z, qw, qx, qy, qz
 TRANSLATION3D_BYTES = 24  # 3 doubles: x, y, z
+POSE2D_BYTES = 24  # 3 doubles: x, y, heading_radians
+
+# PathPlanner active-path key — Pose2d[] of the path the robot is following.
+ACTIVE_PATH_KEY = "/AdvantageKit/RealOutputs/Path Planner/Active Path"
 
 TARGETS = {
     "robot_pos":   "/AdvantageKit/RealOutputs/Field Simulation/Robot Position",
@@ -33,7 +37,16 @@ TARGETS = {
     "shooter":     "/AdvantageKit/RealOutputs/Shooter/Shooter Hood/Display Pose3d",
     "robot_fuel":  "/AdvantageKit/RealOutputs/Field Simulation/Robot Fuel",
     "field_fuels": "/AdvantageKit/RealOutputs/Field Simulation/Fuels",
+    # Per-subsystem current state (string enum names) — drives the state tower.
+    "intake_state":     "/AdvantageKit/RealOutputs/Intake/Intake Rack/Target",
+    "shooter_state":    "/AdvantageKit/RealOutputs/Shooter/Target State",
+    "serializer_state": "/AdvantageKit/RealOutputs/Serializer/Target",
+    "swerve_state":     "/AdvantageKit/RealOutputs/Swerve/Drive Mode",
 }
+
+# Keys whose payload is a UTF-8 string (enum name). Ordered — these become
+# trailing CSV columns in this order.
+STRING_KEYS = ["intake_state", "shooter_state", "serializer_state", "swerve_state"]
 
 ENABLED_KEY = "/AdvantageKit/DriverStation/Enabled"
 AUTO_KEY = "/AdvantageKit/DriverStation/Autonomous"
@@ -147,6 +160,53 @@ def find_auto_window(records):
     return start, end
 
 
+def extract_path_segments(records, key, win_start, win_end):
+    """Time-ordered PathPlanner ActivePath segments over [win_start, win_end] (µs).
+
+    Returns [{"t": seconds_from_win_start, "pts": [[x, y], ...]}, ...] — one entry
+    each time the active path changes, *including* empty pts when the path clears.
+    The scene plays this back, showing only the segment active at the current time.
+    """
+    if win_start is None:
+        return []
+    win_end = win_end if win_end is not None else float("inf")
+    key_n = normalize(key)
+
+    def poses(p):
+        n = len(p) // POSE2D_BYTES
+        return [struct.unpack_from("<3d", p, i * POSE2D_BYTES)[:2] for i in range(n)]
+
+    def sig(pts):
+        if not pts:
+            return ("empty",)
+        return (round(pts[0][0], 3), round(pts[0][1], 3),
+                round(pts[-1][0], 3), round(pts[-1][1], 3), len(pts))
+
+    def fmt(pts):
+        return [[round(x, 4), round(y, 4)] for x, y in pts]
+
+    raw = [(ts, p) for ts, name, _t, p in records if normalize(name) == key_n]
+    segs = []
+    prev = None
+    seed = None
+    for ts, p in raw:
+        if ts <= win_start:
+            seed = p
+    if seed is not None:
+        pts = poses(seed)
+        segs.append({"t": 0.0, "pts": fmt(pts)})
+        prev = sig(pts)
+    for ts, p in raw:
+        if not (win_start < ts <= win_end):
+            continue
+        pts = poses(p)
+        s = sig(pts)
+        if s != prev:
+            segs.append({"t": round((ts - win_start) / 1e6, 3), "pts": fmt(pts)})
+            prev = s
+    return segs
+
+
 def fmt_pose(p):
     return [f"{v:.6f}" for v in p]
 
@@ -214,6 +274,7 @@ def main():
         "shooter_x", "shooter_y", "shooter_z", "shooter_qw", "shooter_qx", "shooter_qy", "shooter_qz",
         "robot_fuel_count", "robot_fuel_poses",
         "field_fuel_count", "field_fuel_poses",
+        *STRING_KEYS,
     ]
 
     with open(out_path, "w", newline="") as f:
@@ -251,9 +312,22 @@ def main():
                     poses = []
                 row += [len(poses), fmt_pose_list(poses)]
 
+            # subsystem states: UTF-8 string payloads, carried forward
+            for sk in STRING_KEYS:
+                v = latest[sk]
+                row.append(v[2].decode("utf-8", "replace") if v else "")
+
             w.writerow(row)
 
     print(f"Wrote {out_path}  ({len(timestamps)} rows)")
+
+    # Sidecar: time-stamped PathPlanner ActivePath segments over the playback
+    # window — the scene shows only the segment active at the current time.
+    seg_list = extract_path_segments(records, ACTIVE_PATH_KEY, start, end)
+    path_out = str(Path(in_path).with_suffix("")) + "_path.json"
+    with open(path_out, "w") as f:
+        json.dump(seg_list, f)
+    print(f"Wrote {path_out}  ({len(seg_list)} path segments)")
 
     seen_types = {}
     for ts, name, tname, payload in records:

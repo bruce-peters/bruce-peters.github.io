@@ -176,6 +176,67 @@ export function statusPillTexture(label, bgColor = '#eef0f6', textColor = '#3a50
   return { tex, aspect: cw / ch }
 }
 
+// Subsystem state chip — a mono pill reading "ELEVATOR  INTAKE": the subsystem
+// label in dim, its current state lit phosphor green, split by a thin divider.
+// One pill per mechanism makes up the robot's live state tower.
+export function subsystemChipTexture(label, state) {
+  const lblText = String(label || '').toUpperCase()
+  const stText  = String(state || '').toUpperCase()
+  const fontSize = 96
+  const padX = 56
+  const gap = 40           // space around the divider, each side
+  const lblFont = `500 ${fontSize}px 'JetBrains Mono', monospace`
+  const stFont  = `600 ${fontSize}px 'JetBrains Mono', monospace`
+
+  const m = document.createElement('canvas').getContext('2d')
+  m.font = lblFont; const lblW = m.measureText(lblText).width
+  m.font = stFont;  const stW  = m.measureText(stText).width
+
+  const ch = 200
+  const cw = Math.ceil(padX * 2 + lblW + gap * 2 + stW)
+  const canvas = document.createElement('canvas')
+  canvas.width = cw
+  canvas.height = ch
+  const ctx = canvas.getContext('2d')
+
+  // Pill body — ink-700 with a hairline border
+  ctx.fillStyle = '#1d1d21'
+  roundRect(ctx, 4, 4, cw - 8, ch - 8, (ch - 8) / 2)
+  ctx.fill()
+  ctx.strokeStyle = '#26262b'
+  ctx.lineWidth = 3
+  roundRect(ctx, 4, 4, cw - 8, ch - 8, (ch - 8) / 2)
+  ctx.stroke()
+
+  const cy = ch / 2 + 2
+  ctx.textBaseline = 'middle'
+  ctx.textAlign = 'left'
+
+  // Label (dim)
+  ctx.font = lblFont
+  ctx.fillStyle = '#9a958b'
+  ctx.fillText(lblText, padX, cy)
+
+  // Divider
+  const divX = padX + lblW + gap
+  ctx.strokeStyle = '#34343a'
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.moveTo(divX, ch * 0.28)
+  ctx.lineTo(divX, ch * 0.72)
+  ctx.stroke()
+
+  // State (phosphor green)
+  ctx.font = stFont
+  ctx.fillStyle = '#57d36a'
+  ctx.fillText(stText, divX + gap, cy)
+
+  const tex = new THREE.CanvasTexture(canvas)
+  tex.anisotropy = 8
+  tex.colorSpace = THREE.SRGBColorSpace
+  return { tex, aspect: cw / ch }
+}
+
 // Internal draw function — renders the project card onto an existing canvas.
 // imgEl / imgEl2 are optional pre-loaded HTMLImageElements to fill the image panel.
 // slim: screenshot-only mode — the framed image fills the whole card with no text

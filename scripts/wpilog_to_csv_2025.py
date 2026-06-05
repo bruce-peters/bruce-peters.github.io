@@ -15,9 +15,13 @@ Usage:
 from __future__ import annotations
 
 import csv
+import json
 import struct
 import sys
 from pathlib import Path
+
+# PathPlanner active-path key — Pose2d[] of the path the robot is following.
+ACTIVE_PATH_KEY = "/ReplayOutputs/PathPlanner/ActivePath"
 
 POSE3D_BYTES = 56  # 7 doubles: x, y, z, qw, qx, qy, qz
 POSE2D_BYTES = 24  # 3 doubles: x, y, heading_radians
@@ -26,7 +30,16 @@ TARGETS = {
     "robot":    "/ReplayOutputs/RobotState/EstimatedPose",
     "elevator": "/ReplayOutputs/Superstructure/Mechanism Poses/Elevator Pose",
     "pivot":    "/ReplayOutputs/Superstructure/Mechanism Poses/Pivot Pose",
+    # Per-subsystem current state (string enum names) — drives the state tower.
+    "elev_state":    "/ReplayOutputs/Superstructure/Elevator/Target",
+    "pivot_state":   "/ReplayOutputs/Superstructure/Pivot/Target",
+    "rollers_state": "/ReplayOutputs/Rollers/TargetState",
+    "swerve_state":  "/ReplayOutputs/Swerve/DriveMode",
 }
+
+# Keys whose payload is a UTF-8 string (enum name), not a Pose3d/Pose2d.
+# Ordered — these become trailing CSV columns in this order.
+STRING_KEYS = ["elev_state", "pivot_state", "rollers_state", "swerve_state"]
 
 ENABLED_KEY = "/DriverStation/Enabled"
 AUTO_KEY    = "/DriverStation/Autonomous"
@@ -105,6 +118,54 @@ def parse_wpilog(path: str):
             records.append((timestamp, name, tname, payload))
 
     return records, entries
+
+
+def extract_path_segments(records, key, win_start, win_end, name_match=None):
+    """Time-ordered PathPlanner ActivePath segments over [win_start, win_end] (µs).
+
+    Returns [{"t": seconds_from_win_start, "pts": [[x, y], ...]}, ...] — one entry
+    each time the active path changes, *including* empty pts when the path clears.
+    The scene plays this back, showing only the segment active at the current time.
+    """
+    if win_start is None:
+        return []
+    win_end = win_end if win_end is not None else float("inf")
+    match = name_match or (lambda n: n == key)
+
+    def poses(p):
+        n = len(p) // POSE2D_BYTES
+        return [struct.unpack_from("<3d", p, i * POSE2D_BYTES)[:2] for i in range(n)]
+
+    def sig(pts):
+        if not pts:
+            return ("empty",)
+        return (round(pts[0][0], 3), round(pts[0][1], 3),
+                round(pts[-1][0], 3), round(pts[-1][1], 3), len(pts))
+
+    def fmt(pts):
+        return [[round(x, 4), round(y, 4)] for x, y in pts]
+
+    raw = [(ts, p) for ts, name, _t, p in records if match(name)]
+    segs = []
+    prev = None
+    # Seed with whatever path is active at the window start (last record at/before it).
+    seed = None
+    for ts, p in raw:
+        if ts <= win_start:
+            seed = p
+    if seed is not None:
+        pts = poses(seed)
+        segs.append({"t": 0.0, "pts": fmt(pts)})
+        prev = sig(pts)
+    for ts, p in raw:
+        if not (win_start < ts <= win_end):
+            continue
+        pts = poses(p)
+        s = sig(pts)
+        if s != prev:
+            segs.append({"t": round((ts - win_start) / 1e6, 3), "pts": fmt(pts)})
+            prev = s
+    return segs
 
 
 def main():
@@ -189,6 +250,7 @@ def main():
         "robot_x",    "robot_y",    "robot_z",    "robot_qw",    "robot_qx",    "robot_qy",    "robot_qz",
         "elevator_x", "elevator_y", "elevator_z", "elevator_qw", "elevator_qx", "elevator_qy", "elevator_qz",
         "pivot_x",    "pivot_y",    "pivot_z",    "pivot_qw",    "pivot_qx",    "pivot_qy",    "pivot_qz",
+        *STRING_KEYS,
     ]
 
     with open(out_path, "w", newline="") as f:
@@ -215,9 +277,21 @@ def main():
                     row += fmt(decode_pose3d(p))
                 else:
                     row += BLANK
+            # subsystem states: UTF-8 string payloads, carried forward like poses
+            for sk in STRING_KEYS:
+                sp = latest[sk]
+                row.append(sp.decode("utf-8", "replace") if sp else "")
             w.writerow(row)
 
     print(f"Wrote {out_path}  ({len(all_ts)} rows)")
+
+    # Sidecar: time-stamped PathPlanner ActivePath segments over the playback
+    # window — the scene shows only the segment active at the current time.
+    seg_list = extract_path_segments(records, ACTIVE_PATH_KEY, t_start, t_end)
+    path_out = str(Path(out_path).parent / "akit_25_path.json")
+    with open(path_out, "w") as f:
+        json.dump(seg_list, f)
+    print(f"Wrote {path_out}  ({len(seg_list)} path segments)")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { createStateTower } from './stateTower.js'
+import { createTrajectoryPlayer } from './trajectory.js'
 
 // FRC 2026 field dimensions, in meters
 const FIELD_LENGTH_M = 16.54
@@ -134,6 +136,19 @@ export function loadAutoPlayback(scene, allUpdaters, manager) {
   robotFuel.frustumCulled = false
   scene.add(fieldFuel, robotFuel)
 
+  // "The Robot's Mind": a tower of per-subsystem state pills above the robot.
+  const tower = createStateTower(robotGroup,
+    ['Intake', 'Shooter', 'Serializer', 'Swerve'], { topY: 2.4 })
+
+  // PathPlanner trajectory — a green spline showing only the path segment active
+  // at the current playback time. Field-absolute, using the same x/y → scene
+  // mapping the robot uses so it overlays the driven path.
+  const trajectory = createTrajectoryPlayer(scene,
+    ([x, y]) => new THREE.Vector3(fieldX(x), 0.03, fieldZ(y) * ROBOT_LATERAL_FLIP))
+  fetch('/wpilog/akit_26-05-22_09-20-01_path.json').then(r => r.ok ? r.json() : null).then(segs => {
+    if (segs) trajectory.setSegments(segs)
+  }).catch(() => {})
+
   // Optional readout span the React side can stamp into.
   const hud = document.getElementById('auto-playback-hud')
 
@@ -168,6 +183,10 @@ export function loadAutoPlayback(scene, allUpdaters, manager) {
                   num('shooter_qw'), num('shooter_qx'), num('shooter_qy'), num('shooter_qz')],
         rf: safeParse(row[idx.robot_fuel_poses]),
         ff: safeParse(row[idx.field_fuel_poses]),
+        intake_state:     row[idx['intake_state']]     ?? '',
+        shooter_state:    row[idx['shooter_state']]    ?? '',
+        serializer_state: row[idx['serializer_state']] ?? '',
+        swerve_state:     row[idx['swerve_state']]     ?? '',
       })
     }
     data = out
@@ -219,6 +238,17 @@ export function loadAutoPlayback(scene, allUpdaters, manager) {
     if (startSec === null) startSec = elapsed
     const t = (elapsed - startSec) % totalSec
     const row = findRowAt(t)
+
+    // Show the PathPlanner segment active at this moment.
+    trajectory.update(t)
+
+    // Drive the subsystem state tower (texture work only when a state changes).
+    tower.update({
+      Intake:     row.intake_state,
+      Shooter:    row.shooter_state,
+      Serializer: row.serializer_state,
+      Swerve:     row.swerve_state,
+    })
 
     // Robot — field-absolute Pose3d
     const [rx, ry, rz, rqw, rqx, rqy, rqz] = row.robot

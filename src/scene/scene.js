@@ -182,6 +182,7 @@ export function initScene(container, onProjectChange, onLoad) {
   let scrollTarget = 0.0
   let activeIndex  = 0
   let debugMode    = false  // true while manual camera control is active (tune/exit)
+  let lastScrollTime = performance.now()  // tracks idle time for camera drift
 
   const N        = PROJECTS.length
   const SCROLL_LERP = 5.0     // exp ease toward scrollTarget (higher = snappier)
@@ -207,6 +208,7 @@ export function initScene(container, onProjectChange, onLoad) {
     if (tuneActive) return
     debugMode = false
     scrollTarget = Math.max(0, Math.min(N - 1, nodeFloat))
+    lastScrollTime = performance.now()
   }
 
   // goToIndex — kept for API compatibility; snaps the target (used by exit/legacy).
@@ -278,6 +280,15 @@ export function initScene(container, onProjectChange, onLoad) {
       // Subtle mouse parallax around the spline point
       camera.position.x += mouseX * PARALLAX
       camera.position.y += -mouseY * PARALLAX
+
+      // Idle drift: after 3s without scrolling, let the lookAt point drift gently
+      // toward the cursor — gives the scene life when the user is reading a card.
+      const idleMs = performance.now() - lastScrollTime
+      if (idleMs > 3000) {
+        const amt = Math.min((idleMs - 3000) / 2000, 1) * 0.45
+        controls.target.x += mouseX * amt
+        controls.target.y -= mouseY * amt * 0.35
+      }
 
       // Gentle FOV breathing: widens while the camera is moving, settles at rest
       const speed = Math.abs(scroll - prevScroll) / Math.max(dt, 0.001)

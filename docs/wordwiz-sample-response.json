@@ -1,0 +1,43 @@
+{
+  "event_type": "analysis",
+  "sentence": "She sells sea shells by the sea shore.",
+  "note": "Captured 2026-06-05. Sentence 2 of DEMO_SENTENCES. Speaker mispronounced 'she', skipped 'sea' (x2), and merged 'shells'/'shore'.",
+  "data": {
+    "pronunciation_dataframe": {
+      "type":               {"0":"substitution","1":"match","2":"deletion","3":"substitution","4":"match","5":"match","6":"deletion","7":"substitution"},
+      "predicted_word":     {"0":"tully","1":"sells","2":"","3":"seashells","4":"by","5":"the","6":"","7":"seashore"},
+      "ground_truth_word":  {"0":"she","1":"sells","2":"sea","3":"shells","4":"by","5":"the","6":"sea","7":"shore"},
+      "expected_phonemes":  {"0":["ʃ","i"],"1":["s","ɛ","l","z"],"2":["s","i"],"3":["ʃ","ɛ","l","z"],"4":["b","aɪ"],"5":["ð","ə"],"6":["s","i"],"7":["ʃ","ɔ","r"]},
+      "actual_phonemes":    {"0":["ð","a","ɪ"],"1":["s","ɛ","l","v","z"],"2":[],"3":["s","i","ʃ","ɛ","l","z"],"4":["b","aɪ"],"5":["ð","ə"],"6":[],"7":["s","i","ʃ","ɔ","r"]},
+      "missed":             {"0":[],"1":[],"2":["s","i"],"3":[],"4":[],"5":[],"6":["s","i"],"7":[]},
+      "added":              {"0":["ð"],"1":["v"],"2":[],"3":["s","i"],"4":[],"5":[],"6":[],"7":["s","i"]},
+      "substituted":        {"0":[["ʃ","a"],["i","ɪ"]],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[]},
+      "per":                {"0":1.5,"1":0.25,"2":1.0,"3":0.5,"4":0.0,"5":0.0,"6":1.0,"7":0.6667},
+      "total_phonemes":     {"0":2,"1":4,"2":2,"3":4,"4":3,"5":2,"6":2,"7":3},
+      "total_errors":       {"0":3,"1":1,"2":2,"3":2,"4":0,"5":0,"6":2,"7":2}
+    },
+    "highest_per_word": {
+      "type": "substitution",
+      "ground_truth_word": "she",
+      "predicted_word": "tully",
+      "per": 1.5,
+      "expected_phonemes": ["ʃ","i"],
+      "actual_phonemes": ["ð","a","ɪ"],
+      "substituted": [["ʃ","a"],["i","ɪ"]],
+      "missed": [],
+      "added": ["ð"]
+    },
+    "problem_summary": {
+      "most_common_phoneme": ["i",3],
+      "most_common_word": ["sea",2],
+      "phoneme_error_counts": {"ð":1,"ʃ":1,"i":3,"v":1,"s":2},
+      "phoneme_group_errors": {"fricatives":5,"vowels":3},
+      "phoneme_articulatory_info": {
+        "ð": {"place":"tongue and teeth","manner":"fricative","voice":"voiced","description":"Put your tongue between your teeth and hum (like 'th' in this)"},
+        "ʃ": {"place":"tongue body","manner":"fricative","voice":"voiceless","description":"Curl your tongue slightly and blow air (like 'sh')"},
+        "s": {"place":"tongue tip","manner":"fricative","voice":"voiceless","description":"Keep your tongue near the roof of your mouth and blow air in a thin stream"}
+      }
+    },
+    "per_summary": {"total_phonemes":22,"total_errors":12,"sentence_per":0.5454545454545454}
+  }
+}

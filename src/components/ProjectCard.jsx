@@ -1,4 +1,5 @@
 import useInView from '../hooks/useInView.js'
+import useMagnetic from '../hooks/useMagnetic.js'
 import { chipDot } from '../utils/chipColors.js'
 
 // In-flow project card for the scrolling-page layout. Sits in a side column over
@@ -7,6 +8,7 @@ export default function ProjectCard({ project, side, onExternalLink }) {
   if (!project) return null
   const kicker = project.isAbout ? 'about' : `work ${project.index}`
   const [ref, inView] = useInView()
+  const ctaRef = useMagnetic(0.25)
   const reduce =
     typeof window !== 'undefined' &&
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -119,8 +121,9 @@ export default function ProjectCard({ project, side, onExternalLink }) {
         <div className="flex items-center gap-3 flex-wrap">
           {project.cta && (
             <button
+              ref={ctaRef}
               onClick={() => onExternalLink?.(project.cta.href)}
-              className="inline-flex items-center gap-2 font-mono font-bold text-[13px] tracking-[0.02em] text-bg bg-accent rounded-full px-[22px] py-2.5 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_0_0_1px_rgba(87,211,106,0.4),0_8px_32px_rgba(87,211,106,0.35)] border-0 cursor-pointer after:content-['→']"
+              className="inline-flex items-center gap-2 font-mono font-bold text-[13px] tracking-[0.02em] text-bg bg-accent rounded-full px-[22px] py-2.5 transition-shadow duration-200 hover:shadow-[0_0_0_1px_rgba(87,211,106,0.4),0_8px_32px_rgba(87,211,106,0.35)] border-0 cursor-pointer after:content-['→']"
             >
               {project.cta.label}
             </button>

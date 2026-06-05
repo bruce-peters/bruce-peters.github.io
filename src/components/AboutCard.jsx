@@ -1,5 +1,7 @@
 import useInView from '../hooks/useInView.js'
+import useMagnetic from '../hooks/useMagnetic.js'
 import { chipDot } from '../utils/chipColors.js'
+import GitHubStats from './GitHubStats.jsx'
 
 // The About card — a richer variant of ProjectCard. Keeps the same glass shell
 // and glass-settle entrance, but adds an identity band (optional portrait +
@@ -7,6 +9,7 @@ import { chipDot } from '../utils/chipColors.js'
 // two CTAs. The 3D `buildAbout()` companion carries identity + work, not skills.
 export default function AboutCard({ project, side, onViewWork }) {
   const [ref, inView] = useInView()
+  const viewWorkRef = useMagnetic(0.25)
   const reduce =
     typeof window !== 'undefined' &&
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -89,8 +92,11 @@ export default function AboutCard({ project, side, onViewWork }) {
         </div>
       )}
 
+      {/* GitHub contribution heatmap — live evidence under the stats */}
+      <GitHubStats />
+
       {/* 4-stat grid — only the lead stat is accent green */}
-      <div className="flex flex-wrap gap-2.5 mb-6">
+      <div className="flex flex-wrap gap-2.5 mb-6 mt-5">
         {project.stats.map(([v, l], i) => (
           <div
             key={l}
@@ -111,8 +117,9 @@ export default function AboutCard({ project, side, onViewWork }) {
       {/* Actions */}
       <div className="flex gap-3 flex-wrap">
         <button
+          ref={viewWorkRef}
           onClick={() => onViewWork?.()}
-          className="inline-flex items-center gap-2 font-mono font-bold text-[13px] tracking-[0.02em] rounded-full px-[22px] py-3 bg-accent text-bg transition-all duration-200 hover:-translate-y-px hover:shadow-[0_0_0_1px_rgba(87,211,106,0.4),0_8px_32px_rgba(87,211,106,0.35)] border-0 cursor-pointer after:content-['→']"
+          className="inline-flex items-center gap-2 font-mono font-bold text-[13px] tracking-[0.02em] rounded-full px-[22px] py-3 bg-accent text-bg transition-shadow duration-200 hover:shadow-[0_0_0_1px_rgba(87,211,106,0.4),0_8px_32px_rgba(87,211,106,0.35)] border-0 cursor-pointer after:content-['→']"
         >
           view work
         </button>
@@ -121,6 +128,14 @@ export default function AboutCard({ project, side, onViewWork }) {
           className="inline-flex items-center font-mono font-bold text-[13px] tracking-[0.02em] rounded-full px-[22px] py-3 border border-line text-fg transition-all duration-200 hover:-translate-y-px hover:border-accent hover:text-accent no-underline"
         >
           get in touch
+        </a>
+        <a
+          href="/resume.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center font-mono font-bold text-[13px] tracking-[0.02em] rounded-full px-[22px] py-3 border border-line text-dim transition-all duration-200 hover:-translate-y-px hover:border-accent hover:text-accent no-underline"
+        >
+          résumé ↓
         </a>
       </div>
     </div>

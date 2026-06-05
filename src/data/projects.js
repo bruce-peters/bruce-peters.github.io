@@ -215,7 +215,7 @@ export const PROJECTS = [
     now: "building a sim pipeline",
     photo: "/screenshots/Headshot.jpg",
     headline: "i build things that <em>outlast me.</em>",
-    desc: "high-school junior from the bay area. i started in scratch at 9, moved to unity at 12, programmed my robotics team to an frc world championship at 17, and build ai products between seasons — like word wiz, a reading tutor that hears the exact sounds kids miss.",
+    desc: "high-school junior from the bay area. i started in scratch at 9, moved to unity at 12, programmed my robotics team to an frc world championship at 15, and build ai products between seasons. Like word wiz, a reading tutor that hears the exact sounds kids miss.",
     tags: ["Java", "Python", "TypeScript", "React", "PyTorch", "WPILib"],
     stats: [
       ["7+", "yrs building"],
@@ -235,7 +235,7 @@ export const PROJECTS = [
     index: "01",
     label: "Iron Panthers FRC · Programming Manager",
     title: "Iron Panthers Robot",
-    desc: "Programming Manager on Iron Panthers (FRC). I wrote the superstructure state machine — elevator + pivot coordination with safety interlocks — that scored every point for the robot through the 2025 season, capped by a World Championship win in Houston out of 4,000+ teams.",
+    desc: "Programming Manager on Iron Panthers (FRC). I wrote the superstructure state machine (elevator + pivot coordination with safety interlocks) that scored every point for the robot through the 2025 season, capped by a World Championship win in Houston out of 4,000+ teams. For our 2026 season, I wrote our trajectory finding code that helped us shoot on the move. All of which was only possible because of a simulation framework I've implemented for the team.",
     tags: ["Java", "WPILib", "OpenCV", "AdvantageKit"],
     image: "./screenshots/robot-physical.png",
     stats: [
@@ -255,11 +255,11 @@ export const PROJECTS = [
     index: "02",
     label: "Word Wiz AI · Solo founder",
     title: "Word Wiz AI",
-    desc: "This is an AI reading tutor I built and run solo. A kid reads a sentence out loud, and the backend runs five ML models plus a grapheme-to-phoneme alignment step to figure out which exact sounds they got wrong, like saying HOSE instead of HOUSE. It then writes the next sentence around the sounds they are still missing so they keep practicing what they actually need. The hardest part was speed. I got response time down from 15 to 20 seconds to about 2 by streaming the results, quantizing the models, and caching. It has had 4,000+ visitors and 130+ signups, and it placed 2nd in the Congressional App Challenge.",
+    desc: "This is an AI reading tutor I built and run solo. A kid reads a sentence out loud, and the backend runs five ML models plus a grapheme-to-phoneme alignment step to figure out which exact sounds they got wrong, like saying HOSE instead of HOUSE. It then writes the next sentence around the sounds they are still missing so they keep practicing what they actually need. The hardest part was speed. I got response time down from 15 to 20 seconds to about 2 by streaming the results, quantizing the models, and caching. It has had 6,000+ visitors and 130+ signups, and it placed 2nd in the Congressional App Challenge.",
     tags: ["React", "FastAPI", "PyTorch", "AWS", "MySQL"],
     image: "/screenshots/word-wiz-practice.png",
     stats: [
-      ["4,000+", "visitors"],
+      ["6,000+", "visitors"],
       ["130+", "signups"],
       ["2nd", "CAC 2024"],
     ],
@@ -294,7 +294,7 @@ export const PROJECTS = [
     index: "04",
     label: "Scouting App · Iron Panthers",
     title: "Iron Panthers Scouting App",
-    desc: "This is an app that I made for my robotics team to help us scout other teams at competitions. It allows users to enter data about the teams and then view the data in a table.",
+    desc: "Rebuilt from scratch after inheriting a broken prototype from a graduating senior. I taught myself web development to understand the codebase, then rewrote it entirely — React TypeScript frontend, Firebase realtime backend, Google Sheets pipeline for post-event analysis. 30+ scouts run it simultaneously during matches, feeding a live dashboard the strategy team uses to make alliance selection picks. The frontend skills I built here are what eventually let me go build Word Wiz AI.",
     tags: ["React", "TypeScript", "Vite", "Tailwind", "Firebase"],
     image: "/screenshots/scouting-mobile-homescreen.png",
     stats: [

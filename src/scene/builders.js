@@ -846,7 +846,7 @@ function aboutTerminalTexture() {
   // Lines
   const lines = [
     ["✓", "2025 worlds champions", "#57d36a", "#cbc6bc"],
-    ["✓", "2024 word wiz · 4k readers", "#57d36a", "#cbc6bc"],
+    ["✓", "2024 word wiz · 6k visitors", "#57d36a", "#cbc6bc"],
     ["//", "next: sim pipeline", "#6f6b62", "#6f6b62"],
   ];
   ctx.font = `500 30px 'JetBrains Mono', monospace`;

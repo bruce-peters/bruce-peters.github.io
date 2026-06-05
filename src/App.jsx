@@ -6,8 +6,16 @@ import DotRail from './components/DotRail.jsx'
 import ProjectSection from './components/ProjectSection.jsx'
 import LoadingScreen from './components/LoadingScreen.jsx'
 import TuneMode from './components/TuneMode.jsx'
+import ResumeView from './components/ResumeView.jsx'
+import { play } from './lib/audio.js'
 
 const isLocalhost = window.location.hostname === 'localhost'
+
+function getInitialResumeMode() {
+  const urlParam = new URLSearchParams(window.location.search).get('mode') === 'resume'
+  if (urlParam) return true
+  try { return localStorage.getItem('resume-mode') === 'true' } catch { return false }
+}
 
 export default function App() {
   const [activeProject, setActiveProject] = useState(PROJECTS[0])
@@ -18,6 +26,7 @@ export default function App() {
   const [editorState, setEditorState] = useState(null)
   const [selectedId, setSelectedId] = useState(null)
   const [exiting, setExiting] = useState(false)
+  const [resumeMode, setResumeMode] = useState(getInitialResumeMode)
   const containerRef = useRef(null)
   const sceneRef = useRef(null)
   const sectionRefs = useRef([])
@@ -25,12 +34,23 @@ export default function App() {
   const handleProjectChange = useCallback((project, index) => {
     setActiveProject(project)
     setActiveIndex(index)
+    play('snap')
+  }, [])
+
+  const toggleResumeMode = useCallback(() => {
+    setResumeMode(prev => {
+      const next = !prev
+      try { localStorage.setItem('resume-mode', String(next)) } catch {}
+      return next
+    })
   }, [])
 
   // Init the 3D background scene. Three.js + the scene/builders live in a lazily
   // imported chunk so the loading screen (tiny main bundle) paints instantly
   // while the heavy 3D code downloads in the background.
+  // Skipped entirely in resume mode so the flat view is instant and lightweight.
   useEffect(() => {
+    if (resumeMode) { setLoaded(true); return }
     if (!containerRef.current) return
     let scene = null
     let cancelled = false
@@ -44,7 +64,7 @@ export default function App() {
       }
     }).catch(e => setError(e.message + '\n' + e.stack))
     return () => { cancelled = true; scene?.destroy() }
-  }, [handleProjectChange])
+  }, [handleProjectChange, resumeMode])
 
   // Drive the background camera from the document scroll position.
   // nodeFloat ∈ [0, N-1] is interpolated from where the viewport center sits
@@ -92,6 +112,7 @@ export default function App() {
   }, [])
 
   const openExternalLink = useCallback((href) => {
+    play('whoosh')
     setExiting(true)
     sceneRef.current?.startExitAnimation(() => {
       window.open(href, '_blank', 'noopener,noreferrer')
@@ -141,6 +162,10 @@ export default function App() {
     )
   }
 
+  if (resumeMode) {
+    return <ResumeView onExit={toggleResumeMode} />
+  }
+
   return (
     <div className="relative w-full">
       {/* Fixed 3D background */}
@@ -154,7 +179,11 @@ export default function App() {
 
       {/* Fixed chrome */}
       <IdentityBlock />
-      <NavBlock onExternalLink={openExternalLink} />
+      <NavBlock
+        onExternalLink={openExternalLink}
+        onToggleResume={toggleResumeMode}
+        resumeMode={resumeMode}
+      />
       <DotRail activeIndex={activeIndex} goToIndex={goToIndex} />
 
       {/* White flash overlay for external link transitions */}
