@@ -63,6 +63,64 @@ export const SCENE_ELEMENTS = [
   { id: "readerDemo", label: "Word Wiz Demo", pos: [14.25, 9.52, -8.69] },
 ];
 
+// Skills shown as faint atmosphere stickers scattered behind the About portrait.
+// Edit freely — buildAbout() renders these procedurally. `color` is a hex token
+// from the /bp/ palette. `dx`/`dy` place the sticker in the card plane and `fz`
+// pushes it back in Z (more negative = further behind). Keep these to skills
+// Bruce actually ships with; they should echo the tags on the project cards.
+export const ABOUT_SKILLS = [
+  { label: "Java", color: "#c7ee5e", dx: -3.2, dy: 2.7, fz: -2.6 },
+  { label: "Python", color: "#57d36a", dx: 0.5, dy: -2.5, fz: -2.2 },
+  { label: "TypeScript", color: "#9b8cff", dx: 2.6, dy: 2.5, fz: -3.0 },
+  { label: "React", color: "#57d36a", dx: -4.1, dy: -0.5, fz: -2.4 },
+  { label: "PyTorch", color: "#ec9576", dx: 3.5, dy: -2.7, fz: -2.8 },
+  { label: "WPILib", color: "#57d36a", dx: -1.7, dy: 3.1, fz: -2.9 },
+  { label: "OpenCV", color: "#9b8cff", dx: 4.5, dy: 0.7, fz: -3.1 },
+  { label: "FastAPI", color: "#c7ee5e", dx: -4.4, dy: 1.8, fz: -3.2 },
+  { label: "AWS", color: "#ec9576", dx: 1.6, dy: 3.4, fz: -3.4 },
+  { label: "TensorFlow", color: "#57d36a", dx: 5.0, dy: -1.0, fz: -3.6 },
+  { label: "C++", color: "#9b8cff", dx: -5.0, dy: -1.9, fz: -3.3 },
+  { label: "C#", color: "#c7ee5e", dx: -2.7, dy: -2.8, fz: -3.5 },
+  { label: "Apps Script", color: "#ec9576", dx: 2.2, dy: -1.0, fz: -3.8 },
+  { label: "HTML/CSS/JS", color: "#57d36a", dx: -3.4, dy: 0.6, fz: -3.9 },
+  { label: "Windows", color: "#9b8cff", dx: 0.0, dy: 1.6, fz: -4.0 },
+  { label: "Linux", color: "#c7ee5e", dx: 4.0, dy: 2.6, fz: -3.7 },
+  { label: "PHP", color: "#ec9576", dx: -0.9, dy: -3.4, fz: -3.6 },
+];
+
+// Stat tiles that float in the About cluster beside the portrait. Each is a
+// big Bricolage hero number over a tracked mono label — the design system's
+// human-voice / machine-output tension in one card. Rendered procedurally by
+// buildAbout(); edit freely. Pick the *engineering* metric, not the trophy —
+// the build.log terminal already lists the wins, so these add depth instead of
+// repeating it. `color` is a /bp/ palette hex; `dx`/`dy`/`fz` place it in the
+// card plane (fz = toward/away in Z), `size` is world height, `opacity` fades
+// far cards back.
+export const ABOUT_HIGHLIGHTS = [
+  {
+    kicker: "word wiz ai",
+    value: "2s",
+    label: "inference, down from 20s",
+    color: "#57d36a",
+    dx: 2.9,
+    dy: 1.0,
+    fz: -0.3,
+    size: 1.9,
+    opacity: 0.97,
+  },
+  {
+    kicker: "robot sim",
+    value: "3×",
+    label: "team throughput",
+    color: "#c7ee5e",
+    dx: 3.7,
+    dy: -1.6,
+    fz: -2.4,
+    size: 1.55,
+    opacity: 0.92,
+  },
+];
+
 export const ARCHIVE_WORKS = [
   {
     title: "Roots",
@@ -212,7 +270,7 @@ export const PROJECTS = [
     title: "",
     name: "Bruce Peters",
     role: "builder · frc programmer · founder\nhillsborough, ca",
-    now: "building a sim pipeline",
+    now: "building an ai robot code pipeline",
     photo: "/screenshots/Headshot.jpg",
     headline: "i build things that <em>outlast me.</em>",
     desc: "high-school junior from the bay area. i started in scratch at 9, moved to unity at 12, programmed my robotics team to an frc world championship at 15, and build ai products between seasons. Like word wiz, a reading tutor that hears the exact sounds kids miss.",

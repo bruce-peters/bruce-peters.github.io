@@ -1,6 +1,11 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { PROJECTS, SCREENSHOT_PANES } from "../data/projects.js";
+import {
+  PROJECTS,
+  SCREENSHOT_PANES,
+  ABOUT_SKILLS,
+  ABOUT_HIGHLIGHTS,
+} from "../data/projects.js";
 import {
   wordPillTexture,
   phonemeCardTexture,
@@ -863,17 +868,21 @@ function aboutTerminalTexture() {
   return { tex: _aboutTex(canvas), aspect: cw / ch };
 }
 
-// A compact project card — accent top bar, title, one-line sub, and a tag.
-// Smaller and lighter than the full scene `projectCardTexture`; it reads as a
-// flagship/supporting work in the About cluster.
-function aboutMiniCardTexture(title, sub, accent) {
-  const cw = 760,
-    ch = 480;
+// A stat tile — the design system's human/machine tension in one card: a big
+// Bricolage hero number over a tracked mono label, on a terminal panel. Reads
+// as one engineering metric, not a repeated project blurb. Data comes from
+// ABOUT_HIGHLIGHTS in projects.js.
+function aboutStatTexture({ kicker, value, label, color }) {
+  const cw = 680,
+    ch = 440;
   const canvas = document.createElement("canvas");
   canvas.width = cw;
   canvas.height = ch;
   const ctx = canvas.getContext("2d");
+  const padX = 52;
+  const maxW = cw - padX * 2;
 
+  // Panel — terminal body, hairline border.
   ctx.fillStyle = "#161619";
   _rr(ctx, 8, 8, cw - 16, ch - 16, 30);
   ctx.fill();
@@ -882,49 +891,41 @@ function aboutMiniCardTexture(title, sub, accent) {
   _rr(ctx, 8, 8, cw - 16, ch - 16, 30);
   ctx.stroke();
 
-  // Accent top bar
-  ctx.fillStyle = accent;
-  _rr(ctx, 44, 40, 70, 7, 3.5);
+  // Kicker — accent dot + machine label, uppercase + tracked (0.18em ≈ 4px).
+  const kickerY = 78;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(padX + 9, kickerY, 9, 0, Math.PI * 2);
   ctx.fill();
-
-  // Title (word-wrapped)
-  ctx.fillStyle = "#f4f0e8";
-  ctx.font = `700 64px 'Bricolage Grotesque', sans-serif`;
+  ctx.fillStyle = "#9a958b";
+  ctx.font = `500 26px 'JetBrains Mono', monospace`;
   ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "4px";
+  ctx.fillText(kicker.toUpperCase(), padX + 32, kickerY + 2);
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+
+  // Hero value — human voice, big Bricolage display, warm cream.
+  ctx.fillStyle = "#f4f0e8";
+  ctx.font = `700 170px 'Bricolage Grotesque', sans-serif`;
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText(value, padX - 2, 290);
+
+  // Label — machine caption, wrapped, dim.
+  ctx.fillStyle = "#9a958b";
+  ctx.font = `400 28px 'JetBrains Mono', monospace`;
   ctx.textBaseline = "top";
   let line = "";
-  let y = 92;
-  const maxW = cw - 88;
-  for (const w of title.split(" ")) {
+  let y = 330;
+  for (const w of label.split(" ")) {
     const test = line + w + " ";
     if (ctx.measureText(test).width > maxW && line) {
-      ctx.fillText(line.trim(), 44, y);
+      ctx.fillText(line.trim(), padX, y);
       line = w + " ";
-      y += 70;
+      y += 38;
     } else line = test;
   }
-  ctx.fillText(line.trim(), 44, y);
-  y += 84;
-
-  // Sub line(s)
-  ctx.fillStyle = "#cbc6bc";
-  ctx.font = `400 27px 'JetBrains Mono', monospace`;
-  let sline = "";
-  for (const w of sub.split(" ")) {
-    const test = sline + w + " ";
-    if (ctx.measureText(test).width > maxW && sline) {
-      ctx.fillText(sline.trim(), 44, y);
-      sline = w + " ";
-      y += 38;
-    } else sline = test;
-  }
-  ctx.fillText(sline.trim(), 44, y);
-
-  // Accent dot bottom-left
-  ctx.fillStyle = accent;
-  ctx.beginPath();
-  ctx.arc(58, ch - 56, 9, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.fillText(line.trim(), padX, y);
 
   return { tex: _aboutTex(canvas), aspect: cw / ch };
 }
@@ -1043,28 +1044,14 @@ export function buildAbout(manager) {
   // ── build.log terminal — proof, machine-voice. Mid plane, to the open side.
   place(aboutTerminal(), -2.9, -0.3, -0.4, 0.12);
 
-  // ── Project cards — flagship forward, supporting pushed back in Z.
-  const wordWiz = makeFloatingCard(
-    aboutMiniCardTexture(
-      "Word Wiz AI",
-      "reading tutor · hears the sounds kids miss",
-      "#57d36a"
-    ),
-    1.9,
-    { opacity: 0.97 }
-  );
-  place(wordWiz, 2.9, 1.0, -0.3, 0.1);
-
-  const robotSim = makeFloatingCard(
-    aboutMiniCardTexture(
-      "Robot Sim",
-      "wpilib physics · 3× team throughput",
-      "#e63b6d"
-    ),
-    1.55,
-    { opacity: 0.92 }
-  );
-  place(robotSim, 3.7, -1.6, -2.4, 0.14);
+  // ── Stat tiles — flagship engineering metrics, rendered from ABOUT_HIGHLIGHTS
+  //    in projects.js. Flagship forward, supporting pushed back in Z.
+  ABOUT_HIGHLIGHTS.forEach((h) => {
+    const tile = makeFloatingCard(aboutStatTexture(h), h.size, {
+      opacity: h.opacity ?? 0.95,
+    });
+    place(tile, h.dx, h.dy, h.fz, 0.1);
+  });
 
   // ── Phoneme fragments — identity DNA, small and scattered, half pushed back.
   const phonemes = [
@@ -1077,15 +1064,10 @@ export function buildAbout(manager) {
     place(makeFloatingCard(wordPillTexture(w, v), 0.42, { opacity: 0.9 }), dx, dy, fz, 0.3);
   });
 
-  // ── Atmosphere stickers — faint, far back. Tools live in the DOM, not here;
-  //    these are texture, not a list.
-  const stickers = [
-    ["three.js", "#9b8cff", -2.4, 2.7, -2.8],
-    ["Java", "#c7ee5e", 0.4, -2.4, -2.2],
-    ["WPILib", "#57d36a", 2.2, 2.3, -2.9],
-  ];
-  stickers.forEach(([t, col, dx, dy, fz]) => {
-    const s = makeFloatingCard(aboutStickerTexture(t, col), 0.46, { opacity: 0.55 });
+  // ── Skill stickers — faint, far back. The real stack Bruce ships with,
+  //    rendered procedurally from ABOUT_SKILLS in projects.js (edit there).
+  ABOUT_SKILLS.forEach(({ label, color, dx, dy, fz }) => {
+    const s = makeFloatingCard(aboutStickerTexture(label, color), 0.46, { opacity: 0.55 });
     place(s, dx, dy, fz, 0.25);
   });
 
