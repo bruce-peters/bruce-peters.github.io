@@ -12,7 +12,10 @@ html, body {
   width: 100%;
   background: #101012;
   color: #f4f0e8;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  /* Human voice is the default: prose, headings, anything a person would say.
+     Machine voice (labels, paths, stats, terminal chrome) opts in via
+     `font-mono` — see the typography rule in CLAUDE.md. */
+  font-family: 'Bricolage Grotesque', 'Helvetica Neue', system-ui, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   scroll-behavior: smooth;

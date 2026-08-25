@@ -27,14 +27,13 @@ export default function ProjectCard({ project, side, onExternalLink }) {
         backdropFilter: 'blur(22px) saturate(1.2)',
         WebkitBackdropFilter: 'blur(22px) saturate(1.2)',
         opacity: shown ? 1 : 0,
-        filter: shown ? 'blur(0px)' : 'blur(8px)',
         transform: shown
-          ? 'translate3d(0, 0, 0) scale(1)'
-          : `translate3d(${slideX}px, 28px, 0) scale(0.94)`,
+          ? 'translate3d(0, 0, 0)'
+          : `translate3d(${slideX * 0.5}px, 14px, 0)`,
         transition: reduce
           ? 'none'
-          : 'opacity 700ms cubic-bezier(0.22,1,0.36,1), transform 800ms cubic-bezier(0.22,1,0.36,1), filter 700ms cubic-bezier(0.22,1,0.36,1)',
-        willChange: 'opacity, transform, filter',
+          : 'opacity 380ms cubic-bezier(0.22,1,0.36,1), transform 460ms cubic-bezier(0.22,1,0.36,1)',
+        willChange: 'opacity, transform',
       }}
     >
       {/* colored top bar — ties the card to the phoneme accent */}
@@ -56,16 +55,22 @@ export default function ProjectCard({ project, side, onExternalLink }) {
         </div>
       )}
 
-      {/* Kicker row */}
-      <div className="flex justify-between items-baseline mb-4 font-mono">
-        <span className="text-[11px] tracking-[0.2em] uppercase text-dim">
-          <span className="text-accent">// {kicker}</span> · {project.label}
-        </span>
-        {project.year && (
-          <span className="text-[11px] tracking-[0.2em] uppercase text-dim2 whitespace-nowrap pl-3">
-            {project.year}
+      {/* Kicker — index and year share a tight baseline row; the label gets its
+          own line below so a long one can't wrap around the floating year. */}
+      <div className="font-mono mb-4">
+        <div className="flex justify-between items-baseline gap-3">
+          <span className="text-[11px] tracking-[0.2em] uppercase text-accent">
+            // {kicker}
           </span>
-        )}
+          {project.year && (
+            <span className="text-[11px] tracking-[0.2em] uppercase text-dim2 whitespace-nowrap">
+              {project.year}
+            </span>
+          )}
+        </div>
+        <div className="mt-1.5 text-[11px] tracking-[0.2em] uppercase text-dim leading-[1.5]">
+          {project.label}
+        </div>
       </div>
 
       {/* Title */}
@@ -73,8 +78,8 @@ export default function ProjectCard({ project, side, onExternalLink }) {
         {project.title}
       </h2>
 
-      {/* Description */}
-      <p className="text-[13.5px] leading-[1.62] text-cream-dim m-0 mb-5">
+      {/* Description — human voice, so it inherits Bricolage from body */}
+      <p className="text-[14.5px] leading-[1.6] text-cream-dim m-0 mb-5">
         {project.desc}
       </p>
 

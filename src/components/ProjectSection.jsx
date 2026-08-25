@@ -1,10 +1,12 @@
-import { forwardRef, lazy, Suspense } from 'react'
+import { forwardRef } from 'react'
 import { PROJECTS } from '../data/projects.js'
 import Hero from './Hero.jsx'
 import ProjectCard from './ProjectCard.jsx'
 import AboutCard from './AboutCard.jsx'
 
-const WordWizDemo = lazy(() => import('./WordWizDemo.jsx'))
+// The inline "Try it live" Word Wiz demo is parked for now — it didn't fit the
+// flow of the card column. WordWizDemo.jsx is intact; re-render it here to
+// bring it back.
 
 // "view work" on the About card jumps to the first real work node (the first
 // project that isn't the overview or about narrative nodes).
@@ -47,11 +49,6 @@ const ProjectSection = forwardRef(function ProjectSection(
         ) : (
           <div className="w-full max-w-[440px]" style={{ pointerEvents: 'auto' }}>
             <ProjectCard project={project} side={side} onExternalLink={onExternalLink} />
-            {project.id === 'reader' && (
-              <Suspense fallback={null}>
-                <WordWizDemo />
-              </Suspense>
-            )}
           </div>
         )}
       </div>
