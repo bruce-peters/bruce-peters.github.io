@@ -290,7 +290,7 @@ export const PROJECTS = [
     title: "",
     name: "Bruce Peters",
     role: "builder · frc programmer · founder\nburlingame, ca",
-    now: "writing up the off-task detection research from BU RISE",
+    now: "starting school & writing a few papers",
     photo: "/screenshots/Headshot.jpg",
     headline: "i build things that <em>outlast me.</em>",
     desc: "high-school senior from the bay area. i started in scratch at 9, moved to unity at 12, programmed my robotics team to an frc world championship at 15, and build ai products between seasons. Like word wiz, a reading tutor that hears the exact sounds kids miss in learning to read. this past summer i spent six weeks at boston university on rise, building a cross-site benchmark for detecting when a kid stops paying attention during reading tutoring.",
