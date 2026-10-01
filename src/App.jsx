@@ -227,6 +227,7 @@ export default function App() {
             side={CARD_SIDES[i]}
             onExternalLink={openExternalLink}
             goToIndex={goToIndex}
+            loaded={loaded}
           />
         ))}
       </main>

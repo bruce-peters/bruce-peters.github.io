@@ -49,55 +49,72 @@ function parseCSV(text) {
   return rows
 }
 
-// Reefer GLB's natural forward is 180° opposite the 2026 robot, so add π.
-const ROBOT_YAW_OFFSET   = -Math.PI / 2
 const ROBOT_LATERAL_FLIP = 1
+
+// From public/models/Robot_Reefer/config.json. The base model and both
+// components share one rotation sequence (Y-up GLB → WPILib X fwd, Y left, Z up).
+const MODEL_ROTATIONS = [['x', 90], ['z', -90]]
+const ELEVATOR_ZEROED_POSITION = [0, 0, 0]
+const PIVOT_ZEROED_POSITION    = [0.0889, 0, -0.860425]
+
+// Same as AdvantageScope's rotationSequenceToQuaternion: each step rotates
+// about the fixed axes, hence premultiply.
+function rotationSequenceToQuaternion(seq) {
+  const q = new THREE.Quaternion()
+  for (const [axis, deg] of seq) {
+    const v = new THREE.Vector3(axis === 'x' ? 1 : 0, axis === 'y' ? 1 : 0, axis === 'z' ? 1 : 0)
+    q.premultiply(new THREE.Quaternion().setFromAxisAngle(v, deg * Math.PI / 180))
+  }
+  return q
+}
 
 export function loadAutoPlayback2025(scene, allUpdaters, manager) {
   const robotGroup = new THREE.Group()
   robotGroup.visible = false
   scene.add(robotGroup)
 
+  // WPILib robot frame inside the Y-up scene: robot forward = robotGroup +X.
+  // Everything below is placed exactly the way AdvantageScope places it, so the
+  // logged mechanism poses and config offsets apply without axis remapping.
+  const wpiFrame = new THREE.Group()
+  wpiFrame.rotation.x = -Math.PI / 2
+  robotGroup.add(wpiFrame)
+
+  const modelQ = rotationSequenceToQuaternion(MODEL_ROTATIONS)
   const loader = new GLTFLoader(manager)
 
   loader.load('/models/Robot_Reefer/model.glb', (gltf) => {
     const m = gltf.scene
     m.scale.setScalar(SCENE_PER_METER)
+    // Native Y is up, so this lifts the whole robot (base + mechanisms together)
+    // until the lowest part of the chassis sits on the carpet. No horizontal
+    // re-centering: the GLB origin is the robot origin the components assume.
     m.updateMatrixWorld(true)
-    const box = new THREE.Box3().setFromObject(m)
-    const center = box.getCenter(new THREE.Vector3())
-    m.position.set(-center.x, -box.min.y, -center.z)
+    wpiFrame.position.y = -new THREE.Box3().setFromObject(m).min.y
+    m.quaternion.copy(modelQ)
     m.traverse(c => { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true } })
-    robotGroup.add(m)
+    wpiFrame.add(m)
   })
 
-  // Mechanism groups: elevator (component 0) and pivot (component 1)
+  // Mechanism hierarchy, as in AdvantageScope:
+  //   pose group (logged Pose3d) → config group (zeroed rotation + position) → model
   const elevatorGroup = new THREE.Group()
-  robotGroup.add(elevatorGroup)
+  wpiFrame.add(elevatorGroup)
 
   const pivotGroup = new THREE.Group()
-  robotGroup.add(pivotGroup)
+  wpiFrame.add(pivotGroup)
 
-  // Zeroed offset applied as a child group under each mechanism group.
-  // Reefer config zeroedPosition format: [x, y, z] (standard order).
-  // Three.js offset = (json[0], json[2], json[1]) = (x, z, y).
-  // zeroedRotations z:-90° → meshYawQ = -π/2 around Y, applied to pivot only
-  // (elevator just translates; no yaw correction needed on its configGroup).
-  const elevYawQ = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0),  Math.PI / 2)
-  const pivYawQ  = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 2)
-
-  // Elevator component 0: zeroedPosition [0, 0, 0], +90° CCW around Y
+  // Elevator, component 0
   const elevatorConfigGroup = new THREE.Group()
-  elevatorConfigGroup.position.set(0, 0, 0)
-  elevatorConfigGroup.quaternion.copy(elevYawQ)
+  elevatorConfigGroup.position.fromArray(ELEVATOR_ZEROED_POSITION).multiplyScalar(SCENE_PER_METER)
+  elevatorConfigGroup.quaternion.copy(modelQ)
   elevatorGroup.add(elevatorConfigGroup)
 
-  // Pivot component 1: zeroedPosition [0.0889, 0, -0.860425]
-  // Mapping (config_y, config_x, config_z) → Three.js (config[1], config[2], config[0])
-  // = (0, -0.860425, 0.0889); orientation -90° around Y
+  // Pivot arm, component 1. zeroedPosition moves the arm's pivot axis to the
+  // origin, so the logged pivot pose rotates the arm about that axis.
   const pivotConfigGroup = new THREE.Group()
-  pivotConfigGroup.position.set(0, -0.860425, 0.0889)
-  pivotConfigGroup.quaternion.copy(pivYawQ)
+  pivotConfigGroup.position.fromArray(PIVOT_ZEROED_POSITION).multiplyScalar(SCENE_PER_METER)
+  pivotConfigGroup.quaternion.copy(modelQ)
   pivotGroup.add(pivotConfigGroup)
 
   loader.load('/models/Robot_Reefer/model_0.glb', (gltf) => {

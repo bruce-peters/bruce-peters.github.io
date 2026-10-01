@@ -3,6 +3,7 @@ import { PROJECTS } from '../data/projects.js'
 import Hero from './Hero.jsx'
 import ProjectCard from './ProjectCard.jsx'
 import AboutCard from './AboutCard.jsx'
+import ScrollCue from './ScrollCue.jsx'
 
 // The inline "Try it live" Word Wiz demo is parked for now — it didn't fit the
 // flow of the card column. WordWizDemo.jsx is intact; re-render it here to
@@ -17,7 +18,7 @@ const FIRST_WORK_INDEX = PROJECTS.findIndex(
 // One full-height section per project node. The card sits in a side column
 // (alternating left/right); narrative nodes (overview, archive intro) center.
 const ProjectSection = forwardRef(function ProjectSection(
-  { project, side, onExternalLink, goToIndex },
+  { project, side, onExternalLink, goToIndex, loaded },
   ref
 ) {
   const isOverview = project.isOverview
@@ -52,6 +53,7 @@ const ProjectSection = forwardRef(function ProjectSection(
           </div>
         )}
       </div>
+      {isOverview && <ScrollCue visible={loaded} onClick={() => goToIndex?.(1)} />}
     </section>
   )
 })

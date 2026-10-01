@@ -38,11 +38,27 @@ export default {
       },
       animation: {
         pulse2: 'pulse2 2s infinite',
+        caret: 'caret 1.05s steps(1) infinite',
+        'cue-in': 'cue-in 900ms ease-out 2s both',
+        'cue-nudge': 'cue-nudge 2.4s ease-in-out infinite',
       },
       keyframes: {
         pulse2: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.4' },
+        },
+        caret: {
+          '0%, 49%': { opacity: '1' },
+          '50%, 100%': { opacity: '0' },
+        },
+        'cue-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        // Chevron dips 3px once per cycle, then rests.
+        'cue-nudge': {
+          '0%, 55%, 100%': { transform: 'translateY(0)' },
+          '28%': { transform: 'translateY(3px)' },
         },
       },
     },

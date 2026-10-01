@@ -3,7 +3,6 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import {
   PROJECTS,
   SCREENSHOT_PANES,
-  ABOUT_SKILLS,
   ABOUT_HIGHLIGHTS,
 } from "../data/projects.js";
 import {
@@ -810,64 +809,6 @@ function aboutPortraitTexture(src, manager) {
   return { tex, aspect: cw / ch };
 }
 
-// A small "build.log" terminal — window chrome + traffic-light dots + a few
-// machine-voice lines. Carries proof in the scene without repeating the card.
-function aboutTerminalTexture() {
-  const cw = 880,
-    ch = 460;
-  const canvas = document.createElement("canvas");
-  canvas.width = cw;
-  canvas.height = ch;
-  const ctx = canvas.getContext("2d");
-
-  // Window body
-  ctx.fillStyle = "#0c0c0e";
-  _rr(ctx, 6, 6, cw - 12, ch - 12, 26);
-  ctx.fill();
-  ctx.strokeStyle = "#26262b";
-  ctx.lineWidth = 2;
-  _rr(ctx, 6, 6, cw - 12, ch - 12, 26);
-  ctx.stroke();
-
-  // Title bar
-  ctx.fillStyle = "#1d1d21";
-  _rr(ctx, 6, 6, cw - 12, 78, 26);
-  ctx.fill();
-  ctx.fillStyle = "#1d1d21";
-  ctx.fillRect(6, 50, cw - 12, 34); // square off the bottom of the bar
-  const dots = ["#e63b6d", "#c7ee5e", "#57d36a"];
-  dots.forEach((col, i) => {
-    ctx.fillStyle = col;
-    ctx.beginPath();
-    ctx.arc(48 + i * 34, 45, 10, 0, Math.PI * 2);
-    ctx.fill();
-  });
-  ctx.fillStyle = "#9a958b";
-  ctx.font = `500 26px 'JetBrains Mono', monospace`;
-  ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
-  ctx.fillText("build.log", 176, 46);
-
-  // Lines
-  const lines = [
-    ["✓", "2025 worlds champions", "#57d36a", "#cbc6bc"],
-    ["✓", "2024 word wiz · 6k visitors", "#57d36a", "#cbc6bc"],
-    ["//", "next: sim pipeline", "#6f6b62", "#6f6b62"],
-  ];
-  ctx.font = `500 30px 'JetBrains Mono', monospace`;
-  let y = 150;
-  for (const [mark, text, markCol, textCol] of lines) {
-    ctx.fillStyle = markCol;
-    ctx.fillText(mark, 48, y);
-    const mw = ctx.measureText(mark + "  ").width;
-    ctx.fillStyle = textCol;
-    ctx.fillText(text, 48 + mw, y);
-    y += 56;
-  }
-
-  return { tex: _aboutTex(canvas), aspect: cw / ch };
-}
-
 // A stat tile — the design system's human/machine tension in one card: a big
 // Bricolage hero number over a tracked mono label, on a terminal panel. Reads
 // as one engineering metric, not a repeated project blurb. Data comes from
@@ -930,51 +871,15 @@ function aboutStatTexture({ kicker, value, label, color }) {
   return { tex: _aboutTex(canvas), aspect: cw / ch };
 }
 
-// A faint "// label" atmosphere sticker — bordered pill, accent dot, mono text.
-function aboutStickerTexture(text, accent) {
-  const label = "// " + text;
-  const m = document.createElement("canvas").getContext("2d");
-  m.font = `500 44px 'JetBrains Mono', monospace`;
-  const tw = m.measureText(label).width;
-  const cw = Math.ceil(tw + 150),
-    ch = 110;
-  const canvas = document.createElement("canvas");
-  canvas.width = cw;
-  canvas.height = ch;
-  const ctx = canvas.getContext("2d");
-
-  ctx.fillStyle = "rgba(22,22,25,0.85)";
-  _rr(ctx, 4, 4, cw - 8, ch - 8, 50);
-  ctx.fill();
-  ctx.strokeStyle = "#26262b";
-  ctx.lineWidth = 2;
-  _rr(ctx, 4, 4, cw - 8, ch - 8, 50);
-  ctx.stroke();
-
-  ctx.fillStyle = accent;
-  ctx.beginPath();
-  ctx.arc(46, ch / 2, 10, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = "#9a958b";
-  ctx.font = `500 44px 'JetBrains Mono', monospace`;
-  ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
-  ctx.fillText(label, 78, ch / 2 + 2);
-
-  return { tex: _aboutTex(canvas), aspect: cw / ch };
-}
-
 export function buildAbout(manager) {
   const ABOUT = PROJECTS.find((p) => p.id === "about");
   const g = new THREE.Group();
   g.position.set(...ABOUT.pos);
 
-  // The DOM About card owns the prose. The 3D layer carries *identity + work*,
-  // not a repeated tech list: a /bp/ anchor, a build.log terminal, two project
-  // cards, a few scattered phoneme fragments, and faint atmosphere stickers —
-  // depth-staggered around the node (biased to the open side) so the cluster
-  // reads as depth rather than a flat wall.
+  // The DOM About card owns the prose, skills, and wins. The 3D layer stays
+  // sparse on purpose: the portrait on top, and below it the two engineering
+  // stat tiles (the only facts here that aren't already in the card), kept on
+  // the open side so the card never covers them.
 
   // Deterministic RNG so the layout is stable between reloads.
   const _rng = (() => {
@@ -1006,33 +911,8 @@ export function buildAbout(manager) {
     return mesh;
   };
 
-  // ── /bp/ anchor — green, with a soft glow plane behind it. Brand rule: the
-  //    logo is always green, regardless of the DOM accent. Forward in Z.
-  const bp = makeFloatingCard(wordPillTexture("/bp/", "green"), 0.72, {
-    opacity: 0.95,
-  });
-  place(bp, 0.1, -0.2, 0.7, 0.1);
-
-  const glowPlane = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.2, 1.6),
-    new THREE.MeshBasicMaterial({
-      color: 0x57d36a,
-      transparent: true,
-      opacity: 0.16,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    })
-  );
-  glowPlane.position.set(
-    rgt.x * 0.1 + fwd.x * 0.55,
-    -0.2,
-    rgt.z * 0.1 + fwd.z * 0.55
-  );
-  glowPlane.rotation.y = cardRotY;
-  g.add(glowPlane); // static (no basePos) — sits behind the anchor
-
   // ── Portrait — the human centerpiece. Terminal-framed + phosphor-graded to
-  //    match the DOM identity band. Sits in the middle of the cluster, brought
+  //    match the DOM identity band. Sits at the top of the cluster, brought
   //    slightly forward so it reads as the focal point.
   if (ABOUT.photo) {
     const portrait = makeFloatingCard(aboutPortraitTexture(ABOUT.photo, manager), 2.4, {
@@ -1041,9 +921,6 @@ export function buildAbout(manager) {
     place(portrait, -0.2, 1.7, 1.0, 0.06);
   }
 
-  // ── build.log terminal — proof, machine-voice. Mid plane, to the open side.
-  place(aboutTerminal(), -2.9, -0.3, -0.4, 0.12);
-
   // ── Stat tiles — flagship engineering metrics, rendered from ABOUT_HIGHLIGHTS
   //    in projects.js. Flagship forward, supporting pushed back in Z.
   ABOUT_HIGHLIGHTS.forEach((h) => {
@@ -1051,24 +928,6 @@ export function buildAbout(manager) {
       opacity: h.opacity ?? 0.95,
     });
     place(tile, h.dx, h.dy, h.fz, 0.1);
-  });
-
-  // ── Phoneme fragments — identity DNA, small and scattered, half pushed back.
-  const phonemes = [
-    ["b", "green", -3.7, 2.4, -1.8],
-    ["r", "coral", 1.1, 2.9, -2.6],
-    ["oo", "lime", -1.6, -1.9, -1.6],
-    ["s", "pink", 4.6, 1.0, -3.0],
-  ];
-  phonemes.forEach(([w, v, dx, dy, fz]) => {
-    place(makeFloatingCard(wordPillTexture(w, v), 0.42, { opacity: 0.9 }), dx, dy, fz, 0.3);
-  });
-
-  // ── Skill stickers — faint, far back. The real stack Bruce ships with,
-  //    rendered procedurally from ABOUT_SKILLS in projects.js (edit there).
-  ABOUT_SKILLS.forEach(({ label, color, dx, dy, fz }) => {
-    const s = makeFloatingCard(aboutStickerTexture(label, color), 0.46, { opacity: 0.55 });
-    place(s, dx, dy, fz, 0.25);
   });
 
   g.userData = {
@@ -1085,11 +944,6 @@ export function buildAbout(manager) {
     },
   };
   return g;
-}
-
-// small wrapper so the terminal reads cleanly in buildAbout's layout block
-function aboutTerminal() {
-  return makeFloatingCard(aboutTerminalTexture(), 1.5, { opacity: 0.95 });
 }
 
 // ---------------------------------------------------------------------------

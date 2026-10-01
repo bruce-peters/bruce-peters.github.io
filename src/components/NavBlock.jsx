@@ -8,7 +8,6 @@ export default function NavBlock({ onExternalLink, onToggleResume, resumeMode })
       <ul className="flex gap-[22px] list-none p-0 m-0 font-mono text-[11px] uppercase tracking-[0.18em] items-center">
         {[
           { label: 'GitHub', href: 'https://github.com/bruce-peters' },
-          { label: 'Word Wiz', href: 'https://wordwizai.com' },
           { label: 'Contact', href: 'mailto:brucebpeters12@gmail.com' },
         ].map(({ label, href }) => {
           const isMailto = href.startsWith('mailto')
