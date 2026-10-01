@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 // Fires once when `ref`'s element first scrolls into view. Used to trigger
 // the card's decrypt-in animation as it enters the viewport.
-export default function useInView({ threshold = 0.35, rootMargin = '0px 0px -10% 0px' } = {}) {
+export default function useInView({ threshold = 0.15, rootMargin = '0px 0px -5% 0px' } = {}) {
   const ref = useRef(null)
   const [inView, setInView] = useState(false)
 

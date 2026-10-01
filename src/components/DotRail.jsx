@@ -57,7 +57,7 @@ export default function DotRail({ activeIndex, goToIndex }) {
             style={{ color: isActive ? '#f4f0e8' : isHovered ? '#cbc6bc' : '#9a958b' }}
           >
             <span
-              className="text-[9px] tracking-[0.2em] uppercase whitespace-nowrap text-right transition-all duration-[200ms]"
+              className="font-mono text-[9px] tracking-[0.2em] uppercase whitespace-nowrap text-right transition-all duration-[200ms]"
               style={{
                 opacity: showLabel ? 1 : 0,
                 transform: showLabel ? 'translateX(0)' : 'translateX(6px)',
@@ -97,7 +97,7 @@ export default function DotRail({ activeIndex, goToIndex }) {
             >
               {/* Label pops out to the left */}
               <span
-                className="text-[8px] tracking-[0.18em] uppercase whitespace-nowrap text-right transition-all duration-[200ms]"
+                className="font-mono text-[8px] tracking-[0.18em] uppercase whitespace-nowrap text-right transition-all duration-[200ms]"
                 style={{
                   color: isActive ? '#57d36a' : '#9a958b',
                   opacity: isActive || isHovered ? 1 : 0,

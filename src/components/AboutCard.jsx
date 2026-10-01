@@ -25,14 +25,13 @@ export default function AboutCard({ project, side, onViewWork }) {
         backdropFilter: 'blur(22px) saturate(1.2)',
         WebkitBackdropFilter: 'blur(22px) saturate(1.2)',
         opacity: shown ? 1 : 0,
-        filter: shown ? 'blur(0px)' : 'blur(8px)',
         transform: shown
-          ? 'translate3d(0, 0, 0) scale(1)'
-          : `translate3d(${slideX}px, 28px, 0) scale(0.94)`,
+          ? 'translate3d(0, 0, 0)'
+          : `translate3d(${slideX * 0.5}px, 14px, 0)`,
         transition: reduce
           ? 'none'
-          : 'opacity 700ms cubic-bezier(0.22,1,0.36,1), transform 800ms cubic-bezier(0.22,1,0.36,1), filter 700ms cubic-bezier(0.22,1,0.36,1)',
-        willChange: 'opacity, transform, filter',
+          : 'opacity 380ms cubic-bezier(0.22,1,0.36,1), transform 460ms cubic-bezier(0.22,1,0.36,1)',
+        willChange: 'opacity, transform',
       }}
     >
       {/* colored top bar — the brand-green accent */}
@@ -73,7 +72,7 @@ export default function AboutCard({ project, side, onViewWork }) {
       />
 
       {/* Bio */}
-      <p className="text-[13.5px] leading-[1.62] text-cream-dim m-0 mb-5">
+      <p className="text-[14.5px] leading-[1.6] text-cream-dim m-0 mb-5">
         {project.desc}
       </p>
 

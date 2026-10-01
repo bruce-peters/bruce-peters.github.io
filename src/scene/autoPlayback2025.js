@@ -177,24 +177,14 @@ export function loadAutoPlayback2025(scene, allUpdaters, manager) {
     return data[lo]
   }
 
-  // Places a mechanism group (child of robotGroup) at a WPI robot-local Pose3d.
-  // WPI robot-local frame: X=forward, Y=left, Z=up.
-  // Three.js robotGroup local: +Z=forward, +X=left, +Y=up.
+  // Places a mechanism group at its WPI robot-local Pose3d. The group lives in
+  // wpiFrame, so the logged pose applies as-is.
   function applyLocalPose(target, pose) {
     const [x, y, z, qw, qx, qy, qz] = pose
     if (!Number.isFinite(x)) { target.visible = false; return }
     target.visible = true
-    target.position.set(
-      y * SCENE_PER_METER * ROBOT_LATERAL_FLIP,
-      z * SCENE_PER_METER,
-      x * SCENE_PER_METER,
-    )
-    target.quaternion.set(
-      qy * ROBOT_LATERAL_FLIP,
-      qz,
-      qx,
-      qw,
-    )
+    target.position.set(x, y, z).multiplyScalar(SCENE_PER_METER)
+    target.quaternion.set(qx, qy, qz, qw)
   }
 
   function tick(elapsed) {
@@ -221,8 +211,9 @@ export function loadAutoPlayback2025(scene, allUpdaters, manager) {
         fieldY(rz),
         fieldZ(ry) * ROBOT_LATERAL_FLIP,
       )
+      // wpiFrame already points robot forward along robotGroup +X, so no offset.
       const yaw = quatYaw(rqw, rqx, rqy, rqz)
-      robotGroup.rotation.set(0, -yaw * ROBOT_LATERAL_FLIP + ROBOT_YAW_OFFSET, 0)
+      robotGroup.rotation.set(0, -yaw * ROBOT_LATERAL_FLIP, 0)
     }
 
     applyLocalPose(elevatorGroup, row.elevator)

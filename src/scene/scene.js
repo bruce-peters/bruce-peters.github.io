@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { Timer } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { PROJECTS, SCENE_ELEMENTS } from '../data/projects.js'
@@ -243,7 +244,7 @@ export function initScene(container, onProjectChange, onLoad) {
   window.addEventListener('resize', onResize)
 
   // Render loop
-  const timer = new THREE.Timer()
+  const timer = new Timer()
   let animId = null
   let started = false
 

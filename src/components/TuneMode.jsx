@@ -448,7 +448,7 @@ export default function TuneMode({
       <button
         type="button"
         onClick={onEnter}
-        className="fixed bottom-7 left-1/2 -translate-x-1/2 z-30 bg-black/70 backdrop-blur-sm border border-dim/40 px-3 py-1.5 text-[10px] tracking-[0.16em] uppercase text-dim hover:text-fg hover:border-fg/60"
+        className="font-mono fixed bottom-7 left-1/2 -translate-x-1/2 z-30 bg-black/70 backdrop-blur-sm border border-dim/40 px-3 py-1.5 text-[10px] tracking-[0.16em] uppercase text-dim hover:text-fg hover:border-fg/60"
       >
         Tune scene
       </button>
@@ -456,7 +456,7 @@ export default function TuneMode({
   }
 
   return (
-    <div className="fixed inset-0 z-40 pointer-events-none">
+    <div className="font-mono fixed inset-0 z-40 pointer-events-none">
       {/* Top bar */}
       <div className="pointer-events-auto flex items-center gap-3 h-10 bg-black/85 backdrop-blur border-b border-dim/30 px-4 text-[10px] tracking-[0.14em] uppercase">
         <span className="text-fg font-mono">Tune Mode</span>

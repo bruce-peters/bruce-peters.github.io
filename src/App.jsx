@@ -11,6 +11,20 @@ import { play } from './lib/audio.js'
 
 const isLocalhost = window.location.hostname === 'localhost'
 
+// Which column each card sits in. Cards alternate left/right down the page, but
+// the parity is a running count rather than the raw array index: a node that
+// declares its own `side` is pinned there and does NOT consume an alternation
+// slot. That way inserting a node mid-sequence (BU research, between Word Wiz
+// and Robot Sim) leaves every card after it on the side it has always been on,
+// instead of flipping the whole rest of the page.
+const CARD_SIDES = (() => {
+  let parity = 0
+  return PROJECTS.map(p => {
+    if (p.side) return p.side
+    return parity++ % 2 === 0 ? 'left' : 'right'
+  })
+})()
+
 function getInitialResumeMode() {
   const urlParam = new URLSearchParams(window.location.search).get('mode') === 'resume'
   if (urlParam) return true
@@ -177,6 +191,14 @@ export default function App() {
         style={{ background: 'radial-gradient(120% 80% at 50% 50%, transparent 40%, rgba(16,16,18,0.55) 100%)' }}
       />
 
+      {/* Top scrim — sits under the fixed chrome (z-20) but over the card
+          column (z-10) so a tall card scrolling past the nav never collides
+          with the links. */}
+      <div
+        className="fixed top-0 left-0 right-0 h-20 z-[15] pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, rgba(16,16,18,0.8) 0%, rgba(16,16,18,0.4) 55%, transparent 100%)' }}
+      />
+
       {/* Fixed chrome */}
       <IdentityBlock />
       <NavBlock
@@ -202,7 +224,7 @@ export default function App() {
             key={p.id}
             ref={el => { sectionRefs.current[i] = el }}
             project={p}
-            side={i % 2 === 0 ? 'left' : 'right'}
+            side={CARD_SIDES[i]}
             onExternalLink={openExternalLink}
             goToIndex={goToIndex}
           />

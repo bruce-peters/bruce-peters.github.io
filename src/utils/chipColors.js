@@ -45,6 +45,10 @@ const CHIP_DOT = {
   AdvantageKit: 'bg-coral',
   'GPT-4o': 'bg-violet',
   Gemini: 'bg-violet',
+  DINOv2: 'bg-accent',
+  'Qwen-VL': 'bg-violet',
+  WhisperX: 'bg-coral',
+  ARKit: 'bg-magenta',
 
   // infra / data
   AWS: 'bg-coral',
