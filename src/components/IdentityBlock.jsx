@@ -8,7 +8,6 @@ export default function IdentityBlock() {
           fontSize: '26px',
           letterSpacing: '-0.01em',
           padding: '0.42em 0.6em 0.5em',
-          boxShadow: '0 0 0 1px rgba(87,211,106,0.4), 0 8px 32px rgba(87,211,106,0.35)',
         }}
       >
         <span style={{ fontWeight: 500, opacity: 0.55 }}>/</span>bp
