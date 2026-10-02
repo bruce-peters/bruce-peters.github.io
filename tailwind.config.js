@@ -55,10 +55,10 @@ export default {
           from: { opacity: '0' },
           to: { opacity: '1' },
         },
-        // Chevron dips 3px once per cycle, then rests.
+        // Chevron dips 5px once per cycle, then rests.
         'cue-nudge': {
           '0%, 55%, 100%': { transform: 'translateY(0)' },
-          '28%': { transform: 'translateY(3px)' },
+          '28%': { transform: 'translateY(5px)' },
         },
       },
     },

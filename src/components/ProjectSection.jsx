@@ -3,6 +3,7 @@ import { PROJECTS } from '../data/projects.js'
 import Hero from './Hero.jsx'
 import ProjectCard from './ProjectCard.jsx'
 import AboutCard from './AboutCard.jsx'
+import DesmosLab from './DesmosLab.jsx'
 import ScrollCue from './ScrollCue.jsx'
 
 // The inline "Try it live" Word Wiz demo is parked for now — it didn't fit the
@@ -23,7 +24,7 @@ const ProjectSection = forwardRef(function ProjectSection(
 ) {
   const isOverview = project.isOverview
   const isArchiveIntro = project.id === 'archive'
-  const centered = isOverview || isArchiveIntro
+  const centered = isOverview || isArchiveIntro || project.isDesmos
 
   const minH = project.isArchive ? 'min-h-[78vh]' : 'min-h-screen'
   const justify = centered ? 'justify-center' : side === 'right' ? 'md:justify-end' : 'md:justify-start'
@@ -39,6 +40,10 @@ const ProjectSection = forwardRef(function ProjectSection(
           <Hero />
         ) : isArchiveIntro ? (
           <NarrativeBlock project={project} />
+        ) : project.isDesmos ? (
+          <div className="w-full" style={{ pointerEvents: 'auto' }}>
+            <DesmosLab project={project} />
+          </div>
         ) : project.isAbout ? (
           <div className="w-full max-w-[440px]" style={{ pointerEvents: 'auto' }}>
             <AboutCard

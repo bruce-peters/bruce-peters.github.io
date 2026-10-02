@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { createGLTFLoader } from "./gltf.js";
 import {
   PROJECTS,
   SCREENSHOT_PANES,
@@ -962,7 +962,7 @@ export function loadFieldModel(scene, basePos = [0, 0, 0], manager) {
   group.position.set(basePos[0], basePos[1], basePos[2]);
   scene.add(group);
 
-  const loader = new GLTFLoader(manager);
+  const loader = createGLTFLoader(manager);
   loader.load(
     "/models/field.glb",
     (gltf) => {
@@ -974,26 +974,22 @@ export function loadFieldModel(scene, basePos = [0, 0, 0], manager) {
       const s = 1.0;
       model.scale.setScalar(s);
 
-      // Center on XZ, put floor at y=0 (relative to the group)
+      // Center on XZ, put floor at y=0 (relative to the group).
+      // precise=true: the optimized GLB is a few merged meshes, each in one
+      // CAD part's rotated frame, so the fast per-mesh box is metres too big.
       model.updateMatrixWorld(true);
-      const box = new THREE.Box3().setFromObject(model);
+      const box = new THREE.Box3().setFromObject(model, true);
       const center = box.getCenter(new THREE.Vector3());
       model.position.set(-center.x, -box.min.y + 0.01, -center.z);
 
-      // Collect all fuel/ball nodes first, then remove them from the scene graph.
-      // Match any mesh name containing "fuel" (case-insensitive) to catch all variants.
-      const fuelNodes = [];
+      // Staged fuel is stripped at build time (scripts/optimize-models.mjs).
+      // Structures cast shadows too, so the hub and towers sit on the carpet.
       model.traverse((child) => {
-        if (/fuel/i.test(child.name)) {
-          fuelNodes.push(child);
-          return;
-        }
         if (child.isMesh) {
           child.receiveShadow = true;
-          child.castShadow = false;
+          child.castShadow = true;
         }
       });
-      fuelNodes.forEach(n => n.removeFromParent());
 
       group.add(model);
     },
@@ -1014,7 +1010,7 @@ export function loadField2025Model(scene, basePos = [0, 0, 0], manager) {
   group.position.set(basePos[0], basePos[1], basePos[2]);
   scene.add(group);
 
-  const loader = new GLTFLoader(manager);
+  const loader = createGLTFLoader(manager);
   loader.load(
     "/models/field2025.glb",
     (gltf) => {
@@ -1023,25 +1019,20 @@ export function loadField2025Model(scene, basePos = [0, 0, 0], manager) {
 
       // No rotation — try Y-up standard like the 2026 field
 
+      // precise=true for the same reason as loadFieldModel above.
       model.updateMatrixWorld(true);
-      const box = new THREE.Box3().setFromObject(model);
+      const box = new THREE.Box3().setFromObject(model, true);
       const center = box.getCenter(new THREE.Vector3());
       model.position.set(-center.x, -box.min.y + 0.01, -center.z);
 
-      // Remove staged game pieces (GE-25500 = coral, GE-25501 = algae).
-      // Keep structural field elements: CORAL STATION, CORAL HOLDER, etc.
-      const gamePieceNodes = [];
+      // Staged game pieces (GE-25500 = coral, GE-25501 = algae) are stripped at
+      // build time (scripts/optimize-models.mjs); structural elements stay.
       model.traverse((child) => {
-        if (/GE-2550[01]/.test(child.name) || child.name.toLowerCase() === 'algae') {
-          gamePieceNodes.push(child);
-          return;
-        }
         if (child.isMesh) {
           child.receiveShadow = true;
-          child.castShadow = false;
+          child.castShadow = true;
         }
       });
-      gamePieceNodes.forEach(n => n.removeFromParent());
 
       group.add(model);
     },
@@ -1057,7 +1048,7 @@ export function loadField2025Model(scene, basePos = [0, 0, 0], manager) {
 // Loaded async; silently skips if missing.
 // ---------------------------------------------------------------------------
 export function loadRobotModel(scene) {
-  const loader = new GLTFLoader();
+  const loader = createGLTFLoader();
   loader.load(
     "/models/robot.glb",
     (gltf) => {
@@ -1068,7 +1059,7 @@ export function loadRobotModel(scene) {
       model.scale.setScalar(s);
 
       model.updateMatrixWorld(true);
-      const box = new THREE.Box3().setFromObject(model);
+      const box = new THREE.Box3().setFromObject(model, true);
       const center = box.getCenter(new THREE.Vector3());
       // Place robot on field: centered on XZ, floor touching y=0
       model.position.set(-center.x, -box.min.y, -center.z);

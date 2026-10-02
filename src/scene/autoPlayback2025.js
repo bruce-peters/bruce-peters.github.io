@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { createGLTFLoader } from './gltf.js'
 import { createStateTower } from './stateTower.js'
 import { createTrajectoryPlayer } from './trajectory.js'
 
@@ -51,7 +51,7 @@ function parseCSV(text) {
 
 const ROBOT_LATERAL_FLIP = 1
 
-// From public/models/Robot_Reefer/config.json. The base model and both
+// From assets-src/models/Robot_Reefer/config.json. The base model and both
 // components share one rotation sequence (Y-up GLB → WPILib X fwd, Y left, Z up).
 const MODEL_ROTATIONS = [['x', 90], ['z', -90]]
 const ELEVATOR_ZEROED_POSITION = [0, 0, 0]
@@ -81,7 +81,7 @@ export function loadAutoPlayback2025(scene, allUpdaters, manager) {
   robotGroup.add(wpiFrame)
 
   const modelQ = rotationSequenceToQuaternion(MODEL_ROTATIONS)
-  const loader = new GLTFLoader(manager)
+  const loader = createGLTFLoader(manager)
 
   loader.load('/models/Robot_Reefer/model.glb', (gltf) => {
     const m = gltf.scene
@@ -90,7 +90,7 @@ export function loadAutoPlayback2025(scene, allUpdaters, manager) {
     // until the lowest part of the chassis sits on the carpet. No horizontal
     // re-centering: the GLB origin is the robot origin the components assume.
     m.updateMatrixWorld(true)
-    wpiFrame.position.y = -new THREE.Box3().setFromObject(m).min.y
+    wpiFrame.position.y = -new THREE.Box3().setFromObject(m, true).min.y
     m.quaternion.copy(modelQ)
     m.traverse(c => { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true } })
     wpiFrame.add(m)
