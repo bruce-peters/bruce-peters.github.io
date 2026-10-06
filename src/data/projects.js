@@ -18,7 +18,7 @@ const ARCHIVE_CARD_LAYOUT = [
 
 export const SCREENSHOT_PANES = [
   {
-    src: "/screenshots/advantagescope.png",
+    src: "/screenshots/advantagescope.webp",
     aspect: 1.4163,
     pos: [-9.67, 5.56, 4.11],
     rotY: -2.1,
@@ -28,7 +28,7 @@ export const SCREENSHOT_PANES = [
     speed: 0.45,
   },
   {
-    src: "/screenshots/robot-sim.png",
+    src: "/screenshots/robot-sim.webp",
     aspect: 1.6498,
     pos: [-7.18, 26.4, 3.7],
     rotY: -0.9,
@@ -38,7 +38,7 @@ export const SCREENSHOT_PANES = [
     speed: 0.38,
   },
   {
-    src: "/screenshots/scouting-mobile-homescreen.png",
+    src: "/screenshots/scouting-mobile-homescreen.webp",
     aspect: 0.5625,
     pos: [7.37, 0.66, 10.27],
     rotY: 0.6,
@@ -48,7 +48,7 @@ export const SCREENSHOT_PANES = [
     speed: 0.42,
   },
   {
-    src: "/screenshots/scouting-mobile-configure.png",
+    src: "/screenshots/scouting-mobile-configure.webp",
     aspect: 0.5625,
     pos: [5.5, 0.8, 11.2],
     rotY: 0.6,
@@ -56,6 +56,36 @@ export const SCREENSHOT_PANES = [
     height: 2.8,
     phase: 2,
     speed: 0.5,
+  },
+  {
+    src: "/screenshots/desmos/neural-net.webp",
+    aspect: 1.5,
+    pos: [-8.5, 14.5, -42],
+    rotY: 0.35,
+    rotX: 0,
+    height: 3.4,
+    phase: 0.4,
+    speed: 0.4,
+  },
+  {
+    src: "/screenshots/desmos/boids.webp",
+    aspect: 1.5,
+    pos: [8.5, 12, -41],
+    rotY: -0.35,
+    rotX: 0,
+    height: 3,
+    phase: 1.6,
+    speed: 0.44,
+  },
+  {
+    src: "/screenshots/desmos/tetris.webp",
+    aspect: 1.5,
+    pos: [4.5, 17.5, -46],
+    rotY: -0.15,
+    rotX: 0,
+    height: 2.8,
+    phase: 2.7,
+    speed: 0.36,
   },
 ];
 
@@ -65,37 +95,12 @@ export const SCENE_ELEMENTS = [
   { id: "readerDemo", label: "Word Wiz Demo", pos: [14.25, 9.52, -8.69] },
 ];
 
-// Skills shown as faint atmosphere stickers scattered behind the About portrait.
-// Edit freely — buildAbout() renders these procedurally. `color` is a hex token
-// from the /bp/ palette. `dx`/`dy` place the sticker in the card plane and `fz`
-// pushes it back in Z (more negative = further behind). Keep these to skills
-// Bruce actually ships with; they should echo the tags on the project cards.
-export const ABOUT_SKILLS = [
-  { label: "Java", color: "#c7ee5e", dx: -3.2, dy: 2.7, fz: -2.6 },
-  { label: "Python", color: "#57d36a", dx: 0.5, dy: -2.5, fz: -2.2 },
-  { label: "TypeScript", color: "#9b8cff", dx: 2.6, dy: 2.5, fz: -3.0 },
-  { label: "React", color: "#57d36a", dx: -4.1, dy: -0.5, fz: -2.4 },
-  { label: "PyTorch", color: "#ec9576", dx: 3.5, dy: -2.7, fz: -2.8 },
-  { label: "WPILib", color: "#57d36a", dx: -1.7, dy: 3.1, fz: -2.9 },
-  { label: "OpenCV", color: "#9b8cff", dx: 4.5, dy: 0.7, fz: -3.1 },
-  { label: "FastAPI", color: "#c7ee5e", dx: -4.4, dy: 1.8, fz: -3.2 },
-  { label: "AWS", color: "#ec9576", dx: 1.6, dy: 3.4, fz: -3.4 },
-  { label: "TensorFlow", color: "#57d36a", dx: 5.0, dy: -1.0, fz: -3.6 },
-  { label: "C++", color: "#9b8cff", dx: -5.0, dy: -1.9, fz: -3.3 },
-  { label: "C#", color: "#c7ee5e", dx: -2.7, dy: -2.8, fz: -3.5 },
-  { label: "Apps Script", color: "#ec9576", dx: 2.2, dy: -1.0, fz: -3.8 },
-  { label: "HTML/CSS/JS", color: "#57d36a", dx: -3.4, dy: 0.6, fz: -3.9 },
-  { label: "Windows", color: "#9b8cff", dx: 0.0, dy: 1.6, fz: -4.0 },
-  { label: "Linux", color: "#c7ee5e", dx: 4.0, dy: 2.6, fz: -3.7 },
-  { label: "PHP", color: "#ec9576", dx: -0.9, dy: -3.4, fz: -3.6 },
-];
-
-// Stat tiles that float in the About cluster beside the portrait. Each is a
+// Stat tiles that float in the About cluster below the portrait. Each is a
 // big Bricolage hero number over a tracked mono label — the design system's
 // human-voice / machine-output tension in one card. Rendered procedurally by
 // buildAbout(); edit freely. Pick the *engineering* metric, not the trophy —
-// the build.log terminal already lists the wins, so these add depth instead of
-// repeating it. `color` is a /bp/ palette hex; `dx`/`dy`/`fz` place it in the
+// the About card's stat grid already lists the wins, so these add depth instead
+// of repeating it. `color` is a /bp/ palette hex; `dx`/`dy`/`fz` place it in the
 // card plane (fz = toward/away in Z), `size` is world height, `opacity` fades
 // far cards back.
 export const ABOUT_HIGHLIGHTS = [
@@ -104,8 +109,8 @@ export const ABOUT_HIGHLIGHTS = [
     value: "2s",
     label: "inference, down from 20s",
     color: "#57d36a",
-    dx: 2.9,
-    dy: 1.0,
+    dx: -2.0,
+    dy: -1.2,
     fz: -0.3,
     size: 1.9,
     opacity: 0.97,
@@ -115,9 +120,9 @@ export const ABOUT_HIGHLIGHTS = [
     value: "3×",
     label: "team throughput",
     color: "#c7ee5e",
-    dx: 3.7,
-    dy: -1.6,
-    fz: -2.4,
+    dx: 1.6,
+    dy: -1.9,
+    fz: -1.6,
     size: 1.55,
     opacity: 0.92,
   },
@@ -147,7 +152,7 @@ export const ARCHIVE_WORKS = [
     year: "2026",
     href: "https://crab-hunt.vercel.app",
     repo: "https://github.com/bruce-peters/crab-hunt",
-    image: "/screenshots/crab-hunt-physics.jpeg",
+    image: "/screenshots/crab-hunt-physics.webp",
   },
   {
     title: "Roots",
@@ -156,7 +161,7 @@ export const ARCHIVE_WORKS = [
     year: "2025",
     href: "https://roots-app-rouge.vercel.app/",
     repo: "https://github.com/bruce-peters/roots-app",
-    image: "/screenshots/roots.png",
+    image: "/screenshots/roots.webp",
   },
   {
     title: "Pill Pal",
@@ -165,7 +170,7 @@ export const ARCHIVE_WORKS = [
     year: "2024",
     href: null,
     repo: "https://github.com/bruce-peters/krab_med_app",
-    image: "/screenshots/pill-pall.jpeg",
+    image: "/screenshots/pill-pall.webp",
   },
   {
     title: "CanvAI",
@@ -181,7 +186,7 @@ export const ARCHIVE_WORKS = [
     tag: "3rd · Science Olympiad",
     year: "2024",
     href: null,
-    image: "/screenshots/scioly-robot.jpeg",
+    image: "/screenshots/scioly-robot.webp",
   },
   {
     title: "Notes Review App",
@@ -197,7 +202,7 @@ export const ARCHIVE_WORKS = [
     tag: "React + Firebase",
     year: "2023",
     href: "https://wordle-app-i.web.app/",
-    image: "/screenshots/wordle.png",
+    image: "/screenshots/wordle.webp",
   },
   {
     title: "Facial Emotion Detection",
@@ -212,7 +217,7 @@ export const ARCHIVE_WORKS = [
     tag: "React + Firebase",
     year: "2022",
     href: "https://chat-react-app-feb57.web.app/",
-    image: "/screenshots/chat-app.png",
+    image: "/screenshots/chat-app.webp",
   },
   {
     title: "Survival Game",
@@ -221,7 +226,7 @@ export const ARCHIVE_WORKS = [
     year: "2022",
     href: "https://bobcat9.itch.io/survival-2d",
     repo: "https://github.com/bruce-peters/SurvivalGame",
-    image: "/screenshots/survival-game.png",
+    image: "/screenshots/survival-game.webp",
   },
   {
     title: "Marshmallow Simulator",
@@ -229,7 +234,7 @@ export const ARCHIVE_WORKS = [
     tag: "Unity · multiplayer",
     year: "2022",
     href: "https://bobcat9.itch.io/marshmallow-simulator",
-    image: "/screenshots/marshmallow-simulator-lobby.png",
+    image: "/screenshots/marshmallow-simulator-lobby.webp",
   },
   {
     title: "Non-Euclidean Escape",
@@ -237,7 +242,7 @@ export const ARCHIVE_WORKS = [
     tag: "Unity · C# · Blender",
     year: "2021 — 2022",
     href: "https://bobcat9.itch.io/non-euclidean-escape",
-    image: "/screenshots/non-euclidean-escape.png",
+    image: "/screenshots/non-euclidean-escape.webp",
   },
   {
     title: "Scuffed Platformer",
@@ -245,13 +250,13 @@ export const ARCHIVE_WORKS = [
     tag: "Unity",
     year: "2021",
     href: "https://bobcat9.itch.io/scuffed-platformer",
-    image: "/screenshots/scuffed-platformer.png",
+    image: "/screenshots/scuffed-platformer.webp",
   },
 ];
 
 export const ARCHIVE_PROJECTS = ARCHIVE_WORKS.map((w, i) => ({
   id: `archive-${i}`,
-  index: String(i + 8).padStart(2, "0"),
+  index: String(i + 9).padStart(2, "0"),
   label: "Archive",
   title: w.title,
   desc: w.sub,
@@ -291,14 +296,14 @@ export const PROJECTS = [
     name: "Bruce Peters",
     role: "builder · frc programmer · founder\nburlingame, ca",
     now: "starting school & writing a few papers",
-    photo: "/screenshots/Headshot.jpg",
+    photo: "/screenshots/Headshot.webp",
     headline: "i build things that <em>outlast me.</em>",
-    desc: "high-school senior from the bay area. i started in scratch at 9, moved to unity at 12, programmed my robotics team to an frc world championship at 15, and build ai products between seasons. Like word wiz, a reading tutor that hears the exact sounds kids miss in learning to read. this past summer i spent six weeks at boston university on rise, building a cross-site benchmark for detecting when a kid stops paying attention during reading tutoring.",
-    tags: ["Java", "Python", "TypeScript", "React", "PyTorch", "WPILib"],
+    desc: "high-school senior from the bay area. i started in scratch at 9, moved to unity at 12, programmed my robotics team to an frc world championship at 15, and build ai products between seasons. Like word wiz, a reading tutor that hears the exact sounds kids miss in learning to read. this past summer i spent six weeks at boston university on rise, comparing models that detect when a kid goes off task during reading tutoring. that work is now a paper submitted to lak27.",
+    tags: ["Java", "Python", "TypeScript", "JavaScript", "C#", "C++", "PHP", "HTML/CSS"],
     stats: [
       ["7+", "yrs building"],
       ["1st", "worlds '25"],
-      ["'27", "graduating"],
+      ["13k+", "visitors"],
     ],
     year: "",
     cta: { label: "view work", href: "#work" },
@@ -314,9 +319,9 @@ export const PROJECTS = [
     title: "Iron Panthers Robot",
     desc: "Programming Manager on Iron Panthers (FRC). I wrote the superstructure state machine (elevator + pivot coordination with safety interlocks) that scored every point for the robot through the 2025 season, capped by a World Championship win in Houston out of 4,000+ teams. For our 2026 season, I wrote our trajectory finding code that helped us shoot on the move and from anywhere on the field. All of which was only possible because of a simulation framework I've implemented for the team.",
     tags: ["Java", "WPILib", "OpenCV", "AdvantageKit"],
-    image: "./screenshots/robot-physical.png",
+    image: "/screenshots/robot-physical.webp",
     stats: [
-      ["1,026", "days on team"],
+      ["75+", "members"],
       ["1st", "Worlds 2025"],
       ["1000+", "hrs logged"],
     ],
@@ -332,12 +337,12 @@ export const PROJECTS = [
     index: "02",
     label: "Word Wiz AI · Solo founder",
     title: "Word Wiz AI",
-    desc: "This is an AI reading tutor I built and run solo. A kid reads a sentence out loud, and the backend runs five ML models plus a grapheme-to-phoneme alignment step to figure out which exact sounds they got wrong, like saying HOSE instead of HOUSE. It then writes the next sentence around the sounds they are still missing so they keep practicing what they actually need. The hardest part was speed. I got response time down from 15 to 20 seconds to about 2 by streaming the results, quantizing the models, and caching. It has had 6,000+ visitors and 130+ signups, and it placed 2nd in the Congressional App Challenge.",
+    desc: "This is an AI reading tutor I built and run solo. A kid reads a sentence out loud, and the backend runs five ML models plus a grapheme-to-phoneme alignment step to figure out which exact sounds they got wrong, like saying HOSE instead of HOUSE. It then writes the next sentence around the sounds they are still missing so they keep practicing what they actually need. The hardest part was speed. I got response time down from 15 to 20 seconds to about 2 by streaming the results, quantizing the models, and caching. It has had 13,000+ visitors and 240+ signups, and it placed 2nd in the Congressional App Challenge.",
     tags: ["React", "FastAPI", "PyTorch", "AWS", "MySQL"],
-    image: "/screenshots/word-wiz-practice.png",
+    image: "/screenshots/word-wiz-practice.webp",
     stats: [
-      ["6,000+", "visitors"],
-      ["130+", "signups"],
+      ["13,000+", "visitors"],
+      ["240+", "signups"],
       ["2nd", "CAC 2024"],
     ],
     year: "2024 — Present",
@@ -351,13 +356,13 @@ export const PROJECTS = [
     id: "bu-research",
     index: "03",
     label: "BU RISE · Ohn-Bar Lab",
-    title: "Off-Task Detection Research",
-    desc: "Six weeks in Prof. Eshed Ohn-Bar's lab at Boston University, on RISE, asking whether off-the-shelf models can tell when a child stops paying attention during one-on-one phonics tutoring. I built a cross-site benchmark over classroom video from five schools, comparing a zero-shot vision-language model, a rule-based pipeline fusing Gaze-LLE gaze estimation with pose, and a linear probe on frozen DINOv2 features. Everything is scored leave-one-school-out — with this few children, a probe quietly learns faces and furniture instead of behavior. I wrote the annotation protocol and hand-labeled the ground truth myself, and since the footage is of children the whole pipeline runs locally on the lab GPU.",
+    title: "Off-Task Detection",
+    desc: "Started as six weeks in Prof. Eshed Ohn-Bar's lab at Boston University on RISE, and is now a paper submitted to LAK27. I wanted to know whether spotting when a young kid goes off task really needs gaze, head pose, and body pose. We hand-coded 14 kindergarten to second-grade phonics tutoring sessions second by second, and I compared a frozen DINOv2 image encoder with a small head against a 96-feature gaze and pose pipeline, a pose graph network, and a zero-shot vision-language model. The simplest model was the most accurate on held-out sessions, by a small margin, and led most during teacher instruction. The hand-built features ended up encoding which kid was on screen more than what they were doing.",
     tags: ["PyTorch", "DINOv2", "Qwen-VL", "WhisperX", "Python"],
     stats: [
-      ["5", "schools benchmarked"],
-      ["4", "systems compared"],
-      ["2026", "bu rise"],
+      ["LAK27", "paper submitted"],
+      ["2.2%", "rise admit rate"],
+      ["14", "sessions hand-coded"],
     ],
     year: "2026",
     cta: null,
@@ -377,7 +382,7 @@ export const PROJECTS = [
     title: "FRC Robot Simulation",
     desc: "A complete WPILib simulation of our physical robot: physics, mechanisms, sensors, and the AprilTag vision pipeline, so the programming team can write and test code without waiting for hardware time. The idea came from a conference talk at Worlds, where I realized simulation could 3× our throughput. I built it that offseason, and the team still uses it every build season.",
     tags: ["Java", "WPILib", "Physics sim"],
-    image: "/screenshots/robot-sim.png",
+    image: "/screenshots/robot-sim.webp",
     stats: [
       ["3×", "team throughput"],
       ["2025", "shipped"],
@@ -396,7 +401,7 @@ export const PROJECTS = [
     title: "Iron Panthers Scouting App",
     desc: "Rebuilt from scratch after inheriting a broken prototype from a graduating senior. I taught myself web development to understand the codebase, then rewrote it entirely. It uses a React TypeScript frontend, Firebase realtime backend, Google Sheets pipeline for post-event analysis. 20+ scouts run it simultaneously during matches, feeding a live dashboard the strategy team uses to make alliance selection picks. The frontend skills I built here are what eventually let me go build Word Wiz AI. I would then go on to rebuild the entire app from scratch, AGAIN, this time using the new tools that had come out in the meantime like generative AI to improve the design and add features to the original app.",
     tags: ["React", "TypeScript", "Vite", "Tailwind", "Firebase"],
-    image: "/screenshots/scouting-mobile-homescreen.png",
+    image: "/screenshots/scouting-mobile-homescreen.webp",
     stats: [
       ["30+", "scouts/event"],
       ["2024", "rewritten"],
@@ -427,8 +432,30 @@ export const PROJECTS = [
     cardRotY: 1.5792,
   },
   {
-    id: "archive",
+    id: "desmos",
     index: "07",
+    label: "Desmos lab · Side projects",
+    title: "Software in a graphing calculator",
+    desc: "desmos is a graphing calculator built for parabolas. i use it to build games, physics sims, and a neural net. there are no loops, no if-statements, and no variables, so everything turns into recursion, piecewise functions, and lists. click any graph to run it live.",
+    tags: ["2025 — Present"],
+    stats: [
+      ["12", "graphs"],
+      ["9.5k", "weights in the net"],
+      ["0", "for-loops"],
+    ],
+    year: "2025 — Present",
+    cta: null,
+    // Camera rises above the archive corridor and looks out at the floating
+    // desmos panes (SCREENSHOT_PANES) before dropping down to the archive gate.
+    // The graphs themselves live in src/data/desmos.js.
+    pos: [0, 13, -40],
+    focusOffset: [0, 1, 13],
+    lookAt: [0, 13, -40],
+    isDesmos: true,
+  },
+  {
+    id: "archive",
+    index: "08",
     label: "Archive · Other works",
     title: "A BUNCH of other things",
     desc: "Going back in time through Hackathon wins, side experiments, Unity games from middle school onward, and the projects that taught me how to ship. Keep scrolling to walk through them.",

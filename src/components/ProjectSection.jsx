@@ -3,6 +3,8 @@ import { PROJECTS } from '../data/projects.js'
 import Hero from './Hero.jsx'
 import ProjectCard from './ProjectCard.jsx'
 import AboutCard from './AboutCard.jsx'
+import DesmosLab from './DesmosLab.jsx'
+import ScrollCue from './ScrollCue.jsx'
 
 // The inline "Try it live" Word Wiz demo is parked for now — it didn't fit the
 // flow of the card column. WordWizDemo.jsx is intact; re-render it here to
@@ -17,12 +19,12 @@ const FIRST_WORK_INDEX = PROJECTS.findIndex(
 // One full-height section per project node. The card sits in a side column
 // (alternating left/right); narrative nodes (overview, archive intro) center.
 const ProjectSection = forwardRef(function ProjectSection(
-  { project, side, onExternalLink, goToIndex },
+  { project, side, onExternalLink, goToIndex, loaded },
   ref
 ) {
   const isOverview = project.isOverview
   const isArchiveIntro = project.id === 'archive'
-  const centered = isOverview || isArchiveIntro
+  const centered = isOverview || isArchiveIntro || project.isDesmos
 
   const minH = project.isArchive ? 'min-h-[78vh]' : 'min-h-screen'
   const justify = centered ? 'justify-center' : side === 'right' ? 'md:justify-end' : 'md:justify-start'
@@ -38,6 +40,10 @@ const ProjectSection = forwardRef(function ProjectSection(
           <Hero />
         ) : isArchiveIntro ? (
           <NarrativeBlock project={project} />
+        ) : project.isDesmos ? (
+          <div className="w-full" style={{ pointerEvents: 'auto' }}>
+            <DesmosLab project={project} />
+          </div>
         ) : project.isAbout ? (
           <div className="w-full max-w-[440px]" style={{ pointerEvents: 'auto' }}>
             <AboutCard
@@ -52,6 +58,7 @@ const ProjectSection = forwardRef(function ProjectSection(
           </div>
         )}
       </div>
+      {isOverview && <ScrollCue visible={loaded} onClick={() => goToIndex?.(1)} />}
     </section>
   )
 })

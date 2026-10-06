@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { createGLTFLoader } from './gltf.js'
 import { createStateTower } from './stateTower.js'
 import { createTrajectoryPlayer } from './trajectory.js'
 
@@ -14,7 +14,9 @@ const SCENE_PER_METER = 1.0
 // Reefscape fuel: ~15 cm spheres, center at z=0.075 when resting on floor
 const FUEL_RADIUS_M = 0.075
 
-const CSV_URL = '/wpilog/akit_26-05-22_09-20-01.auto.csv'
+// Compact replay built from the auto CSV by scripts/build-replay.mjs — see
+// that script for the row layout. One JSON.parse instead of a 16 MB CSV parse.
+const REPLAY_URL = '/wpilog/akit_26-05-22_09-20-01.replay.json'
 
 // Field-coord (WPI) → scene-coord (Three, Y-up). Robot's pose lives in field
 // coords with X along field length, Y across, Z up.
@@ -28,32 +30,6 @@ function quatYaw(qw, qx, qy, qz) {
 }
 
 
-// Minimal RFC-4180 parser. Handles "..." quoting (the field_fuel_poses column
-// is a JSON list with commas; csv.writer quoted it for us).
-function parseCSV(text) {
-  const rows = []
-  let row = []
-  let field = ''
-  let inQ = false
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i]
-    if (inQ) {
-      if (c === '"') {
-        if (text[i + 1] === '"') { field += '"'; i++ }
-        else inQ = false
-      } else field += c
-    } else {
-      if (c === '"') inQ = true
-      else if (c === ',') { row.push(field); field = '' }
-      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = '' }
-      else if (c === '\r') { /* skip */ }
-      else field += c
-    }
-  }
-  if (field.length || row.length) { row.push(field); rows.push(row) }
-  return rows
-}
-
 // Empirical: robot GLB and WPI yaw=0 don't necessarily align. Adjust here if
 // the robot drives "backwards" through the auto routine.
 const ROBOT_YAW_OFFSET = Math.PI / 2
@@ -65,12 +41,12 @@ export function loadAutoPlayback(scene, allUpdaters, manager) {
   robotGroup.visible = false
   scene.add(robotGroup)
 
-  const loader = new GLTFLoader(manager)
+  const loader = createGLTFLoader(manager)
   loader.load('/models/robot.glb', (gltf) => {
     const m = gltf.scene
     m.scale.setScalar(SCENE_PER_METER)
     m.updateMatrixWorld(true)
-    const box = new THREE.Box3().setFromObject(m)
+    const box = new THREE.Box3().setFromObject(m, true)  // precise: see loadFieldModel
     const center = box.getCenter(new THREE.Vector3())
     m.position.set(-center.x, -box.min.y, -center.z)
     m.traverse(c => { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true } })
@@ -152,54 +128,32 @@ export function loadAutoPlayback(scene, allUpdaters, manager) {
   // Optional readout span the React side can stamp into.
   const hud = document.getElementById('auto-playback-hud')
 
-  // Load + parse CSV asynchronously
+  // Load the replay asynchronously
   let data = null
   let totalSec = 0
   let startSec = null
 
-  fetch(CSV_URL).then(r => {
-    if (!r.ok) throw new Error('CSV fetch failed: ' + r.status)
-    return r.text()
-  }).then(text => {
-    const rows = parseCSV(text)
+  fetch(REPLAY_URL).then(r => {
+    if (!r.ok) throw new Error('replay fetch failed: ' + r.status)
+    return r.json()
+  }).then(rows => {
     if (!rows.length) return
-    const header = rows[0]
-    const idx = Object.fromEntries(header.map((h, i) => [h, i]))
-    const out = []
-    for (let r = 1; r < rows.length; r++) {
-      const row = rows[r]
-      if (row.length !== header.length) continue
-      const num = (k) => {
-        const v = row[idx[k]]
-        return v === '' || v == null ? NaN : parseFloat(v)
+    let ff = []
+    data = rows.map(([t, robot, intake, shooter, rf, ffRow, ...states]) => {
+      if (ffRow !== 0) ff = ffRow   // 0 = field fuel unchanged since the previous row
+      return {
+        t, robot, intake, shooter, rf, ff,
+        intake_state:     states[0],
+        shooter_state:    states[1],
+        serializer_state: states[2],
+        swerve_state:     states[3],
       }
-      out.push({
-        t: num('t_s'),
-        robot: [num('robot_x'), num('robot_y'), num('robot_z'),
-                num('robot_qw'), num('robot_qx'), num('robot_qy'), num('robot_qz')],
-        intake: [num('intake_x'), num('intake_y'), num('intake_z'),
-                 num('intake_qw'), num('intake_qx'), num('intake_qy'), num('intake_qz')],
-        shooter: [num('shooter_x'), num('shooter_y'), num('shooter_z'),
-                  num('shooter_qw'), num('shooter_qx'), num('shooter_qy'), num('shooter_qz')],
-        rf: safeParse(row[idx.robot_fuel_poses]),
-        ff: safeParse(row[idx.field_fuel_poses]),
-        intake_state:     row[idx['intake_state']]     ?? '',
-        shooter_state:    row[idx['shooter_state']]    ?? '',
-        serializer_state: row[idx['serializer_state']] ?? '',
-        swerve_state:     row[idx['swerve_state']]     ?? '',
-      })
-    }
-    data = out
+    })
     totalSec = data[data.length - 1].t
     robotGroup.visible = true
   }).catch(err => {
     console.warn('[autoPlayback]', err)
   })
-
-  function safeParse(s) {
-    if (!s) return []
-    try { return JSON.parse(s) } catch { return [] }
-  }
 
   function findRowAt(tSec) {
     let lo = 0, hi = data.length - 1

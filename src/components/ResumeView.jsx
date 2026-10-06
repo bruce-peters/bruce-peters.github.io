@@ -4,6 +4,7 @@
 // Reachable via ?mode=resume URL param or the "text view" chrome link.
 // Print stylesheet included via @media print so ⌘P yields a clean page.
 import { PROJECTS, ARCHIVE_WORKS } from '../data/projects.js'
+import { DESMOS_GRAPHS } from '../data/desmos.js'
 
 const mainProjects = PROJECTS.filter(p => !p.isOverview && !p.isAbout && !p.isArchive)
 const aboutNode = PROJECTS.find(p => p.isAbout)
@@ -101,6 +102,23 @@ export default function ResumeView({ onExit }) {
               <p className="text-[13px] leading-[1.65] text-cream-dim m-0 mb-4">
                 {p.desc}
               </p>
+
+              {p.isDesmos && (
+                <div className="mb-4">
+                  {DESMOS_GRAPHS.map(g => (
+                    <a
+                      key={g.slug}
+                      href={g.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-baseline justify-between gap-4 py-1.5 border-b border-line last:border-0 no-underline group"
+                    >
+                      <span className="font-display font-semibold text-[14px] text-fg group-hover:text-accent transition-colors">{g.title}</span>
+                      <span className="font-mono text-[10px] tracking-[0.08em] uppercase text-dim2 truncate">{g.tag} ↗</span>
+                    </a>
+                  ))}
+                </div>
+              )}
 
               {/* Tags + stats inline */}
               <div className="flex flex-wrap gap-1.5 mb-4">

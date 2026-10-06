@@ -125,6 +125,23 @@ All project content is in `src/data/projects.js`. `PROJECTS` is the canonical li
 | `src/scene/textures.js` | Canvas-based texture generators for 3D cards. |
 | `src/scene/tuneGizmos.js` | Tune Mode drag/select helpers. |
 | `src/scene/autoPlayback.js` / `autoPlayback2025.js` | Replay match logs for the robot2025 section animation. |
+| `src/scene/gltf.js` | `createGLTFLoader()` — GLTFLoader with the meshopt decoder attached. Also swaps the CAD exports' default polished-metal materials for matte ones (a mirror-finish carpet reflected the env map as a white glare). Use it for every GLB. |
+
+---
+
+## Asset pipeline
+
+Source assets live in `assets-src/` (not deployed). Generated, web-ready copies go to `public/`. Edit the source, then regenerate. Never hand-edit the `public/` outputs.
+
+| Command | Source → output | What it does |
+|---|---|---|
+| `npm run optimize:models` | `assets-src/models/**.glb` → `public/models/` | Strips staged game pieces, merges meshes per material (thousands of draw calls → ~25), simplifies within a few mm, meshopt-compresses with 16-bit positions. Per-model settings in `CONFIG` in `scripts/optimize-models.mjs`. |
+| `npm run optimize:images` | `assets-src/screenshots/*` → `public/screenshots/*.webp` | Resizes to the size each image is displayed at, bakes EXIF rotation, converts to WebP. Size caps in `MAX_SIDE` in `scripts/optimize_images.py`. Reference the `.webp` path in `projects.js`. |
+| `npm run build:replay` | `public/wpilog/*.auto.csv` → `*.replay.json` | Compact 2026 auto replay that `autoPlayback.js` loads with one `JSON.parse` (the raw CSV took ~2.4 s to parse in the browser). Rerun after regenerating the CSV with `wpilog_to_csv.py`. |
+
+Keep the 14-bit quantization default out of `optimize-models.mjs`. After the join, one mesh spans the ~22 m field, and 14 bits snaps floor tape lines into the carpet.
+
+Any code that places a model by its bounds must use `new THREE.Box3().setFromObject(model, true)` (precise). Each merged mesh keeps one CAD part's rotated frame, so the default fast box comes out metres too big and the fields float.
 
 ---
 

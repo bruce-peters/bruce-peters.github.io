@@ -28,7 +28,11 @@ const CHIP_DOT = {
   Python: 'bg-lime',
   TypeScript: 'bg-coral',
   JS: 'bg-lime',
+  JavaScript: 'bg-lime',
   'C#': 'bg-magenta',
+  'C++': 'bg-violet',
+  PHP: 'bg-accent',
+  'HTML/CSS': 'bg-coral',
 
   // frameworks / runtimes
   React: 'bg-violet',

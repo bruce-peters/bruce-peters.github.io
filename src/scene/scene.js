@@ -34,8 +34,9 @@ export function initScene(container, onProjectChange, onLoad) {
   renderer.toneMappingExposure = 0.7
   container.appendChild(renderer.domElement)
 
-  // Environment map — gives GLTF metallic/glossy materials something to reflect.
-  // Without this, PBR materials with any metalness render black.
+  // Environment map — soft image-based fill plus something for the glossy
+  // polycarbonate to reflect. Kept low (environmentIntensity below) so the
+  // key light, not the room's ceiling panels, decides how bright things are.
   const pmrem = new THREE.PMREMGenerator(renderer)
   const envTexture = pmrem.fromScene(new RoomEnvironment()).texture
   pmrem.dispose()
@@ -50,7 +51,7 @@ export function initScene(container, onProjectChange, onLoad) {
   scene.background = new THREE.Color(0x101012)
   scene.fog = new THREE.Fog(0x101012, 50, 120)
   scene.environment = envTexture
-  scene.environmentIntensity = 0.2
+  scene.environmentIntensity = 0.15
 
   // Camera — initial position matches overview's focusOffset + lookAt so the
   // first frame is consistent with what goToIndex(0) would produce.
@@ -77,9 +78,21 @@ export function initScene(container, onProjectChange, onLoad) {
   const _overviewLookAt = _overview.lookAt ?? _overview.pos
   controls.target.set(_overviewLookAt[0], _overviewLookAt[1], _overviewLookAt[2])
 
-  // Lights — design-system palette: warm cream ambient only, kept deliberately
-  // dim so the field reads dark and moody, lit by the environment map.
-  scene.add(new THREE.AmbientLight(0xf4f0e8, 0.02))
+  // Lights — an arena rig in the design-system palette. A warm cream key sits
+  // high overhead like the venue's stage lights and casts the robots' shadows
+  // onto the carpet; a dim cream-over-ink hemisphere fills the sides so matte
+  // surfaces never fall to pure black. Kept low so the scene still reads dark.
+  scene.add(new THREE.HemisphereLight(0xf4f0e8, 0x101012, 0.25))
+
+  const keyLight = new THREE.DirectionalLight(0xf4f0e8, 1.0)
+  keyLight.position.set(6, 24, 2)
+  keyLight.target.position.set(0, 0, -10)  // between the 2026 (z=0) and 2025 (z=-20) fields
+  keyLight.castShadow = true
+  keyLight.shadow.mapSize.set(2048, 2048)
+  Object.assign(keyLight.shadow.camera, { left: -20, right: 20, top: 20, bottom: -20, near: 1, far: 60 })
+  keyLight.shadow.camera.updateProjectionMatrix()
+  keyLight.shadow.normalBias = 0.02
+  scene.add(keyLight, keyLight.target)
 
   // Stars
   scene.add(makeStars())

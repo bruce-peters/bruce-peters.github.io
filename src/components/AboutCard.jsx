@@ -5,8 +5,16 @@ import GitHubStats from './GitHubStats.jsx'
 
 // The About card — a richer variant of ProjectCard. Keeps the same glass shell
 // and glass-settle entrance, but adds an identity band (optional portrait +
-// name/role/now), a human-voice headline, the tech-chip row, a 4-stat grid, and
-// two CTAs. The 3D `buildAbout()` companion carries identity + work, not skills.
+// name/now), a human-voice headline, the language-chip row, a stat grid, and
+// the CTAs. The 3D `buildAbout()` companion only adds the portrait and two
+// engineering stat tiles, so nothing here should be repeated over there.
+
+// Secondary CTA — filled ink pill, medium weight, dimmer text. Sits beside the
+// solid green primary without competing with it; warms to cream + a faint
+// green edge on hover.
+const SECONDARY_BTN =
+  'inline-flex items-center gap-1.5 whitespace-nowrap font-mono font-medium text-[12.5px] leading-4 tracking-[0.02em] rounded-full px-4 py-2.5 bg-ink-700 border border-line text-cream-dim transition-colors duration-200 hover:text-fg hover:border-accent/50 hover:bg-ink-600 no-underline'
+
 export default function AboutCard({ project, side, onViewWork }) {
   const [ref, inView] = useInView()
   const viewWorkRef = useMagnetic(0.25)
@@ -43,18 +51,15 @@ export default function AboutCard({ project, side, onViewWork }) {
       {/* Kicker */}
       <div className="flex justify-between items-baseline mb-5 font-mono">
         <span className="text-[11px] tracking-[0.2em] uppercase text-dim">
-          <span className="text-accent">// about</span> · {project.label}
+          <span className="text-accent">// about</span>
         </span>
       </div>
 
-      {/* Identity band — name / role / now. The portrait lives in the 3D scene
+      {/* Identity band — name / now. The portrait lives in the 3D scene
           (buildAbout's centerpiece), not here. */}
       <div className="mb-5">
         <p className="font-display font-extrabold text-[25px] leading-none tracking-[-0.02em] m-0 mb-2.5 text-fg">
           {project.name}
-        </p>
-        <p className="font-mono text-[11px] text-dim leading-[1.5] m-0 mb-2 whitespace-pre-line">
-          {project.role}
         </p>
         <p className="font-mono text-[11px] text-dim2 flex items-center gap-2 m-0">
           <span
@@ -114,17 +119,19 @@ export default function AboutCard({ project, side, onViewWork }) {
       </div>
 
       {/* Actions */}
-      <div className="flex gap-3 flex-wrap">
+      {/* Actions — one row. The solid green pill is the only primary; the two
+          secondaries are quieter filled-ink pills so they read as a pair. */}
+      <div className="flex gap-2 flex-wrap items-center">
         <button
           ref={viewWorkRef}
           onClick={() => onViewWork?.()}
-          className="inline-flex items-center gap-2 font-mono font-bold text-[13px] tracking-[0.02em] rounded-full px-[22px] py-3 bg-accent text-bg transition-shadow duration-200 hover:shadow-[0_0_0_1px_rgba(87,211,106,0.4),0_8px_32px_rgba(87,211,106,0.35)] border-0 cursor-pointer after:content-['→']"
+          className="inline-flex items-center gap-2 whitespace-nowrap font-mono font-bold text-[13px] leading-4 tracking-[0.02em] rounded-full px-5 py-2.5 bg-accent text-bg transition-shadow duration-200 hover:shadow-[0_0_0_1px_rgba(87,211,106,0.4),0_8px_32px_rgba(87,211,106,0.35)] border border-accent cursor-pointer after:content-['→']"
         >
           view work
         </button>
         <a
           href="mailto:brucebpeters12@gmail.com"
-          className="inline-flex items-center font-mono font-bold text-[13px] tracking-[0.02em] rounded-full px-[22px] py-3 border border-line text-fg transition-all duration-200 hover:-translate-y-px hover:border-accent hover:text-accent no-underline"
+          className={SECONDARY_BTN}
         >
           get in touch
         </a>
@@ -132,9 +139,9 @@ export default function AboutCard({ project, side, onViewWork }) {
           href="/resume.pdf"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center font-mono font-bold text-[13px] tracking-[0.02em] rounded-full px-[22px] py-3 border border-line text-dim transition-all duration-200 hover:-translate-y-px hover:border-accent hover:text-accent no-underline"
+          className={SECONDARY_BTN}
         >
-          résumé ↓
+          résumé <span className="text-accent">↓</span>
         </a>
       </div>
     </div>
