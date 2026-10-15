@@ -233,6 +233,21 @@
   .bp-anatomy-labels span { font-size: 8.5px; }
   .bp-anatomy-labels [data-corner='hint'] { display: none; }
 }
+/* On desktop the banner is a fixed 200px so the longer cards fit a laptop
+   screen. The svg keeps the viewBox's ratio (width follows height) so the
+   pointer-to-viewBox maths in the figures stays exact. */
+@media (min-width: 768px) {
+  .bp-anatomy-banner .iso-svg {
+    width: auto;
+    max-width: 100%;
+    height: 200px;
+    margin: 0 auto;
+  }
+  .bp-anatomy-banner .bp-anatomy-hold {
+    aspect-ratio: auto !important;
+    height: 200px;
+  }
+}
 
 /* Expand pill on the banner, and the large view it opens. */
 .bp-anatomy-expand {

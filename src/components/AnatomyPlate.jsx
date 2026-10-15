@@ -33,7 +33,7 @@ export default function AnatomyPlate({ id, heading }) {
 
   if (!spec) return null
   const { Figure } = spec
-  const placeholder = <div style={{ aspectRatio: `1 / ${spec.ratio}` }} />
+  const placeholder = <div className="bp-anatomy-hold" style={{ aspectRatio: `1 / ${spec.ratio}` }} />
 
   return (
     <div ref={ref} className="bp-anatomy bp-anatomy-banner iso" data-theme="dark">

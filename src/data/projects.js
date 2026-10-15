@@ -350,7 +350,7 @@ export const PROJECTS = [
     index: "02",
     label: "Word Wiz AI · Solo founder",
     title: "Word Wiz AI",
-    desc: "This is an AI reading tutor I built and run solo. A kid reads a sentence out loud, and the backend runs four ML models plus a grapheme-to-phoneme alignment step to figure out which exact sounds they got wrong, like saying HOSE instead of HOUSE. It then writes the next sentence around the sounds they are still missing so they keep practicing what they actually need. The hardest part was speed. I got the server's response time down from 8.6 seconds to 1.7 by streaming the results, generating the feedback with rules instead of GPT (so GPT only writes the next sentence), and running text-to-speech and GPT in parallel. It has had 13,000+ visitors and 240+ signups, and it placed 2nd in the Congressional App Challenge.",
+    desc: "This is an AI reading tutor I built and run solo. A kid reads a sentence out loud, and the backend runs four ML models plus a grapheme-to-phoneme alignment step to figure out which exact sounds they got wrong, like saying HOSE instead of HOUSE. It then writes the next sentence around the sounds they are still missing so they keep practicing what they actually need. The hardest part was speed. I got the server's response time down from 8.6 seconds to 1.7 by streaming the results, generating the feedback with rules instead of GPT (so GPT only writes the next sentence), and running text-to-speech and GPT in parallel. It placed 2nd in the Congressional App Challenge.",
     tags: ["React", "FastAPI", "PyTorch", "AWS", "MySQL"],
     image: "/screenshots/word-wiz-practice.webp",
     stats: [
@@ -372,7 +372,7 @@ export const PROJECTS = [
     label: "BU RISE · Ohn-Bar Lab",
     title: "Off-Task Detection",
     desc: "Started as six weeks in Prof. Eshed Ohn-Bar's lab at Boston University on RISE, and is now a paper submitted to LAK27. I wanted to know whether spotting when a young kid goes off task really needs gaze, head pose, and body pose. We hand-coded 14 kindergarten to second-grade phonics tutoring sessions second by second, and I compared a frozen DINOv2 image encoder with a small head against a 96-feature gaze and pose pipeline, a pose graph network, and a zero-shot vision-language model. The simplest model was the most accurate on held-out sessions, by a small margin, and led most during teacher instruction. The hand-built features ended up encoding which kid was on screen more than what they were doing.",
-    tags: ["PyTorch", "DINOv2", "Qwen-VL", "WhisperX", "Python"],
+    tags: ["PyTorch", "DINOv2", "Qwen-VL", "WhisperX"],
     // The paper's t-SNE of the hand-built features, redrawn in /bp/ colors by
     // scripts/render_offtask_tsne.py. No video frames: the data is video of children.
     image: "/screenshots/offtask-tsne.webp",

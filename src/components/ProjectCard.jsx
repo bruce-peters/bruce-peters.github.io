@@ -46,7 +46,7 @@ export default function ProjectCard({ project, side, onExternalLink }) {
 
       {/* Anatomy banner: a live figure of how the project works */}
       {project.anatomy && (
-        <div className="-mx-7 -mt-6 mb-5 overflow-hidden border-b border-line">
+        <div className="-mx-7 -mt-6 mb-4 overflow-hidden border-b border-line">
           <AnatomyPlate id={project.anatomy} heading={project.title} />
         </div>
       )}
@@ -57,7 +57,7 @@ export default function ProjectCard({ project, side, onExternalLink }) {
       {project.isArchive && project.images?.length > 1 ? (
         <ScreenshotGallery images={project.images} title={project.title} />
       ) : project.isArchive && project.image && (
-        <div className="-mx-7 -mt-6 mb-5 overflow-hidden border-b border-line">
+        <div className="-mx-7 -mt-6 mb-4 overflow-hidden border-b border-line">
           <img
             src={project.image}
             alt={`${project.title} screenshot`}
@@ -69,7 +69,7 @@ export default function ProjectCard({ project, side, onExternalLink }) {
 
       {/* Kicker — index and year share a tight baseline row; the label gets its
           own line below so a long one can't wrap around the floating year. */}
-      <div className="font-mono mb-4">
+      <div className="font-mono mb-3">
         <div className="flex justify-between items-baseline gap-3">
           <span className="text-[11px] tracking-[0.2em] uppercase text-accent">
             // {kicker}
@@ -91,17 +91,17 @@ export default function ProjectCard({ project, side, onExternalLink }) {
       </h2>
 
       {/* Description — human voice, so it inherits Bricolage from body */}
-      <p className="text-[14.5px] leading-[1.6] text-cream-dim m-0 mb-5">
+      <p className="text-[14.5px] leading-[1.55] text-cream-dim m-0 mb-4 last:mb-0">
         {project.desc}
       </p>
 
       {/* Tech chips — pill + colored dot ties tech to a phoneme */}
       {project.tags?.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-5">
+        <div className="flex flex-wrap gap-1.5 mb-4 last:mb-0">
           {project.tags.map(t => (
             <span
               key={t}
-              className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] uppercase text-dim border border-line rounded-full px-2.5 py-1"
+              className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] uppercase text-dim border border-line rounded-full px-2 py-1"
             >
               <span className={`inline-block w-1.5 h-1.5 rounded-full ${chipDot(t)}`} />
               {t}
@@ -113,11 +113,11 @@ export default function ProjectCard({ project, side, onExternalLink }) {
       {/* Stats — bordered readout boxes (/bp/ .stat spec); only the lead stat
           carries the accent, the rest stay cream so one number leads the eye */}
       {project.stats?.length > 0 && (
-        <div className="flex flex-wrap gap-2.5 mb-5">
+        <div className="flex flex-wrap gap-2.5 mb-4 last:mb-0">
           {project.stats.map(([val, lbl], i) => (
             <div
               key={lbl}
-              className="flex-1 min-w-[92px] border border-line rounded-[14px] px-4 py-3.5 bg-[rgba(22,22,25,0.66)] backdrop-blur-sm"
+              className="flex-1 min-w-[92px] border border-line rounded-[14px] px-4 py-3 bg-[rgba(22,22,25,0.66)] backdrop-blur-sm"
             >
               <div
                 className={`font-display font-extrabold text-[clamp(22px,2.6vw,28px)] leading-none tracking-[-0.02em] ${i === 0 ? 'text-accent' : 'text-fg'}`}

@@ -61,7 +61,7 @@ export default function ScreenshotGallery({ images, title }) {
 
   return (
     <div
-      className="group relative -mx-7 -mt-6 mb-5 overflow-hidden border-b border-line"
+      className="group relative -mx-7 -mt-6 mb-4 overflow-hidden border-b border-line"
       role="region"
       aria-roledescription="carousel"
       aria-label={`${title} screenshots`}
