@@ -359,6 +359,9 @@ export const PROJECTS = [
     title: "Off-Task Detection",
     desc: "Started as six weeks in Prof. Eshed Ohn-Bar's lab at Boston University on RISE, and is now a paper submitted to LAK27. I wanted to know whether spotting when a young kid goes off task really needs gaze, head pose, and body pose. We hand-coded 14 kindergarten to second-grade phonics tutoring sessions second by second, and I compared a frozen DINOv2 image encoder with a small head against a 96-feature gaze and pose pipeline, a pose graph network, and a zero-shot vision-language model. The simplest model was the most accurate on held-out sessions, by a small margin, and led most during teacher instruction. The hand-built features ended up encoding which kid was on screen more than what they were doing.",
     tags: ["PyTorch", "DINOv2", "Qwen-VL", "WhisperX", "Python"],
+    // The paper's t-SNE of the hand-built features, redrawn in /bp/ colors by
+    // scripts/render_offtask_tsne.py. No video frames: the data is video of children.
+    image: "/screenshots/offtask-tsne.webp",
     stats: [
       ["LAK27", "paper submitted"],
       ["2.2%", "rise admit rate"],
@@ -370,9 +373,9 @@ export const PROJECTS = [
     // keeps this inserted node out of the left/right alternation count so every
     // card below it stays on its original side. See CARD_SIDES in App.jsx.
     side: "right",
-    pos: [14.0, 20.2, -10.0],
-    focusOffset: [0.5, 1.6, 11.0],
-    lookAt: [16.2, 30.0, -9.0],
+    pos: [14.0, 21.0, -10.0],
+    focusOffset: [0.5, 0.8, 11.0],
+    lookAt: [16.1, 21.4, -8.8],
     cardRotY: 0.15,
   },
   {

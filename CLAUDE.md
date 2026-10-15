@@ -139,6 +139,8 @@ Source assets live in `assets-src/` (not deployed). Generated, web-ready copies 
 | `npm run optimize:images` | `assets-src/screenshots/*` → `public/screenshots/*.webp` | Resizes to the size each image is displayed at, bakes EXIF rotation, converts to WebP. Size caps in `MAX_SIDE` in `scripts/optimize_images.py`. Reference the `.webp` path in `projects.js`. |
 | `npm run build:replay` | `public/wpilog/*.auto.csv` → `*.replay.json` | Compact 2026 auto replay that `autoPlayback.js` loads with one `JSON.parse` (the raw CSV took ~2.4 s to parse in the browser). Rerun after regenerating the CSV with `wpilog_to_csv.py`. |
 
+The off-task 3D card image (`assets-src/screenshots/offtask-tsne.png`) is drawn by `scripts/render_offtask_tsne.py`, the paper's t-SNE redrawn in /bp/ colors. It restyles from the cached embedding in `assets-src/offtask/tsne.npz`. `--recompute` rebuilds that cache from `../gaze-analyzing` and needs that repo's venv. Never put video frames on the site. The data is video of children.
+
 Keep the 14-bit quantization default out of `optimize-models.mjs`. After the join, one mesh spans the ~22 m field, and 14 bits snaps floor tape lines into the carpet.
 
 Any code that places a model by its bounds must use `new THREE.Box3().setFromObject(model, true)` (precise). Each merged mesh keeps one CAD part's rotated frame, so the default fast box comes out metres too big and the fields float.

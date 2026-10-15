@@ -148,6 +148,7 @@ export function initScene(container, onProjectChange, onLoad) {
   const simP       = PROJECTS.find(p => p.id === 'sim')
   const scoutingP  = PROJECTS.find(p => p.id === 'scouting')
   const readerP    = PROJECTS.find(p => p.id === 'reader')
+  const researchP  = PROJECTS.find(p => p.id === 'bu-research')
 
   // Helper: add a slim project card if one was built (skipped when imageless)
   function addCard(p, opts) {
@@ -171,6 +172,9 @@ export function initScene(container, onProjectChange, onLoad) {
 
   // Reader (Word Wiz AI) card — pos and rotY come from projects.js data
   addCard(readerP, { rotY: readerP.cardRotY ?? 0 })
+
+  // Off-task detection card — the paper's t-SNE, floating above the Word Wiz demo
+  addCard(researchP, { rotY: researchP.cardRotY ?? 0 })
 
   // Archive corridor — floor-disc gate + git commit graph. Each archive work is
   // a commit node; the node for the project the camera is parked on lights up,
