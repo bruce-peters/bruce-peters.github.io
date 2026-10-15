@@ -1,16 +1,45 @@
-# React + Vite
+# brucepeters.dev
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Bruce Peters' portfolio: a scrolling 3D scene (Three.js) with one section per project, built with React, Vite and Tailwind.
 
-Currently, two official plugins are available:
+**Live:** https://brucepeters.dev
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Run it locally
 
-## React Compiler
+Requires Node.js 20.19+ or 22.12+ (Vite 8).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+git clone https://github.com/bruce-peters/bruce-peters.github.io
+cd bruce-peters.github.io
+npm ci
+npm run dev        # http://localhost:5174
+```
 
-## Expanding the ESLint configuration
+Production build:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm run build      # outputs dist/
+npm run preview    # serves dist/ locally
+```
+
+### Optional: Word Wiz live demo
+
+One section embeds a live demo of [Word Wiz AI](https://wordwizai.com) that signs in to a demo account. Copy `.env.example` to `.env.local` and fill in the demo credentials to enable it. Without them the rest of the site works and the demo shows a "Demo credentials not configured." error when used. These values end up in the client bundle, so only use a throwaway demo account.
+
+## Project structure
+
+| Path | What's there |
+|---|---|
+| `src/data/projects.js` | All project content (titles, descriptions, links, screenshots, 3D positions) |
+| `src/scene/` | Vanilla Three.js scene: camera path, 3D cards, robot/field models |
+| `src/components/` | React UI: project cards, nav, résumé view, Desmos lab, Word Wiz demo |
+| `src/anatomy/` | Animated SVG "anatomy" figures for the major projects |
+| `public/` | Optimized models, screenshots, résumé PDF, robot log replays |
+| `scripts/` | Asset pipeline: model/image optimization, robot log → replay JSON, anatomy figure builds |
+
+See `CLAUDE.md` for architecture details and the asset pipeline commands.
+
+## Deployment
+
+- `brucepeters.dev` is served by Vercel.
+- `.github/workflows/deploy.yml` also publishes `main` to GitHub Pages (`bruce-peters.github.io`). It runs `npm ci`, so `package-lock.json` must stay in sync with `package.json`. After changing dependencies, run `npm install` and commit the updated lockfile.
