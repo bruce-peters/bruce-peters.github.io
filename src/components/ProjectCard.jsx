@@ -1,6 +1,7 @@
 import useInView from '../hooks/useInView.js'
 import useMagnetic from '../hooks/useMagnetic.js'
 import { chipDot } from '../utils/chipColors.js'
+import AnatomyPlate from './AnatomyPlate.jsx'
 
 // In-flow project card for the scrolling-page layout. Sits in a side column over
 // the fixed 3D background; the background frames the matching project as it scrolls in.
@@ -41,6 +42,13 @@ export default function ProjectCard({ project, side, onExternalLink }) {
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: '#57d36a', boxShadow: '0 0 16px rgba(87,211,106,0.5)' }}
       />
+
+      {/* Anatomy banner: a live figure of how the project works */}
+      {project.anatomy && (
+        <div className="-mx-7 -mt-6 mb-5 overflow-hidden border-b border-line">
+          <AnatomyPlate id={project.anatomy} heading={project.title} />
+        </div>
+      )}
 
       {/* Screenshot banner — archive cards carry their imagery in the DOM
           (the main project cards are rendered in the 3D scene instead) */}

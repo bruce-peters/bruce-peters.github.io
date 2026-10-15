@@ -1,0 +1,99 @@
+/* The Word Wiz sound sorter's own classes (from word-wiz-ai's
+   sound-sorter.css at 2ecf0c7), with its brand colours mapped to /bp/:
+   violet for the hat and record button, Word Wiz yellow kept for the
+   listening head and the star, and the score bands as green (good), lime (close) and coral
+   (practice). Dark only. */
+.bp-anatomy.iso {
+  --ss-purple-0: #3d3670; --ss-purple-1: #4a4288; --ss-purple-2: #574e9f; --ss-purple-3: #655bb5; --ss-purple-top: #7a6fd0; --ss-purple-edge: #231f45;
+  --ss-star: #f8ca68;
+  --ss-yellow-0: #d99a2b; --ss-yellow-1: #e3a738; --ss-yellow-2: #ecb446; --ss-yellow-3: #f3c15a; --ss-yellow-top: #fbcb60; --ss-yellow-edge: #8a5a12;
+  --ss-hole: #050506;
+  --ss-good: #12301a; --ss-good-ink: #57d36a; --ss-good-deep: #1d4a27;
+  --ss-close: #2c3313; --ss-close-ink: #c7ee5e; --ss-close-deep: #3d4719;
+  --ss-practice: #3a2018; --ss-practice-ink: #ec9576; --ss-practice-deep: #5a3326;
+  --ss-screen: #121214; --ss-screen-ink: #f4f0e8; --ss-chip: #1d1d21;
+  --ss-glow: #57d36a;
+}
+
+.bp-anatomy .ss-stage { touch-action: pan-y; cursor: pointer; }
+.bp-anatomy .ss-stage:focus { outline: none; }
+.bp-anatomy .ss-stage:focus-visible { outline: 1px solid #6f6b62; outline-offset: 6px; border-radius: 8px; }
+
+.bp-anatomy .ss-purple .iso-shade[data-shade="0"] { fill: var(--ss-purple-0); }
+.bp-anatomy .ss-purple .iso-shade[data-shade="1"] { fill: var(--ss-purple-1); }
+.bp-anatomy .ss-purple .iso-shade[data-shade="2"] { fill: var(--ss-purple-2); }
+.bp-anatomy .ss-purple .iso-shade[data-shade="3"] { fill: var(--ss-purple-3); }
+.bp-anatomy .ss-purple .iso-top { fill: var(--ss-purple-top); }
+.bp-anatomy .ss-purple .iso-solid[data-seamless] > .iso-shade[data-shade="0"] { stroke: var(--ss-purple-0); }
+.bp-anatomy .ss-purple .iso-solid[data-seamless] > .iso-shade[data-shade="1"] { stroke: var(--ss-purple-1); }
+.bp-anatomy .ss-purple .iso-solid[data-seamless] > .iso-shade[data-shade="2"] { stroke: var(--ss-purple-2); }
+.bp-anatomy .ss-purple .iso-solid[data-seamless] > .iso-shade[data-shade="3"] { stroke: var(--ss-purple-3); }
+.bp-anatomy .ss-purple .iso-solid[data-seamless] > .iso-top { stroke: var(--ss-purple-top); }
+.bp-anatomy .ss-purple .iso-fill { fill: var(--ss-purple-1); }
+.bp-anatomy .ss-purple .iso-edge, .bp-anatomy .ss-purple .iso-crease, .bp-anatomy .ss-purple .iso-bevel { stroke: var(--ss-purple-edge); }
+.bp-anatomy .ss-yellow .iso-shade[data-shade="0"] { fill: var(--ss-yellow-0); }
+.bp-anatomy .ss-yellow .iso-shade[data-shade="1"] { fill: var(--ss-yellow-1); }
+.bp-anatomy .ss-yellow .iso-shade[data-shade="2"] { fill: var(--ss-yellow-2); }
+.bp-anatomy .ss-yellow .iso-shade[data-shade="3"] { fill: var(--ss-yellow-3); }
+.bp-anatomy .ss-yellow .iso-top { fill: var(--ss-yellow-top); }
+.bp-anatomy .ss-yellow .iso-fill { fill: var(--ss-yellow-1); }
+.bp-anatomy .ss-yellow .iso-edge, .bp-anatomy .ss-yellow .iso-crease { stroke: var(--ss-yellow-edge); }
+.bp-anatomy .ss-yellow .iso-bevel { stroke: #fff3c9; }
+.bp-anatomy .ss-brim .iso-shade, .bp-anatomy .ss-brim .iso-top { filter: brightness(0.82); }
+.bp-anatomy .ss-band .iso-top, .bp-anatomy .ss-band .iso-shade { filter: brightness(1.18); }
+.bp-anatomy .ss-star { fill: var(--ss-star); stroke: none; }
+.bp-anatomy .ss-rec[data-on] .iso-top { fill: #b4a8ff; }
+
+.bp-anatomy .ss-lamp[data-on] .iso-top, .bp-anatomy .ss-lamp[data-on] .iso-shade { fill: var(--ss-glow); stroke: var(--ss-glow); }
+.bp-anatomy .ss-lamp[data-on] .iso-edge { stroke: var(--ss-glow); }
+.bp-anatomy .ss-led circle { opacity: 0.2; transition: opacity 0.25s var(--anatomy-ease); }
+.bp-anatomy .ss-led[data-on] circle { opacity: 1; fill: var(--ss-glow); }
+.bp-anatomy .ss-wordlamp[data-band] .iso-shade, .bp-anatomy .ss-wordlamp[data-band] .iso-top { transition: fill 0.3s var(--anatomy-ease); }
+.bp-anatomy .ss-wordlamp[data-band="good"] .iso-top, .bp-anatomy .ss-wordlamp[data-band="good"] .iso-shade { fill: var(--ss-good-deep); stroke: var(--ss-good-deep); }
+.bp-anatomy .ss-wordlamp[data-band="close"] .iso-top, .bp-anatomy .ss-wordlamp[data-band="close"] .iso-shade { fill: var(--ss-close-deep); stroke: var(--ss-close-deep); }
+.bp-anatomy .ss-wordlamp[data-band="practice"] .iso-top, .bp-anatomy .ss-wordlamp[data-band="practice"] .iso-shade { fill: var(--ss-practice-deep); stroke: var(--ss-practice-deep); }
+.bp-anatomy .ss-wordlamp[data-band="good"] .iso-edge { stroke: var(--ss-good-ink); }
+.bp-anatomy .ss-wordlamp[data-band="close"] .iso-edge { stroke: var(--ss-close-ink); }
+.bp-anatomy .ss-wordlamp[data-band="practice"] .iso-edge { stroke: var(--ss-practice-ink); }
+
+.bp-anatomy .ss-flag .iso-shade, .bp-anatomy .ss-flag .iso-top { fill: var(--ss-practice-deep); }
+.bp-anatomy .ss-flag .iso-edge { stroke: var(--ss-practice-ink); }
+
+.bp-anatomy .ss-hole-floor { fill: var(--ss-hole); stroke: none; }
+.bp-anatomy .ss-hole-rim { fill: none; stroke: var(--anatomy-lo); stroke-width: var(--anatomy-weight); vector-effect: non-scaling-stroke; transition: stroke 0.3s var(--anatomy-ease); }
+.bp-anatomy .ss-hole[data-state="fit"] .ss-hole-rim { stroke: var(--ss-good-ink); }
+.bp-anatomy .ss-hole[data-state="stuck"] .ss-hole-rim { stroke: var(--ss-practice-ink); }
+.bp-anatomy [data-block][data-state="fit"] .iso-top { fill: var(--ss-good-deep); }
+.bp-anatomy [data-block][data-state="stuck"] .iso-top { fill: var(--ss-practice-deep); }
+.bp-anatomy [data-block][data-seated] .iso-fill, .bp-anatomy [data-block][data-seated] .iso-shade, .bp-anatomy [data-block][data-seated] .iso-edge, .bp-anatomy [data-block][data-seated] .iso-crease, .bp-anatomy [data-block][data-seated] .iso-bevel { display: none; }
+.bp-anatomy [data-block][data-seated] .iso-top { stroke: var(--ss-good-ink); stroke-width: 0.5px; vector-effect: non-scaling-stroke; }
+.bp-anatomy [data-block][data-state="stuck"] .iso-shade { fill: var(--ss-practice); }
+
+.bp-anatomy .ss-void { fill: var(--anatomy-shade-0); stroke: none; }
+
+.bp-anatomy .ss-window { fill: var(--anatomy-shade-0); stroke: var(--anatomy-lo); stroke-width: 0.4px; vector-effect: non-scaling-stroke; }
+.bp-anatomy .ss-scale { fill: none; stroke: var(--anatomy-mid); stroke-width: 0.4px; vector-effect: non-scaling-stroke; }
+.bp-anatomy .ss-needle { fill: none; stroke: var(--anatomy-lit); stroke-width: 0.9px; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.bp-anatomy .ss-hub { fill: var(--anatomy-hi); }
+
+/* The tablet's screen. Words a human reads are set in Bricolage. */
+.bp-anatomy .ss-screen { fill: var(--ss-screen); stroke: var(--anatomy-lo); stroke-width: 0.4px; vector-effect: non-scaling-stroke; }
+.bp-anatomy .ss-chip rect { fill: var(--ss-chip); stroke: var(--anatomy-faint); stroke-width: 0.4px; vector-effect: non-scaling-stroke; transition: fill 0.3s var(--anatomy-ease), stroke 0.3s var(--anatomy-ease); }
+.bp-anatomy .ss-chip text { fill: var(--ss-screen-ink); font: 600 6.2px/1 'Bricolage Grotesque', system-ui, sans-serif; }
+.bp-anatomy .ss-chip[data-band="good"] rect { fill: var(--ss-good); stroke: var(--ss-good-ink); }
+.bp-anatomy .ss-chip[data-band="close"] rect { fill: var(--ss-close); stroke: var(--ss-close-ink); stroke-dasharray: 1.2 0.8; }
+.bp-anatomy .ss-chip[data-band="practice"] rect { fill: var(--ss-practice); stroke: var(--ss-practice-ink); }
+.bp-anatomy .ss-chip[data-band="good"] text { fill: var(--ss-good-ink); }
+.bp-anatomy .ss-chip[data-band="close"] text { fill: var(--ss-close-ink); }
+.bp-anatomy .ss-chip[data-band="practice"] text { fill: var(--ss-practice-ink); }
+.bp-anatomy .ss-say { fill: var(--ss-screen-ink); font: 500 4.4px/1 'Bricolage Grotesque', system-ui, sans-serif; }
+.bp-anatomy .ss-mic-ring { fill: var(--ss-glow); opacity: 0.14; }
+.bp-anatomy .ss-mic-dot { fill: var(--ss-purple-2); }
+.bp-anatomy .ss-mic-glyph { fill: none; stroke: #f4f0e8; stroke-width: 0.5; stroke-linecap: round; }
+.bp-anatomy .ss-mic[data-on] .ss-mic-ring { opacity: 0.32; }
+
+.bp-anatomy .ss-ring { fill: none; stroke: var(--ss-glow); stroke-width: 0.8px; vector-effect: non-scaling-stroke; opacity: 0; }
+.bp-anatomy .ss-grille[data-on] circle { fill: var(--ss-glow); }
+
+.bp-anatomy .it[data-hot] .tb-body, .bp-anatomy .it[data-hot] .tb-shine, .bp-anatomy .it[data-hot] .tb-shade { fill: var(--ss-glow); }
+.bp-anatomy .it[data-hot] .tb-edge, .bp-anatomy .it[data-hot] .iso-edge { stroke: var(--ss-glow); }

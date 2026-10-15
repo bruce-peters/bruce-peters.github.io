@@ -327,6 +327,7 @@ export const PROJECTS = [
     ],
     year: "2023 — Present",
     cta: { label: "Team site", href: "https://ironpanthers.com" },
+    anatomy: "shooter",
     pos: [6.09, 1.8, -5.37],
     focusOffset: [-3.75, 0.89, 16.64],
     lookAt: [2.96, 0.81, -4.97],
@@ -337,7 +338,7 @@ export const PROJECTS = [
     index: "02",
     label: "Word Wiz AI · Solo founder",
     title: "Word Wiz AI",
-    desc: "This is an AI reading tutor I built and run solo. A kid reads a sentence out loud, and the backend runs five ML models plus a grapheme-to-phoneme alignment step to figure out which exact sounds they got wrong, like saying HOSE instead of HOUSE. It then writes the next sentence around the sounds they are still missing so they keep practicing what they actually need. The hardest part was speed. I got response time down from 15 to 20 seconds to about 2 by streaming the results, quantizing the models, and caching. It has had 13,000+ visitors and 240+ signups, and it placed 2nd in the Congressional App Challenge.",
+    desc: "This is an AI reading tutor I built and run solo. A kid reads a sentence out loud, and the backend runs four ML models plus a grapheme-to-phoneme alignment step to figure out which exact sounds they got wrong, like saying HOSE instead of HOUSE. It then writes the next sentence around the sounds they are still missing so they keep practicing what they actually need. The hardest part was speed. I got the server's response time down from 8.6 seconds to 1.7 by streaming the results, generating the feedback with rules instead of GPT (so GPT only writes the next sentence), and running text-to-speech and GPT in parallel. It has had 13,000+ visitors and 240+ signups, and it placed 2nd in the Congressional App Challenge.",
     tags: ["React", "FastAPI", "PyTorch", "AWS", "MySQL"],
     image: "/screenshots/word-wiz-practice.webp",
     stats: [
@@ -347,6 +348,7 @@ export const PROJECTS = [
     ],
     year: "2024 — Present",
     cta: { label: "wordwizai.com", href: "https://wordwizai.com" },
+    anatomy: "soundsorter",
     pos: [14.19, 7.04, -8.23],
     focusOffset: [0.47, 2.16, 11.16],
     lookAt: [16.7, 8.6, -7.05],
@@ -369,6 +371,7 @@ export const PROJECTS = [
     ],
     year: "2026",
     cta: null,
+    anatomy: "offtask",
     // Pinned to Word Wiz's column: same thread of work (reading), and pinning
     // keeps this inserted node out of the left/right alternation count so every
     // card below it stays on its original side. See CARD_SIDES in App.jsx.
@@ -392,6 +395,7 @@ export const PROJECTS = [
     ],
     year: "2025",
     cta: null,
+    anatomy: "robotsim",
     pos: [-7.04, 6.31, 0.01],
     focusOffset: [-14.73, -0.04, -0.37],
     lookAt: [0.72, 3.2, -3.13],
@@ -429,6 +433,7 @@ export const PROJECTS = [
     stats: [],
     year: "2025",
     cta: null,
+    anatomy: "superstructure",
     pos: [-9.79, 3.33, -17.89],
     focusOffset: [6.85, 1.15, -9.6],
     lookAt: [-3.1, 0.81, -15.95],

@@ -1,0 +1,276 @@
+/* The anatomy plate, restyled for /bp/: an opaque ink panel with the card's
+   14px radius, hairline border and green top bar, and mono corner labels.
+   The kit's own .iso-* styles come from kit/iso.css. */
+@import './kit/iso.css';
+
+.bp-anatomy .iso-figure {
+  margin: 0;
+}
+.bp-anatomy .iso-plate {
+  position: relative;
+  overflow: hidden;
+  padding: 6px 6px 4px;
+  border-radius: 14px;
+  background: var(--anatomy-card);
+  box-shadow: 0 0 0 1px #26262b, 0 24px 48px -24px rgba(0, 0, 0, 0.7);
+}
+.bp-anatomy .iso-plate::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: #57d36a;
+  box-shadow: 0 0 16px rgba(87, 211, 106, 0.5);
+}
+.bp-anatomy .iso-plate-corners {
+  inset: 14px 16px 12px;
+  z-index: 1;
+}
+.bp-anatomy .iso-plate-corner {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6f6b62;
+}
+.bp-anatomy .iso-plate-corner[data-corner='fig'] {
+  color: #57d36a;
+  text-transform: none;
+  letter-spacing: 0.2em;
+}
+.bp-anatomy .iso-plate-corner[data-corner='readout'] {
+  color: #9a958b;
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+.bp-anatomy .iso-plate-corner[data-corner='hint'] {
+  letter-spacing: 0.14em;
+}
+.bp-anatomy .iso-stage {
+  outline: none;
+  touch-action: pan-y;
+  cursor: pointer;
+}
+.bp-anatomy .iso-stage:focus-visible {
+  outline: 1px solid #6f6b62;
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+.bp-anatomy .iso-legend {
+  margin-top: 10px;
+  padding: 0 4px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  line-height: 1.6;
+  color: #6f6b62;
+}
+.bp-anatomy .bp-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .bp-anatomy .iso-plate {
+    padding: 6px 4px 4px;
+  }
+  .bp-anatomy .iso-plate-corners {
+    inset: 12px 12px 10px;
+  }
+  .bp-anatomy .iso-plate-corner {
+    font-size: 9px;
+  }
+}
+
+/* The anatomy kit's tokens, remapped to /bp/.
+   Warm inks instead of neutral greys, phosphor green for the one part to
+   watch, magenta only for a lever lock that is holding. Dark only. */
+.bp-anatomy.iso {
+  --anatomy-page: #101012;
+  --anatomy-card: #161619;
+  --anatomy-text: #9a958b;
+  --anatomy-strong: #f4f0e8;
+  --anatomy-muted: #6f6b62;
+  --anatomy-paper: #161619;
+  --anatomy-face: #1d1d21;
+  --anatomy-top: #202024;
+  --anatomy-shade-0: #121214;
+  --anatomy-shade-1: #151517;
+  --anatomy-shade-2: #18181b;
+  --anatomy-shade-3: #1b1b1e;
+  --anatomy-lit-top: #1d2a20;
+  --anatomy-lit-shade: #18221b;
+  --anatomy-hi: #ddd8cd;
+  --anatomy-mid: #77726a;
+  --anatomy-lo: #43413c;
+  --anatomy-faint: #2a292a;
+  --anatomy-lit: #57d36a;
+  --anatomy-halo: #050506;
+  --anatomy-halo-opacity: 0.9;
+  --anatomy-dot: #ddd8cd;
+  --anatomy-red: #ec9576;
+  --anatomy-green: #c7ee5e;
+  --anatomy-blue: #9b8cff;
+  --anatomy-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --anatomy-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* The lit part glows faintly, like the logo pill. */
+.bp-anatomy .iso-solid[data-lit] > .iso-edge {
+  filter: drop-shadow(0 0 1.5px rgba(87, 211, 106, 0.55));
+}
+
+/* Lamps: lenses are dark glass until lit. */
+.bp-anatomy .an-lens {
+  fill: #232327;
+  stroke: var(--anatomy-lo);
+  stroke-width: 0.4px;
+  vector-effect: non-scaling-stroke;
+  transition: fill 140ms linear;
+}
+.bp-anatomy .an-lens[data-on] {
+  fill: #57d36a;
+  stroke: #57d36a;
+  filter: drop-shadow(0 0 2px rgba(87, 211, 106, 0.8));
+}
+.bp-anatomy .an-lens[data-on='asked'] {
+  fill: #c7ee5e;
+  stroke: #c7ee5e;
+  filter: drop-shadow(0 0 2px rgba(199, 238, 94, 0.6));
+  animation: an-blink 1.05s steps(1, end) infinite;
+}
+
+/* Lever-lock flags: a slot of dark glass, magenta while the lock holds. */
+.bp-anatomy .an-flag {
+  fill: #1a1a1d;
+  transition: fill 140ms linear;
+}
+.bp-anatomy .an-flag[data-on] {
+  fill: #e63b6d;
+  filter: drop-shadow(0 0 1.5px rgba(230, 59, 109, 0.7));
+}
+
+/* The describer screen: phosphor on black glass. */
+.bp-anatomy .an-glass {
+  fill: #0b100c;
+  stroke: none;
+}
+.bp-anatomy .an-text {
+  fill: #57d36a;
+  font-family: var(--anatomy-mono);
+  letter-spacing: 0;
+}
+.bp-anatomy .an-text[data-dim] {
+  fill: #2f6f3a;
+}
+.bp-anatomy .an-caret {
+  fill: #57d36a;
+  animation: an-blink 1.05s steps(1, end) infinite;
+}
+.bp-anatomy .an-mark {
+  fill: var(--anatomy-hi);
+  font-family: var(--anatomy-mono);
+  font-weight: 700;
+}
+.bp-anatomy .an-mark .an-slash {
+  fill: #57d36a;
+}
+
+@keyframes an-blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0.15; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bp-anatomy .an-caret,
+  .bp-anatomy .an-lens[data-on='asked'] {
+    animation: none;
+  }
+}
+
+/* Meter pegs and needle hubs. */
+.bp-anatomy .an-peg { fill: var(--anatomy-mid); }
+.bp-anatomy .an-hub { fill: var(--anatomy-hi); }
+.bp-anatomy .an-void { fill: #050506; stroke: none; }
+.bp-anatomy .an-frame { fill: #1a201b; stroke: #2f6f3a; stroke-width: 0.4px; vector-effect: non-scaling-stroke; }
+
+/* In a project card: the figure is the card's top banner, full bleed, on
+   solid ink, with mono labels in the drawing's empty corners. */
+.bp-anatomy-banner {
+  position: relative;
+  background: var(--anatomy-card);
+}
+.bp-anatomy-labels span {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 9.5px;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6f6b62;
+  white-space: nowrap;
+}
+.bp-anatomy-labels [data-corner='title'] { top: 14px; left: 16px; color: #9a958b; }
+.bp-anatomy-labels [data-corner='hint'] { top: 14px; right: 16px; letter-spacing: 0.14em; }
+.bp-anatomy-labels [data-corner='readout'] {
+  bottom: 9px;
+  left: 12px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: rgba(22, 22, 25, 0.82);
+  color: #9a958b;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 560px) {
+  .bp-anatomy-labels span { font-size: 8.5px; }
+  .bp-anatomy-labels [data-corner='hint'] { display: none; }
+}
+
+/* Expand pill on the banner, and the large view it opens. */
+.bp-anatomy-expand {
+  position: absolute;
+  bottom: 9px;
+  right: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9a958b;
+  background: rgba(22, 22, 25, 0.85);
+  border: 1px solid #26262b;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 140ms linear, border-color 140ms linear;
+}
+.bp-anatomy-expand:hover,
+.bp-anatomy-expand:focus-visible {
+  color: #57d36a;
+  border-color: #57d36a;
+  outline: none;
+}
+.bp-anatomy-modal { background: var(--anatomy-card); }
+.bp-anatomy-modal .iso-stage {
+  position: absolute;
+  inset: 14px;
+}
+.bp-anatomy-modal .iso-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* AprilTag board on the robot-sim bench. */
+.bp-anatomy .an-tagpaper { fill: #e9e4d9; }
+.bp-anatomy .an-tag rect:not(.an-tagpaper) { fill: #121214; }

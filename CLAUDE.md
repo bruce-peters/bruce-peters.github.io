@@ -97,6 +97,7 @@ Two primitives underlie everything: **the pill** (human, tappable) and **the ter
 | About card | `AboutCard.jsx` | The about node — bio, skills, stats. |
 | Loading screen | `LoadingScreen.jsx` | Fades out when scene signals loaded. |
 | Tune Mode | `TuneMode.jsx` | Dev-only 3D position inspector. localhost-gated. |
+| Anatomy banner | `AnatomyPlate.jsx` | Isometric "anatomy" figure as the top banner inside a `ProjectCard` (the slot archive cards use for screenshots). Rendered when a PROJECTS entry has `anatomy: '<id>'`; the figure lazy-loads. See Anatomy figures below. |
 
 ---
 
@@ -146,6 +147,30 @@ Keep the 14-bit quantization default out of `optimize-models.mjs`. After the joi
 Any code that places a model by its bounds must use `new THREE.Box3().setFromObject(model, true)` (precise). Each merged mesh keeps one CAD part's rotated frame, so the default fast box comes out metres too big and the fields float.
 
 ---
+
+## Anatomy figures
+
+Interactive isometric figures (Anatomy skill kit, vendored in `src/anatomy/kit/`, MIT) that explain how a project works as a real machine. Each one is the top banner of the card of a project that has `anatomy` set in `projects.js`, drawn at 600×300 so the banner stays about 220px tall, with an expand pill that opens the same machine in a large overlay (`AnatomyModal` in `AnatomyPlate.jsx`, styled like `DesmosModal`); `src/anatomy/index.js` registers them. Figures: `shooter` (2026 shoot-on-the-move, from FRC-2026 `RobotState.java`), `soundsorter` (Word Wiz, copied from word-wiz-ai `2ecf0c7`, see its README), `offtask` (short line vs long line: one image model against five sensor stations and 96 features, gauges from paper Table 1 only, no session data or children drawn), `superstructure` (2025, from SIM-2025 `Superstructure.java` at `0457264`), `robotsim` (the robot's brain wired to physics stand-ins with a REAL / SIM / REPLAY switch; motion is 24 s of the Worlds Newton Q62 log replayed through SIM-2025, read from `public/wpilog/akit_25_sim.auto.csv` at build time).
+
+Each figure lives in `src/anatomy/<id>/`:
+
+| File | Role |
+|---|---|
+| `model.js` | The truth: pure JS, no DOM. Numbers, rules and thresholds come from the real code or data, with the source cited at the top. |
+| `scene.js` | World layout, camera (`P`) and builders for the parts that move. Shared by the build and the page. |
+| `Figure.jsx` | The live figure. Writes the static art once, then one rAF loop updates slots, lamps and the readout through refs. Stops offscreen; reduced motion jumps to the end state. |
+| `art.generated.js` | Static SVG segments with slot markers. Generated, never hand-edited. |
+
+Build scripts live in `scripts/anatomy/<id>.mjs` and share `scripts/anatomy/common.mjs`.
+
+| Command | What it does |
+|---|---|
+| `npm run build:anatomy` | Regenerates every `art.generated.js`. Add `-- --only <id>` for one, `-- --preview <dir>` for standalone rest-pose pages. |
+| `npm run check:anatomy` | Model checks (2025 routes against `Superstructure.java`, 2026 shots against `ShootingAnglePredictor`), then the kit audit (clearances, supports, depth order). Must print `audit passed` for every figure. |
+
+`/dev/anatomy.html` (dev server only, not in the production build) shows every plate without the 3D scene, for checking motion. `?only=<id>&width=358` narrows it.
+
+Theme: `src/anatomy/anatomy.css` remaps the kit tokens to /bp/ (warm inks, `accent` for the one part to watch, magenta only for a holding lock) and holds the shared machine classes (`an-lens`, `an-flag`, `an-glass`, `an-text`, `an-caret`, `an-mark`). The only text in a drawing is what a machine displays and one engraved `/bp/` pill.
 
 ## Open items (from original handoff)
 

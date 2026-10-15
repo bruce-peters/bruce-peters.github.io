@@ -11,7 +11,9 @@
     "optimize:models": "node scripts/optimize-models.mjs",
     "optimize:images": "python scripts/optimize_images.py",
     "build:replay": "node scripts/build-replay.mjs public/wpilog/akit_26-05-22_09-20-01.auto.csv",
-    "deploy": "node scripts/fetch-github-stats.mjs && npm run build && gh-pages -d dist"
+    "deploy": "node scripts/fetch-github-stats.mjs && npm run build && gh-pages -d dist",
+    "build:anatomy": "node scripts/build-anatomy.mjs",
+    "check:anatomy": "node scripts/check-superstructure.mjs && node scripts/check-shooter.mjs && node scripts/build-anatomy.mjs --audit"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",

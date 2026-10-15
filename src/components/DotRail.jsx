@@ -37,9 +37,15 @@ export default function DotRail({ activeIndex, goToIndex }) {
     <div
       ref={railRef}
       className="fixed right-0 top-1/2 -translate-y-1/2 z-20 flex flex-col items-end gap-3.5 pr-7 pl-10 py-6"
+      style={{ pointerEvents: 'none' }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
+      {/* The rail is as wide as its longest hidden label, which reaches over
+          the right-hand cards. Only the dots, shown labels and this strip along
+          the edge take the pointer, so the cards under the rail stay clickable. */}
+      <div aria-hidden="true" className="absolute top-0 bottom-0 right-0 w-16 -z-10" style={{ pointerEvents: 'auto' }} />
+
       {/* Main projects */}
       {mainProjects.map((p) => {
         const i = PROJECTS.indexOf(p)
@@ -59,6 +65,7 @@ export default function DotRail({ activeIndex, goToIndex }) {
             <span
               className="font-mono text-[9px] tracking-[0.2em] uppercase whitespace-nowrap text-right transition-all duration-[200ms]"
               style={{
+                pointerEvents: showLabel ? 'auto' : 'none',
                 opacity: showLabel ? 1 : 0,
                 transform: showLabel ? 'translateX(0)' : 'translateX(6px)',
               }}
@@ -68,6 +75,7 @@ export default function DotRail({ activeIndex, goToIndex }) {
             <span
               className="w-2 h-2 rounded-full border flex-shrink-0 transition-all duration-[200ms]"
               style={{
+                pointerEvents: 'auto',
                 background: isActive ? '#57d36a' : isHovered ? 'rgba(87,211,106,0.25)' : 'transparent',
                 borderColor: isActive ? '#57d36a' : isHovered ? '#57d36a' : '#9a958b',
                 transform: isActive ? 'scale(1.25)' : isHovered ? 'scale(1.1)' : 'scale(1)',
@@ -99,6 +107,7 @@ export default function DotRail({ activeIndex, goToIndex }) {
               <span
                 className="font-mono text-[8px] tracking-[0.18em] uppercase whitespace-nowrap text-right transition-all duration-[200ms]"
                 style={{
+                  pointerEvents: isActive || isHovered ? 'auto' : 'none',
                   color: isActive ? '#57d36a' : '#9a958b',
                   opacity: isActive || isHovered ? 1 : 0,
                   transform: isActive || isHovered ? 'translateX(0)' : 'translateX(6px)',
@@ -109,6 +118,7 @@ export default function DotRail({ activeIndex, goToIndex }) {
               <span
                 className="transition-all duration-200 flex-shrink-0"
                 style={{
+                  pointerEvents: 'auto',
                   width: '6px',
                   height: '6px',
                   borderRadius: '50%',
