@@ -35,6 +35,11 @@ MAX_SIDE = {
     "marshmallow-simulator-lobby.png": 1200,
     "non-euclidean-escape.png": 1200,
     "scuffed-platformer.png": 1200,
+    "ap-study-topic-sheet.png": 1200,
+    "ap-study-calcbc-grid.png": 1200,
+    "ap-study-apush.png": 1200,
+    "notes-review-typing.png": 1200,
+    "notes-review-edit.png": 1200,
 }
 QUALITY = 82
 

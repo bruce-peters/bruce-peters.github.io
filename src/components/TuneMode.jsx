@@ -66,8 +66,14 @@ export function serializeProjectsJs({ projects, screenshotPanes, sceneElements }
       `    tag: ${fmtStr(p.tags?.[0] ?? '')},`,
       `    year: ${fmtStr(p.year)},`,
       `    href: ${href ? fmtStr(href) : 'null'},`,
-    ].join('\n')
-    return `  {\n${fields}\n  },`
+    ]
+    if (p.images?.length) {
+      const imgRows = p.images.map(img => `      { src: ${fmtStr(img.src)}, alt: ${fmtStr(img.alt ?? '')} },`).join('\n')
+      fields.push(`    images: [\n${imgRows}\n    ],`)
+    } else if (p.image) {
+      fields.push(`    image: ${fmtStr(p.image)},`)
+    }
+    return `  {\n${fields.join('\n')}\n  },`
   }).join('\n')
 
   // SCENE_ELEMENTS
@@ -137,6 +143,8 @@ export function serializeProjectsJs({ projects, screenshotPanes, sceneElements }
     `  stats: [],`,
     `  year: w.year,`,
     `  cta: w.href ? { label: "Open project", href: w.href } : null,`,
+    `  image: w.image || w.images?.[0]?.src || null,`,
+    `  images: w.images || null,`,
     `  pos: ARCHIVE_CARD_LAYOUT[i].pos,`,
     `  focusOffset: ARCHIVE_CARD_LAYOUT[i].focusOffset,`,
     `  archiveRotY: ARCHIVE_CARD_LAYOUT[i].rotY,`,

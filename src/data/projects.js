@@ -140,10 +140,15 @@ export const ARCHIVE_WORKS = [
   {
     title: "AP Study",
     sub: "A study tool for AP Calc BC, Physics C, CS A, and APUSH that replaces juggling a textbook, a formula sheet, and a problem set. Every topic is a card; opening one gives you the formula in real math notation, a worked method, and scored multiple choice. APUSH terms additionally get a force-directed connections web and a timeline across all periods.",
-    tag: "React + TypeScript + Supabase + KaTeX",
+    tag: "React + TypeScript + KaTeX",
     year: "2026",
     href: "https://stem-ap-review.vercel.app",
     repo: "https://github.com/bruce-peters/stem-ap-review",
+    images: [
+      { src: "/screenshots/ap-study-topic-sheet.webp", alt: "AP Study topic sheet" },
+      { src: "/screenshots/ap-study-calcbc-grid.webp", alt: "AP Study Calc BC topic grid" },
+      { src: "/screenshots/ap-study-apush.webp", alt: "AP Study APUSH Period 1 view" },
+    ],
   },
   {
     title: "Crab Hunt",
@@ -195,6 +200,10 @@ export const ARCHIVE_WORKS = [
     year: "2024",
     href: "https://bruce-peters.github.io/notes-review-app/",
     repo: "https://github.com/bruce-peters/notes-review-app",
+    images: [
+      { src: "/screenshots/notes-review-typing.webp", alt: "Notes Review App typing test on a history fact" },
+      { src: "/screenshots/notes-review-edit.webp", alt: "Notes Review App pasted notes and the facts generated from them" },
+    ],
   },
   {
     title: "Wordle Clone",
@@ -265,7 +274,10 @@ export const ARCHIVE_PROJECTS = ARCHIVE_WORKS.map((w, i) => ({
   year: w.year,
   cta: w.href ? { label: "Open project", href: w.href } : null,
   repo: w.repo || null,
-  image: w.image || null,
+  // `images` ({ src, alt }[]) turns the card banner into a gallery; `image`
+  // falls back to the first one so single-image readers still get a cover.
+  image: w.image || w.images?.[0]?.src || null,
+  images: w.images || null,
   pos: ARCHIVE_CARD_LAYOUT[i].pos,
   focusOffset: ARCHIVE_CARD_LAYOUT[i].focusOffset,
   archiveRotY: ARCHIVE_CARD_LAYOUT[i].rotY,

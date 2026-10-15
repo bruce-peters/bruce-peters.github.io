@@ -1,6 +1,7 @@
 import useInView from '../hooks/useInView.js'
 import useMagnetic from '../hooks/useMagnetic.js'
 import { chipDot } from '../utils/chipColors.js'
+import ScreenshotGallery from './ScreenshotGallery.jsx'
 import AnatomyPlate from './AnatomyPlate.jsx'
 
 // In-flow project card for the scrolling-page layout. Sits in a side column over
@@ -51,8 +52,11 @@ export default function ProjectCard({ project, side, onExternalLink }) {
       )}
 
       {/* Screenshot banner — archive cards carry their imagery in the DOM
-          (the main project cards are rendered in the 3D scene instead) */}
-      {project.isArchive && project.image && (
+          (the main project cards are rendered in the 3D scene instead).
+          Works with several screenshots get a swipeable gallery instead. */}
+      {project.isArchive && project.images?.length > 1 ? (
+        <ScreenshotGallery images={project.images} title={project.title} />
+      ) : project.isArchive && project.image && (
         <div className="-mx-7 -mt-6 mb-5 overflow-hidden border-b border-line">
           <img
             src={project.image}
