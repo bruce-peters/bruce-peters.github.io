@@ -192,6 +192,10 @@
   }
 }
 
+/* Alliance colours on the scouting desks: coral for red, violet for blue. */
+.bp-anatomy .an-red { fill: #ec9576; }
+.bp-anatomy .an-blue { fill: #9b8cff; }
+
 /* Meter pegs and needle hubs. */
 .bp-anatomy .an-peg { fill: var(--anatomy-mid); }
 .bp-anatomy .an-hub { fill: var(--anatomy-hi); }

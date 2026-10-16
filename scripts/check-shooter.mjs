@@ -1,7 +1,7 @@
 // Checks the shooter model against values worked out by hand from
 // RobotState.java's ShootingAnglePredictor at d = 3.0 m.
 // Run: node scripts/check-shooter.mjs
-import { solve, lookup } from '../src/anatomy/shooter/model.js'
+import { solve, lookup } from '../src/anatomy/firecontrol/model.js'
 
 let failures = 0
 const near = (got, want, tol, label) => {

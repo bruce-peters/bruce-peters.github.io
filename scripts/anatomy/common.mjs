@@ -36,7 +36,7 @@ export function workshop(P) {
 
 // Settle the order, keep moving parts beside the neighbours they need in
 // every pose, audit, and write the generated module (and a preview page).
-export function finish(R, P, { name, W, H, prefix = [], mustFollow = [], label, exports = {}, preview }) {
+export function finish(R, P, { name, W, H, prefix = [], mustFollow = [], last = [], label, exports = {}, preview }) {
   A.settle(R, P)
   R.items.sort((a, b) => a.key - b.key)
   const index = (n) => R.items.findIndex((item) => item.name === n)
@@ -49,6 +49,8 @@ export function finish(R, P, { name, W, H, prefix = [], mustFollow = [], label, 
     }
   }
   for (const [later, earlier] of mustFollow) if (index(later) < index(earlier)) console.warn(`${name}: order still wrong:`, later, 'before', earlier)
+  // Items drawn over everything, such as things in flight.
+  for (const n of last) R.items.push(...R.items.splice(index(n), 1))
   // The audit reads keys, so make them follow the order actually drawn.
   R.items.forEach((item, i) => (item.key = i))
 

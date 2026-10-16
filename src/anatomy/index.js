@@ -11,12 +11,12 @@ export const FIGURES = {
     rest: 'stow · 0.6 in · -96°',
     ratio: 300 / 600,
   },
-  shooter: {
-    Figure: lazy(() => import('./shooter/Figure.jsx')),
+  firecontrol: {
+    Figure: lazy(() => import('./firecontrol/Figure.jsx')),
     fig: '// fig 01',
     title: 'shoot on the move',
     hint: 'hover to drive',
-    rest: '2.7 m · 0.0 m/s · lead 0° · hood 74°',
+    rest: '2.7 m · 0.0 m/s · lead 0° · hood 73°',
     ratio: 300 / 600,
   },
   offtask: {
@@ -42,5 +42,13 @@ export const FIGURES = {
     hint: 'tap for the next reading',
     rest: '1 of 4 · “The dog ran.”',
     ratio: 424 / 760,
+  },
+  scouting: {
+    Figure: lazy(() => import('./scouting/Figure.jsx')),
+    fig: '// fig 05',
+    title: 'eight scouts, one board',
+    hint: 'click a desk',
+    rest: 'q12 · scouts paged',
+    ratio: 300 / 600,
   },
 }
