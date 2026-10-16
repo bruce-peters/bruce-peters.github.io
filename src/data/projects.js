@@ -174,7 +174,7 @@ export const ARCHIVE_WORKS = [
     tag: "1st @ LG Hacks 2.0 + Whisper + ESP32 + React",
     year: "2024",
     href: null,
-    repo: "https://github.com/bruce-peters/krab_med_app",
+    repo: "https://github.com/bruce-peters/krab_med_bot",
     image: "/screenshots/pill-pall.webp",
   },
   {
