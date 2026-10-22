@@ -371,7 +371,7 @@ export const PROJECTS = [
     index: "03",
     label: "BU RISE · Ohn-Bar Lab",
     title: "Off-Task Detection",
-    desc: "Started as six weeks in Prof. Eshed Ohn-Bar's lab at Boston University on RISE, and is now a paper submitted to LAK27. I wanted to know whether spotting when a young kid goes off task really needs gaze, head pose, and body pose. We hand-coded 14 kindergarten to second-grade phonics tutoring sessions second by second, and I compared a frozen DINOv2 image encoder with a small head against a 96-feature gaze and pose pipeline, a pose graph network, and a zero-shot vision-language model. The simplest model was the most accurate on held-out sessions, by a small margin, and led most during teacher instruction. The hand-built features ended up encoding which kid was on screen more than what they were doing.",
+    desc: "Started as six weeks in Prof. Eshed Ohn-Bar's lab at Boston University on RISE, and is now a paper submitted to LAK27. I wanted to know whether spotting when a young kid goes off task really needs gaze, head pose, and body pose. We hand-coded 14 kindergarten to second-grade phonics tutoring sessions second by second, and I compared a frozen DINOv2 image encoder with a small head against a 96-feature gaze and pose pipeline, a pose graph network, and a zero-shot vision-language model. The simplest model was the most accurate on held-out sessions, by a small margin, and led most during teacher instruction.",
     tags: ["PyTorch", "DINOv2", "Qwen-VL", "WhisperX"],
     // The paper's t-SNE of the hand-built features, redrawn in /bp/ colors by
     // scripts/render_offtask_tsne.py. No video frames: the data is video of children.
