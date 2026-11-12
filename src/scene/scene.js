@@ -51,7 +51,7 @@ export function initScene(container, onProjectChange, onLoad) {
   scene.background = new THREE.Color(0x101012)
   scene.fog = new THREE.Fog(0x101012, 50, 120)
   scene.environment = envTexture
-  scene.environmentIntensity = 0.15
+  scene.environmentIntensity = 0.08
 
   // Camera — initial position matches overview's focusOffset + lookAt so the
   // first frame is consistent with what goToIndex(0) would produce.
@@ -78,21 +78,28 @@ export function initScene(container, onProjectChange, onLoad) {
   const _overviewLookAt = _overview.lookAt ?? _overview.pos
   controls.target.set(_overviewLookAt[0], _overviewLookAt[1], _overviewLookAt[2])
 
-  // Lights — an arena rig in the design-system palette. A warm cream key sits
-  // high overhead like the venue's stage lights and casts the robots' shadows
-  // onto the carpet; a dim cream-over-ink hemisphere fills the sides so matte
-  // surfaces never fall to pure black. Kept low so the scene still reads dark.
-  scene.add(new THREE.HemisphereLight(0xf4f0e8, 0x101012, 0.25))
+  // Lights — the page's mood: a dark room lit by warm cream stage spots and the
+  // green glow of a terminal. Each field gets its own tight spot, so it sits in
+  // a pool of light and its ends fall off into the page ink. A low phosphor side
+  // light picks out walls and robots the way accent green picks out actions on
+  // the page, and a dim cream-over-green-ink hemisphere keeps parts off black.
+  scene.add(new THREE.HemisphereLight(0xf4f0e8, 0x0b1a10, 0.1))
 
-  const keyLight = new THREE.DirectionalLight(0xf4f0e8, 1.0)
-  keyLight.position.set(6, 24, 2)
-  keyLight.target.position.set(0, 0, -10)  // between the 2026 (z=0) and 2025 (z=-20) fields
-  keyLight.castShadow = true
-  keyLight.shadow.mapSize.set(2048, 2048)
-  Object.assign(keyLight.shadow.camera, { left: -20, right: 20, top: 20, bottom: -20, near: 1, far: 60 })
-  keyLight.shadow.camera.updateProjectionMatrix()
-  keyLight.shadow.normalBias = 0.02
-  scene.add(keyLight, keyLight.target)
+  for (const z of [0, -20]) {  // 2026 field at z=0, 2025 field at z=-20
+    // decay 0: no distance falloff, so only the cone edge dims the field
+    const spot = new THREE.SpotLight(0xf4f0e8, 1.6, 0, 0.45, 0.35, 0)
+    spot.position.set(3, 20, z + 2)
+    spot.target.position.set(0, 0, z)
+    spot.castShadow = true
+    spot.shadow.mapSize.set(1024, 1024)
+    Object.assign(spot.shadow.camera, { near: 5, far: 40 })
+    spot.shadow.normalBias = 0.02
+    scene.add(spot, spot.target)
+  }
+
+  const glowLight = new THREE.DirectionalLight(0x57d36a, 0.22)
+  glowLight.position.set(-14, 4, 12)
+  scene.add(glowLight)
 
   // Stars
   scene.add(makeStars())
